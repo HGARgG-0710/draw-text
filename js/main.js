@@ -5,23 +5,33 @@ class Primitive {
 }
 
 class Square extends Primitive {
-	constructor(sizes) {}
+	constructor(sizes) {
+		super("Square")
+	}
 }
 
 class Rectangle extends Primitive {
-	constructor(sizes) {}
+	constructor(sizes) {
+		super("Rectangle")
+	}
 }
 
 class Triangle extends Primitive {
-	constructor(sizes) {}
+	constructor(sizes) {
+		super("Triangle")
+	}
 }
 
 class Ellipse extends Primitive {
-	constructor(sizes) {}
+	constructor(sizes) {
+		super("Ellipse")
+	}
 }
 
-class Parallelepiped extends Primitive {
-	constructor(sizes) {}
+class Parallelogram extends Primitive {
+	constructor(sizes) {
+		super("Parallelogram")
+	}
 }
 
 function draw(primitive) {}
@@ -52,14 +62,15 @@ function evaluateText(text) {
 
 			case "3":
 				primitiveName = "Ellipse"
-				//TODO: IDK what should I write as height (h) for an ellipse for now `\_*_*_/`
+				//TODO: IDK what should I write as height (h) for an ellipse for now `\_*_*_/`, will decide later.
 				break
 
 			case "4":
-				primitiveName = "Parallelepiped"
-				h = 4
+				primitiveName = "Parallelogramm"
+				h = 3
 		}
 
+		// Filling the coordinates array according to the user's input.
 		for (let n = 0; text[i] != "|"; ++i) {
 			if (text[i] != "(" && text[i] != ")" && isANumber(text[i])) {
 				coordinates[j][n] += text[i]
