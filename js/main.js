@@ -82,8 +82,7 @@ function evaluateText(text) {
 				n = 1
 			}
 		}
-		obj = new [primitiveName](coordinates)
-
+		eval(`obj = new ${primitiveName}(coordinates)`)
 		primitives.push(obj)
 	}
 
