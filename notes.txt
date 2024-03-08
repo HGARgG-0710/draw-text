@@ -1,0 +1,6 @@
+1. IDEA: re-do the thing in React? 
+2. Question: hosting? 
+
+	As the thing is serverless, one could use GitHub Pages... 
+
+3. IDEA: create means to program curves for the thing...; 

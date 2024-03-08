@@ -1,19 +1,21 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <script defer type="text/javascript" src="../js/main.js"></script>
-        <script defer type="text/javascript" src="../js/bindings.js"></script>
-    </head>
-    <body>
-        <header></header>
-        <main></main>
-        <div id="input_area">
-            <textarea></textarea>
-            <button>Draw</button>
-        </div>
-        <div id="output_area">
-            <canvas width="1200" height="800" id="out"></canvas>
-        </div>
-        <footer></footer>
-    </body>
+
+<head>
+	<styles src="../css/main.css"></styles>
+	<script src="../js/activation.mjs" type="module"></script>
+</head>
+
+<body>
+	<header></header>
+	<main>
+		<label for="code">Text input<label/>
+		<textarea row="8" cols="120" id="code"/>
+		<div id="output_area">
+			<canvas width="1200" height="800" id="out"></canvas>
+		</div>
+	</main>
+	<footer></footer>
+</body>
+
 </html>
