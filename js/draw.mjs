@@ -25,7 +25,11 @@ export default function draw(primitive) {
 
 			const predicate = primitive.connected[key]
 				? (i, j) => multc * i + addc === j
-				: (i, j) => i === primitive.points[key] && j === primitive.points[key]
+				: (i, j) =>
+						[
+							[i, 0],
+							[j, 1]
+						].every((pair) => pair[0] === primitive.points[key][pair[1]])
 
 			for (let i = begpointx; i < endpointx; i++, it++) {
 				data.push([])
@@ -35,7 +39,11 @@ export default function draw(primitive) {
 					data[it][jt] = [0, 0, 0, predicate(it, jt) ? 255 : 0]
 			}
 
-			context.putImageData(new ImageData(data.flat()), 0, 0)
+			context.putImageData(
+				new ImageData(new Uint8ClampedArray(data.flat().flat())),
+				0,
+				0
+			)
 		}
 	}
 }

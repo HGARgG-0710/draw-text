@@ -1,9 +1,8 @@
 // TODO: later, refactor this parser using the parser library of one's own...;
-// ? This 'parseNext' is a good addition to the library in question...; Index-based parsing...;
+// ? This 'findSegments' is a good addition to the library in question...; Also - consider index-passing-based parsing (one, where one of inputs is an index, and so is one of outputs...);
 
 import { NGon } from "./primitives.mjs"
 
-// * Note: slightly too 'inaccurate'; Things like '->(..., ...)->(..., ...)' will create issues...;
 function parseConnections(string) {
 	const presentConnections = findSegments(string, /->/)
 	const pairsinds = pairsInds(string)
@@ -21,14 +20,21 @@ function findSegments(string, regex) {
 }
 
 function pairsInds(string) {
-	return findSegments(string, /\([0-9], [0-9]\)/)
+	return findSegments(string, /\([0-9]+, ?[0-9]+\)/)
 }
 
 function parsePairs(string) {
 	// ? Extend to hexidecimal/different numeric notations supported by native JS number-conversion? Add own implementation, if that is too narrow?
 	return pairsInds(string)
 		.map((x) => string.slice(...x))
-		.map((pair) => pair.split(", ").map((x) => Number(x)))
+		.map((pair) =>
+			pair
+				.slice(1, pair.length - 1)
+				.split(", ")
+				.join(",")
+				.split(",")
+				.map((x) => Number(x))
+		)
 }
 
 // TODO: more new features to include [parser]:
@@ -38,13 +44,18 @@ export default function parse(text) {
 	const lines = text.split(";").join("\n").split("\n")
 	const parsed = []
 	for (let i = 0; i < lines.length; i++)
-		parsed.push(NGon(parsePairs(lines[i]), parseConnections(lines[i])))
+		parsed.push(new NGon(parsePairs(lines[i]), parseConnections(lines[i])))
 	return parsed
 }
 
 // * All that's needed to check for validation:
-// ! All pairs on all lines have beginning and ending '(', ')', and the arguments are separated either by ',' or by ';'. Also - THEY'RE ALL INTEGERS...;
-function isValid(text) {}
+// ! All pairs on all lines have beginning and ending '(', ')', and the arguments are separated either by ','. Also - THEY'RE ALL INTEGERS...;
+function isValid(text) {
+	return (
+		!/?!((->)|(\([0-9]+, ?[0-9]+\))|(\t)|( ))/.match(text).length &&
+		!/^(?=(\t| )*)->/.match(text).length
+	)
+}
 
 export function validate(text, callback) {
 	if (isValid(text)) return callback(text)
