@@ -3,4 +3,4 @@
 
 	As the thing is serverless, one could use GitHub Pages... 
 
-3. IDEA: create means to program curves for the thing...; 
+3. IDEA: create means to program curves ... (?using functions/Infinite series? some recursive name-giving mini-language?); 

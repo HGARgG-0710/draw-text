@@ -7,10 +7,12 @@ function parseConnections(string) {
 	const presentConnections = findSegments(string, /->/)
 	const pairsinds = pairsInds(string)
 	return pairsinds
-		.slice(0, pairsinds.length - 1)
+		.slice(0, pairsinds.length)
 		.map(
 			(_x, i) =>
-				!!presentConnections[i] && presentConnections[i][0] < pairsinds[i + 1][0]
+				!!presentConnections[i] &&
+				(i > (i + 1) % pairsinds.length ||
+					presentConnections[i][0] < pairsinds[(i + 1) % pairsinds.length][0])
 		)
 }
 
@@ -63,7 +65,9 @@ function isEntire(string, regex) {
 // * All that's needed to check for validation:
 // ! All pairs on all lines have beginning and ending '(', ')', and the arguments are separated either by ','. Also - THEY'RE ALL INTEGERS...;
 function isValid(text) {
-	return isEntire(text, /((->)|(\([0-9]+,( ?)[0-9]+\))|(\t)|( ))/g)
+	return text
+		.split("\n")
+		.map((line) => isEntire(line, /((->)|(\([0-9]+,( ?)[0-9]+\))|(\t)|( ))/g))
 }
 
 export function validate(text, callback) {
