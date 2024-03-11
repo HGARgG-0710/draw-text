@@ -82,6 +82,15 @@ ol {
 }
 
 #input_area {
+	padding-top: 2vh;
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+	gap: 2vw;
+}
+
+#draw_input {	
 	display: flex;
 	flex-direction: row;
 	justify-content: center;
@@ -92,4 +101,10 @@ ol {
 textarea#code {
 	width: 30vw;
 	height: 10vh;
+}
+
+#sizes {
+	display: flex; 
+	flex-direction: column; 
+	gap: 1vh;
 }

@@ -61,21 +61,23 @@
 				Besides <code>background</code> (which is just an alias for a case of 'fill'), they are all independent.
 				Usage looks something like the following:
 			</p>
-			
+
 			<ol>
-				<li>
-					<code>contour (x1, y1, c1)...(xn, yn, cn)</code>	
-					<code>contour (x1, y1, c1)->...->(xn, yn, cn)-></code>
+				<li>	
+					<code>contour (x1, y1)...(xn, yn)</code>
+					<code>contour (x1, y1, c1)...(xn, yn, cn)</code>
+					<code>contour (x1, y1, c1)->...->(xn, yn, cn)-></code>	
+					<code>contour (x1, y1, c1)->(cc1)...->(ccn)(xn, yn, cn)-></code>
 				</li>
 				<li>
 					<code>fill (x1, y1, c1)...(xn, yn, cn)</code>
 				</li>
 				<li>
-					<code>clean (x1, y1, c1)...(xn, yn, cn)</code>	
-					<code>clean (x1, y1, c1)->...->(xn, yn, cn)-></code>
+					<code>clean (x1, y1)...(xn, yn)</code>
+					<code>clean (x1, y1)->...->(xn, yn)-></code>
 				</li>
 				<li>
-					<code>erase (x1, y1, c1)...(xn, yn, cn)</code>
+					<code>erase (x1, y1)...(xn, yn)</code>
 				</li>
 				<li>
 					<code>background c</code>
@@ -83,8 +85,20 @@
 			</ol>
 
 			<div id="input_area">
-				<label for="code">Input:</label>
-				<textarea rows="9" cols="120" id="code"></textarea>
+				<div id="draw_input">
+					<label for="code">Input:</label>
+					<textarea id="code"></textarea>
+				</div>
+				<div id="sizes">
+					<div class="pair">
+						<label for="width">width: </label>
+						<input type="text" class="size" id="width">
+					</div>
+					<div class="pair">
+						<label for="height">height: </label>
+						<input type="text" class="size" id="height">
+					</div>
+				</div>
 			</div>
 			<div id="output_area">
 				<canvas width="1200" height="800" id="out"></canvas>
