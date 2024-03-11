@@ -3,36 +3,94 @@
 
 <head>
 	<title>Draw-Text!</title>
-	<styles src="./css/main.css"></styles>
+	<link rel="stylesheet" href="./css/main.css">
+	</style>
 	<script src="./js/activation.mjs" type="module"></script>
 </head>
 
 <body>
 	<header>
-		<div id="pagetop">
+		<div id="pagetop"></div>
+		<div id="pagename">
 			<h1>draw-this</h1>
 		</div>
 	</header>
 	<main>
-		<h1>What is this?</h1>
+		<div class="blue-rect blue-rect-left"></div>
+		<div class="main-rect">
+			<h2>What is this?</h2>
 
-		<p>
-			Draw-Text is a simple webpage, that allows one to draw polygons with the usage of simple
-			coordinate-setting format, then export the results to png/jpg any other desired image format.
-			Try it!
-		</p>
+			<p>
+				Draw-Text is a simple webpage, that allows one to draw polygons with the usage of simple
+				coordinate-setting format, then export the results to png/jpg any other desired image format.
+			</p>
 
-		<h1>
-			Why?
-		</h1>
+			<h2>
+				Why?
+			</h2>
 
-		<p>Why not?</p>
+			<p>Why not? Try it!</p>
 
-		<label for="code">Text input</label>
-		<textarea rows="9" cols="120" id="code"></textarea>
-		<div id="output_area">
-			<canvas width="1200" height="800" id="out"></canvas>
+			<h2>
+				Vocabulary
+			</h2>
+
+			<p>
+				The language of the page contains five elementary commands:
+			</p>
+
+			<ol>
+				<li>
+					<code>contour</code>
+				</li>
+				<li>
+					<code>fill</code>
+				</li>
+				<li>
+					<code>clean</code>
+				</li>
+				<li>
+					<code>erase</code>
+				</li>
+				<li>
+					<code>background</code>
+				</li>
+			</ol>
+
+			<p>
+				Besides <code>background</code> (which is just an alias for a case of 'fill'), they are all independent.
+				Usage looks something like the following:
+			</p>
+			
+			<ol>
+				<li>
+					<code>contour (x1, y1, c1)...(xn, yn, cn)</code>	
+					<code>contour (x1, y1, c1)->...->(xn, yn, cn)-></code>
+				</li>
+				<li>
+					<code>fill (x1, y1, c1)...(xn, yn, cn)</code>
+				</li>
+				<li>
+					<code>clean (x1, y1, c1)...(xn, yn, cn)</code>	
+					<code>clean (x1, y1, c1)->...->(xn, yn, cn)-></code>
+				</li>
+				<li>
+					<code>erase (x1, y1, c1)...(xn, yn, cn)</code>
+				</li>
+				<li>
+					<code>background c</code>
+				</li>
+			</ol>
+
+			<div id="input_area">
+				<label for="code">Input:</label>
+				<textarea rows="9" cols="120" id="code"></textarea>
+			</div>
+			<div id="output_area">
+				<canvas width="1200" height="800" id="out"></canvas>
+			</div>
 		</div>
+		<div class="blue-rect blue-rect-right"></div>
 	</main>
 	<footer>
 		<div>

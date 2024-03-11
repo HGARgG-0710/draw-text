@@ -1,0 +1,95 @@
+/* ^ NOTE: the colours are all messed up; 
+* These are but a fairly approximate sketch...; 
+*/
+
+body {
+	margin: 0;
+}
+
+header {
+	margin: 0;
+	padding: 0;
+}
+
+#pagetop {
+	background-color: salmon;
+	height: 6vh;
+	margin: 0;
+}
+
+#pagename {
+	background-color: mintcream;
+	text-align: center;
+	vertical-align: middle;
+	height: 7.5vh;
+	display: flex;
+	flex-direction: column;
+}
+
+#pagename h1 {
+	color: violet;
+	font-size: 3.2vh;
+	margin: 0;
+	padding: 2vh;
+}
+
+main {
+	display: flex;
+	flex-direction: row;
+}
+
+.blue-rect {
+	background-color: lightblue;
+	width: 20vw;
+	border-radius: 2vw;
+}
+.blue-rect-left {
+	border-top-left-radius: 0;
+	border-bottom-left-radius: 0;
+}
+.blue-rect-right {
+	border-top-right-radius: 0;
+	border-bottom-right-radius: 0;
+}
+.main-rect {
+	background-color: white;
+	width: 60vw;
+	display: flex;
+	flex-direction: column;
+}
+
+p {
+	--padlr: 5vh;
+	--padtb: 1.5vh;
+	padding-left: var(--padlr);
+	padding-right: var(--padlr);
+	padding-top: var(--padtb);
+	padding-bottom: var(--padtb);
+}
+
+.main-rect h2 {
+	color: goldenrod;
+	text-align: center;
+	padding-top: 1vh;
+}
+
+ol {
+	--padlr: 9vh;
+	padding-left: var(--padlr);
+	padding-right: var(--padlr);
+	padding-top: 0;
+	padding-bottom: 0.5vh;
+}
+
+#input_area {
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+	gap: 1vw;
+}
+
+textarea#code {
+	width: 30vw;
+	height: 10vh;
+}
