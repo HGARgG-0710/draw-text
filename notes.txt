@@ -1,7 +1,13 @@
 1. IDEA: re-do the thing in React? 
+	There's a lot of same 'types' (kinds/classes) of elements repeating throughout the HTMl of the page. 
+	Starts to bugger oneself a little bit. React-based refactoring could remedy it.
 2. Question: hosting? 
 
 	As the thing is serverless, one could use GitHub Pages... 
 
 3. IDEA: create means to program curves ... (?using functions/Infinite series? some recursive name-giving mini-language?); 
-4. IDEA: for README, draw something pretty!
+4. IDEA: for README, draw something pretty! [in a minimalistic-cubistic-style? how about a Bloodborne hunter picture? Or one of one's characters?]
+5. IDEA: add the project's repository GitHub-page area-href-picture; 
+6. IDEA: add more details to the page's HTML and CSS; 
+	Examples: images for a more 'sophisticated' layout, gradient, multicolours, that kind of thing...;
+7. CSS is good (adaptive for SOME screens..., computer screens for instance...), but not good enough for the app to be used on mobile devices...; 

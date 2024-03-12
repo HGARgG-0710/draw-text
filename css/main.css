@@ -1,5 +1,6 @@
-/* ^ NOTE: the colours are all messed up; 
+/* ^ NOTE: the colours are (still) messed up;  
 * These are but a fairly approximate sketch...; 
+! ALSO - 'padding' and 'margin' are also switched places here...; 
 */
 
 body {
@@ -12,15 +13,14 @@ header {
 }
 
 #pagetop {
-	background-color: salmon;
+	background-color: rgb(255, 149, 137);
 	height: 6vh;
 	margin: 0;
 }
 
 #pagename {
-	background-color: mintcream;
+	background-color: rgb(208, 255, 231);
 	text-align: center;
-	vertical-align: middle;
 	height: 7.5vh;
 	display: flex;
 	flex-direction: column;
@@ -31,6 +31,9 @@ header {
 	font-size: 3.2vh;
 	margin: 0;
 	padding: 2vh;
+	font-family: "Madimi One", sans-serif;
+	font-style: normal;
+	font-weight: bold;
 }
 
 main {
@@ -39,7 +42,7 @@ main {
 }
 
 .blue-rect {
-	background-color: lightblue;
+	background-color: rgb(117, 220, 255);
 	width: 20vw;
 	border-radius: 2vw;
 }
@@ -56,21 +59,35 @@ main {
 	width: 60vw;
 	display: flex;
 	flex-direction: column;
+	padding-top: 3vh;
 }
 
 p {
 	--padlr: 5vh;
-	--padtb: 1.5vh;
+	padding: 0;
 	padding-left: var(--padlr);
 	padding-right: var(--padlr);
-	padding-top: var(--padtb);
-	padding-bottom: var(--padtb);
+	font-family: "Josefin Sans", sans-serif;
+	font-style: normal;
+	font-weight: 375;
+	font-size: 18px;
+	margin-top: 2.25vh;
+	margin-bottom: 0.75vh;
 }
 
 .main-rect h2 {
 	color: goldenrod;
 	text-align: center;
-	padding-top: 1vh;
+	padding-top: 2vh;
+	font-family: "Nunito", sans-serif;
+	font-weight: 700;
+	font-style: normal;
+	margin-bottom: 0.25vh;
+	margin-top: 0.5vh;
+}
+
+.main-rect h2:first-child {
+	margin-top: 1vh;
 }
 
 ol {
@@ -79,6 +96,8 @@ ol {
 	padding-right: var(--padlr);
 	padding-top: 0;
 	padding-bottom: 0.5vh;
+	font-size: 16px;
+	font-family: "Josefin Sans", sans-serif;
 }
 
 #input_area {
@@ -90,7 +109,7 @@ ol {
 	gap: 2vw;
 }
 
-#draw_input {	
+#draw_input {
 	display: flex;
 	flex-direction: row;
 	justify-content: center;
@@ -99,12 +118,58 @@ ol {
 }
 
 textarea#code {
-	width: 30vw;
-	height: 10vh;
+	min-width: 30vw;
+	min-height: 10vh;
+	resize: vertical;
 }
 
 #sizes {
-	display: flex; 
-	flex-direction: column; 
+	display: flex;
+	flex-direction: column;
 	gap: 1vh;
+}
+
+.gappedol {
+	display: flex;
+	flex-direction: column;
+	gap: 0.55vh;
+}
+
+.nogapli {
+	display: flex;
+	flex-direction: column;
+	gap: 0;
+}
+
+.nogapli code {
+	margin-bottom: -0.2vh;
+}
+.nogapli code:last-child {
+	margin-bottom: 0.05vh;
+}
+
+label {
+	font-family: "Nunito", sans-serif;
+}
+
+footer {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	background-color: rgb(213, 147, 241);
+	height: 10vh;
+}
+
+a {
+	font-family: "Josefin Sans", sans-serif;
+	color: blue;
+	text-decoration: none;
+	margin-left: 4vh;
+}
+a:visited {
+	color: white;
+}
+
+:focus {
+	outline: none;
 }
