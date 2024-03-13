@@ -27,7 +27,7 @@
 
 			<p>
 				Draw-Text is a simple webpage, that allows one to draw polygons with the usage of a basic
-				coordinate-setting format, then export the results to png/jpg any other desired image format.
+				coordinate-setting format, then export the results to png/jpg or any other desired image format.
 			</p>
 
 			<h2>
@@ -100,12 +100,21 @@
 				</li>
 			</ol>
 
+			<!-- ! WRITE THE FORMAT FOR SETTING A COLOUR!!! -->
+			<p>
+				Here, the <code>x</code> and <code>y</code> are the point coordinates, while <code>-></code> are the
+				connections between them
+				(to connect <code>i</code>'th coordinate with the next one, write an 'arrow' between them...). 
+				The <code>c</code>, <code>c1...cn</code> are the colours' values.
+			</p>
+
 			<div id="input_area">
 				<div id="draw_input">
 					<label for="code">Input:</label>
 					<textarea id="code"></textarea>
 				</div>
 				<div id="sizes">
+					<!-- ! NOTE: this probably will reuqire a Grid to be represented perfectly... -->
 					<div class="pair">
 						<label for="width">width: </label>
 						<input type="text" class="size" id="width">
@@ -117,7 +126,7 @@
 				</div>
 			</div>
 			<div id="output_area">
-				<canvas width="1200" height="800" id="out"></canvas>
+				<canvas id="out"></canvas>
 			</div>
 		</div>
 		<div class="blue-rect blue-rect-right"></div>
@@ -126,7 +135,6 @@
 	<footer>
 		<!-- TODO: add the personal page here (while it's still undone - the personal GitHub page...); -->
 		<a href="https://github.com/HGARgG-0710/">Me</a>
-		<a>TT</a>
 	</footer>
 </body>
 

@@ -11,3 +11,7 @@
 6. IDEA: add more details to the page's HTML and CSS; 
 	Examples: images for a more 'sophisticated' layout, gradient, multicolours, that kind of thing...;
 7. CSS is good (adaptive for SOME screens..., computer screens for instance...), but not good enough for the app to be used on mobile devices...; 
+8. ?Add more canvas properties to the project? 
+	Ideally, the final thing ought to be something of a total-Canvas-drawing-API-wrapper, 
+		but reformulated purely in terms of shapes (that being, 
+			the entire programming paraphanalia is taken out - only these elementary instructions remain). 

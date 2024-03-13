@@ -53,19 +53,25 @@ function isEntire(string, regex) {
 
 // ! PROBLEM: for now, only the HEX colour notation is supported (RGB used...): ADD OTHER COLOUR SCHEMES... (possibly, ways of defining them??? via transformations, perhaps?);
 function isValid(text) {
-	return text.split("\n").every((line) => {
-		const r = commandList.map((command) => countOccurrencesStr(line, command))
-		return (
-			[0, 1].every(r.includes) &&
-			[3, 1].map((x, i) => i === countOccurencesArr(r, x)) &&
-			isEntire(
-				line.split(command)[1],
-				command !== "background"
-					? /((->)|(\([0-9]+,( ?)[0-9]+\))|(\t)|( ))/g
-					: /#[0-9a-f]/g
+	// ! note : the '.split-.join-.filter' sequence appears for the second time. Refactor.
+	return text
+		.split(";")
+		.join("\n")
+		.split("\n")
+		.filter((x) => x.length)
+		.every((line) => {
+			const r = commandList.map((command) => countOccurrencesStr(line, command))
+			const command = commandList[r.indexOf(1)]
+			return (
+				[commandList.length - 1, 1].every((x, i) => x === countOccurencesArr(r, i)) &&
+				isEntire(
+					line.split(command)[1],
+					command !== "background"
+						? /((->)|(\([0-9]+,( ?)[0-9]+\))|(\t)|( ))/g
+						: /#[0-9a-f]/g
+				)
 			)
-		)
-	})
+		})
 }
 
 export function validateNumber(string) {
@@ -83,7 +89,7 @@ function countOccurrencesStr(string, sub) {
 	out: for (let i = 0; i < string.length; i++)
 		for (let j = 0; j < sub.length; j++) {
 			if (string[i + j] !== sub[j]) continue out
-			counted++
+			if (j === sub.length - 1) counted++
 		}
 	return counted
 }
@@ -100,22 +106,21 @@ export const commandList = ["contour", "fill", "clean", "erase", "background"]
 // * 2. colour-setting for the nGons (last argument in a line, parsColours->'parseHexes|...' [add other colour schemes/representations/formats, think about prefixing them, maybe... make a CMYK- or RGB-default]);
 
 export default function parse(text) {
-	const commandInd = commandList
-		.map((command) => countOccurrencesStr(text, command))
-		.indexOf(1)
-	const notBackground = commandInd < 4
-	const lines = text.split(";").join("\n").split("\n")
-
-	return {
-		command: commandList[commandInd],
-		args: lines.reduce(
-			(acc, curr, i) =>
-				acc.concat([
-					(notBackground && !(commandInd % 2)
-						? (x) => new NGon(x, parseConnections(lines[i]))
-						: (x) => x)((notBackground ? parsePairs : (x) => x)(curr))
-				]),
-			[]
+	const lines = text
+		.split(";")
+		.join("\n")
+		.split("\n")
+		.filter((x) => x.length)
+	const commandInds = lines.map((l) =>
+		commandList.map((command) => countOccurrencesStr(l, command)).indexOf(1)
+	)
+	const commands = lines.map((_x, i) => commandList[commandInds[i]])
+	return lines.map((x, i) => ({
+		command: commands[i],
+		argline: (commandInds[i] < 4 && !(commandInds[i] % 2)
+			? (y) => new NGon(y, parseConnections(x))
+			: (x) => x)(
+			(commandInds[i] < 4 ? parsePairs : (x) => x)(x.split(commands[i])[1])
 		)
-	}
+	}))
 }

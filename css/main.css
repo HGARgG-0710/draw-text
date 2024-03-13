@@ -1,6 +1,6 @@
-/* ^ NOTE: the colours are (still) messed up;  
-* These are but a fairly approximate sketch...; 
-! ALSO - 'padding' and 'margin' are also switched places here...; 
+/* % Problems and notes:
+! 'padding' and 'margin' are also switched places here...; 
+^ IDEA: let the footer and header of the page 'cover' the blue rectangles slightly, so that there is a curious effect of fluid-abruptness, when they meet... (try that out later as well...); 
 */
 
 body {
@@ -27,10 +27,15 @@ header {
 }
 
 #pagename h1 {
+	--tb: 2vh;
+	--lr: 2vw;
 	color: violet;
 	font-size: 3.2vh;
 	margin: 0;
-	padding: 2vh;
+	padding-top: var(--tb);
+	padding-bottom: var(--tb);
+	padding-left: var(--lr);
+	padding-right: var(--lr);
 	font-family: "Madimi One", sans-serif;
 	font-style: normal;
 	font-weight: bold;
@@ -43,7 +48,7 @@ main {
 
 .blue-rect {
 	background-color: rgb(117, 220, 255);
-	width: 20vw;
+	width: 15vw;
 	border-radius: 2vw;
 }
 .blue-rect-left {
@@ -56,14 +61,14 @@ main {
 }
 .main-rect {
 	background-color: white;
-	width: 60vw;
+	width: 70vw;
 	display: flex;
 	flex-direction: column;
 	padding-top: 3vh;
 }
 
 p {
-	--padlr: 5vh;
+	--padlr: 5vw;
 	padding: 0;
 	padding-left: var(--padlr);
 	padding-right: var(--padlr);
@@ -91,7 +96,7 @@ p {
 }
 
 ol {
-	--padlr: 9vh;
+	--padlr: 9vw;
 	padding-left: var(--padlr);
 	padding-right: var(--padlr);
 	padding-top: 0;
@@ -164,7 +169,7 @@ a {
 	font-family: "Josefin Sans", sans-serif;
 	color: blue;
 	text-decoration: none;
-	margin-left: 4vh;
+	margin-left: 4vw;
 }
 a:visited {
 	color: white;
@@ -172,4 +177,18 @@ a:visited {
 
 :focus {
 	outline: none;
+}
+
+#output_area {
+	display: flex; 
+	flex-direction: column;
+	align-items: center;
+	margin-top: 5vh;	
+	margin-bottom: 4.25vh;
+}
+#output_area canvas {
+	/* width: 60vw; */
+	border-style: dashed;
+	border-color: biege;
+	border-width: 3px;
 }
