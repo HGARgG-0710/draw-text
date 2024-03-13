@@ -1,13 +1,23 @@
+const canvas = document.querySelector("canvas")
+
 function drawPoint(x, y) {
-	document.querySelector("canvas").getContext("2d").fillRect(x, y, 1, 1)
+	canvas.getContext("2d").fillRect(x, y, 1, 1)
+}
+
+function drawBackground(colour) {
+	const prevFill = canvas.fillStyle
+	const context = canvas.getContext("2d")
+	console.log(colour)
+	context.fillStyle = colour
+	context.fillRect(0, 0, canvas.width, canvas.height)
+	context.fillStyle = prevFill
 }
 
 // ! Later expand the 'primitives' to not only work with NGons...;
-export default function draw(primitive) {
+export default function draw(primitive, background) {
 	const { command } = primitive
 	primitive = primitive.argline
 
-	const canvas = document.querySelector("canvas")
 	const context = canvas.getContext("2d")
 
 	// ^ NOTE: currently, no curves are supported, so the otherwise meaningful 'instanceof' check is dropped for sanity reasons.
@@ -47,15 +57,39 @@ export default function draw(primitive) {
 				context.fill()
 			}
 			break
+		// ? QUESTION: rewrite 'clear' + 'erase' in terms of 'contour' + 'fill'? [Should be quite good, actually...];
 		case "clear":
 			context.globalCompositeOperation = "source-atop"
-			// ! MUST BE THE SAME AS THE background-color of the context!
-			context.strokeStyle = ""
-			break
+			context.beginPath()
+			for (const key of Array.from(primitive.points.keys())) {
+				context.moveTo(...primitive.points[key])
+				drawPoint(...primitive.points[key])
+				if (primitive.connected[key])
+					context.lineTo(
+						...primitive.points[(key + 1) % primitive.points.length]
+					)
+			}
+			context.closePath()
+			context.strokeStyle = background
+			context.stroke()
+			return background
 		case "erase":
+			if (primitive.length) {
+				context.globalCompositeOperation = "source-over"
+				context.fillStyle = "#00000"
+				context.beginPath()
+				context.moveTo(...primitive[0])
+				// ? Question: is this "moveTo" thing needed (because one believes not..., seen places that did without it); See if so - should be a good optimization for complex pictures...;
+				for (const key of Array.from(primitive.keys())) {
+					context.lineTo(...primitive[(key + 1) % primitive.length])
+				}
+				context.closePath()
+				context.fill()
+			}
 			break
 		case "background":
-			break
+			drawBackground(primitive)
+			return primitive
 	}
 }
 export function clear() {

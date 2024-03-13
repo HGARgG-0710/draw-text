@@ -9,8 +9,8 @@ import { clear } from "./draw.mjs"
 
 let lastCode = ""
 // ? the user isn't able to see the intermediate background values anyway... So, maybe, just clean them out?
-// ! to be used for background colour... (it's saved with 'background', then used for 'clean'/'erase'); 
-// let background = ""
+// ! to be used for background colour... (it's saved with 'background', then used for 'clear'/'erase');
+let background = "#fffff"
 
 const [vh, vw] = ["Height", "Width"].map((x) =>
 	Math.max(
@@ -23,7 +23,7 @@ const [vh, vw] = ["Height", "Width"].map((x) =>
 
 const imgout = (text) => {
 	clear()
-	parse(text).forEach(draw)
+	parse(text).forEach((x) => (background = draw(x, background) || background))
 }
 
 const canvas = document.querySelector("canvas")
