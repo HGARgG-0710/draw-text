@@ -10,7 +10,7 @@ import { clear } from "./draw.mjs"
 let lastCode = ""
 // ? the user isn't able to see the intermediate background values anyway... So, maybe, just clean them out?
 // ! to be used for background colour... (it's saved with 'background', then used for 'clear'/'erase');
-let background = "#fffff"
+let background = "#ffffff"
 
 const [vh, vw] = ["Height", "Width"].map((x) =>
 	Math.max(
@@ -48,4 +48,15 @@ document.addEventListener("keyup", (_kevent) => {
 				},
 				validateNumber
 			)
+})
+
+// ? Allow user to do the thing with 'mime-types'?
+// ! validate the code for working with things besides png/jpg...;
+document.querySelector("#download-button").addEventListener("click", (_event) => {
+	const ext = document.querySelector("#img-format").value || "png"
+	const downloadA = document.createElement("a")
+	downloadA.setAttribute("download", `draw-this.${ext}`)
+	downloadA.hidden = true
+	downloadA.setAttribute("href", canvas.toDataURL(`image/${ext}`))
+	downloadA.click()
 })

@@ -1,13 +1,12 @@
 const canvas = document.querySelector("canvas")
+const context = canvas.getContext("2d")
 
 function drawPoint(x, y) {
-	canvas.getContext("2d").fillRect(x, y, 1, 1)
+	context.fillRect(x, y, 1, 1)
 }
 
 function drawBackground(colour) {
-	const prevFill = canvas.fillStyle
-	const context = canvas.getContext("2d")
-	console.log(colour)
+	const prevFill = context.fillStyle
 	context.fillStyle = colour
 	context.fillRect(0, 0, canvas.width, canvas.height)
 	context.fillStyle = prevFill
@@ -17,8 +16,6 @@ function drawBackground(colour) {
 export default function draw(primitive, background) {
 	const { command } = primitive
 	primitive = primitive.argline
-
-	const context = canvas.getContext("2d")
 
 	// ^ NOTE: currently, no curves are supported, so the otherwise meaningful 'instanceof' check is dropped for sanity reasons.
 	// ? Use a map of function instead of a 'switch'?
@@ -30,11 +27,11 @@ export default function draw(primitive, background) {
 			for (const key of Array.from(primitive.points.keys())) {
 				context.beginPath()
 				// * For point...
-				context.strokeStyle = "#00000"
+				context.strokeStyle = "#000000"
 				context.moveTo(...primitive.points[key])
-				drawPoint(...primitive.points[key])
 				// * For polygon...
 				context.fillStyle = "#00000"
+				drawPoint(...primitive.points[key])
 				if (primitive.connected[key])
 					context.lineTo(
 						...primitive.points[(key + 1) % primitive.points.length]
@@ -46,17 +43,17 @@ export default function draw(primitive, background) {
 		case "fill":
 			if (primitive.length) {
 				context.globalCompositeOperation = "source-over"
-				context.fillStyle = "#00000"
+				context.fillStyle = "#000000"
 				context.beginPath()
 				context.moveTo(...primitive[0])
 				// ? Question: is this "moveTo" thing needed (because one believes not..., seen places that did without it); See if so - should be a good optimization for complex pictures...;
-				for (const key of Array.from(primitive.keys())) {
+				for (const key of Array.from(primitive.keys()))
 					context.lineTo(...primitive[(key + 1) % primitive.length])
-				}
 				context.closePath()
 				context.fill()
 			}
 			break
+		// % note: the 'clear' "sorta" works, but it doesn't erase the thing completely (just makes it minorly thinner)
 		// ? QUESTION: rewrite 'clear' + 'erase' in terms of 'contour' + 'fill'? [Should be quite good, actually...];
 		case "clear":
 			context.globalCompositeOperation = "source-atop"
@@ -76,13 +73,12 @@ export default function draw(primitive, background) {
 		case "erase":
 			if (primitive.length) {
 				context.globalCompositeOperation = "source-over"
-				context.fillStyle = "#00000"
+				context.fillStyle = background
 				context.beginPath()
 				context.moveTo(...primitive[0])
 				// ? Question: is this "moveTo" thing needed (because one believes not..., seen places that did without it); See if so - should be a good optimization for complex pictures...;
-				for (const key of Array.from(primitive.keys())) {
+				for (const key of Array.from(primitive.keys()))
 					context.lineTo(...primitive[(key + 1) % primitive.length])
-				}
 				context.closePath()
 				context.fill()
 			}
@@ -93,5 +89,5 @@ export default function draw(primitive, background) {
 	}
 }
 export function clear() {
-	document.querySelector("canvas").getContext("2d").reset()
+	context.reset()
 }

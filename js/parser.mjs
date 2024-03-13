@@ -63,7 +63,7 @@ function isValid(text) {
 				line.split(command)[1],
 				command !== "background"
 					? /((->)|(\([0-9]+,( ?)[0-9]+\))|(\t)|( ))/g
-					: /( |\t)*#[0-9a-f]{6,}( |\t)*/g
+					: /( |\t)*#[0-9a-f]{3,}( |\t)*/g
 			)
 		)
 	})
@@ -139,7 +139,7 @@ function deBackground(text) {
 // ! Support more formats for colour-setting (CMYK, RGBA, grayscale and others...);
 function parseColour(text, single = true) {
 	return (single ? (x) => x[0] : (x) => x)(
-		text.match(/( |\t)*#([0-9a-f]{6,}( |\t)*)/g) || ["#ffffff"]
+		text.match(/( |\t)*#([0-9a-f]{3,}( |\t)*)/g) || ["#ffffff"]
 	)
 }
 
@@ -155,10 +155,10 @@ export default function parse(text) {
 		.map((x, i) => ({ command: commands[i], argline: parseColour(x).trim() }))
 		.concat(
 			lines.slice(hasBackground).map((x, i) => ({
-				command: commands[i + 1],
-				argline: (!(commandInds[i + 1] % 2)
+				command: commands[i + hasBackground],
+				argline: (!(commandInds[i + hasBackground] % 2)
 					? (y) => new NGon(y, parseConnections(x))
-					: (x) => x)(parsePairs(x.split(commands[i + 1])[1]))
+					: (x) => x)(parsePairs(x.split(commands[i + hasBackground])[1]))
 			}))
 		)
 }

@@ -13,9 +13,11 @@ header {
 }
 
 #pagetop {
+	display: flex;
 	background-color: rgb(255, 149, 137);
 	height: 6vh;
 	margin: 0;
+	align-items: center;
 }
 
 #pagename {
@@ -54,10 +56,12 @@ main {
 .blue-rect-left {
 	border-top-left-radius: 0;
 	border-bottom-left-radius: 0;
+	border-bottom-right-radius: 0.5vw;
 }
 .blue-rect-right {
 	border-top-right-radius: 0;
 	border-bottom-right-radius: 0;
+	border-bottom-left-radius: 0.5vw;
 }
 .main-rect {
 	background-color: white;
@@ -82,13 +86,14 @@ p {
 
 .main-rect h2 {
 	color: goldenrod;
-	text-align: center;
+	text-align: left;
 	padding-top: 2vh;
 	font-family: "Nunito", sans-serif;
 	font-weight: 700;
 	font-style: normal;
 	margin-bottom: 0.25vh;
 	margin-top: 0.5vh;
+	margin-left: 5vw;
 }
 
 .main-rect h2:first-child {
@@ -157,14 +162,6 @@ label {
 	font-family: "Nunito", sans-serif;
 }
 
-footer {
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
-	background-color: rgb(213, 147, 241);
-	height: 10vh;
-}
-
 a {
 	font-family: "Josefin Sans", sans-serif;
 	color: blue;
@@ -180,15 +177,33 @@ a:visited {
 }
 
 #output_area {
-	display: flex; 
+	display: flex;
 	flex-direction: column;
 	align-items: center;
-	margin-top: 5vh;	
+	margin-top: 5vh;
 	margin-bottom: 4.25vh;
 }
 #output_area canvas {
-	/* width: 60vw; */
 	border-style: dashed;
 	border-color: biege;
 	border-width: 3px;
+}
+
+#ghimg {
+	height: 4vh;
+	margin: 2vh;
+}
+
+.img-download {
+	display: flex;
+	flex-direction: row;
+	gap: 1vh;
+	margin-left: auto;
+}
+
+#second-align {
+	display: flex; 
+	flex-direction: column; 
+	justify-content: flex-start;	
+	gap: 2.5vh;
 }

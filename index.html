@@ -15,7 +15,14 @@
 
 <body>
 	<header>
-		<div id="pagetop"></div>
+		<div id="pagetop">
+			<map name="ghicon">
+				<area href="https://github.com/HGARgG-0710/draw-text" shape="rect" coords="0,0,80,80">
+			</map>
+			<img src="./img/github.svg" usemap="#ghicon" id="ghimg" target="_blank">
+			<!-- TODO: add the personal page here (while it's still undone - the personal GitHub page...); -->
+			<a href="https://github.com/HGARgG-0710/">Me</a>
+		</div>
 		<div id="pagename">
 			<h1>draw-text</h1>
 		</div>
@@ -34,7 +41,7 @@
 				Why?
 			</h2>
 
-			<p>Why not? Try it!</p>
+			<p>Why not? It's fun, try!</p>
 
 			<h2>
 				Vocabulary
@@ -104,8 +111,10 @@
 			<p>
 				Here, the <code>x</code> and <code>y</code> are the point coordinates, while <code>-></code> are the
 				connections between them
-				(to connect <code>i</code>'th coordinate with the next one, write an 'arrow' between them...). 
+				(to connect <code>i</code>'th coordinate with the next one, write an 'arrow' between them...).
 				The <code>c</code>, <code>c1...cn</code> are the colours' values.
+				These are (currently) settable with hex as RGB color spectre values
+				(note: in future, more color schemes are intended for support).
 			</p>
 
 			<div id="input_area">
@@ -126,16 +135,17 @@
 				</div>
 			</div>
 			<div id="output_area">
-				<canvas id="out"></canvas>
+				<div id="second-align">
+					<canvas id="out"></canvas>
+					<div id="img-download">
+						<input id="img-format" type="text" placeholder="Format (png/jpg/other)">
+						<button id="download-button">Download</button>
+					</div>
+				</div>
 			</div>
 		</div>
 		<div class="blue-rect blue-rect-right"></div>
 	</main>
-	<!-- ! footer is incomplete... Add more content to it... -->
-	<footer>
-		<!-- TODO: add the personal page here (while it's still undone - the personal GitHub page...); -->
-		<a href="https://github.com/HGARgG-0710/">Me</a>
-	</footer>
 </body>
 
 </html>
