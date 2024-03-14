@@ -21,11 +21,7 @@ export default function draw(primitive, background) {
 	// ? Use a map of function instead of a 'switch'?
 	switch (command) {
 		case "contour":
-			console.log(primitive.points)
-			console.log(primitive.connected)
 			context.globalCompositeOperation = "source-over"
-			// ? Create separate Path2D's here, then do each one in a loop?
-			// ! THE 'fillStyle' is to be generalized!!! [to a particular colour for each one point of a polygon..., and for each arrow];
 			for (const key of Array.from(primitive.points.keys())) {
 				context.beginPath()
 				// * For contour...

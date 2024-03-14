@@ -22,6 +22,9 @@
 			<img src="./img/github.svg" usemap="#ghicon" id="ghimg" target="_blank">
 			<!-- TODO: add the personal page here (while it's still undone - the personal GitHub page...); -->
 			<a href="https://github.com/HGARgG-0710/">Me</a>
+			<div id="pagetop-end">
+				<p>&copy; Igor Kuznetsov, 2024</p>
+			</div>
 		</div>
 		<div id="pagename">
 			<h1>draw-text</h1>
@@ -33,7 +36,8 @@
 			<h2>What is this?</h2>
 
 			<p>
-				Draw-Text is a simple webpage, that allows one to draw pictures using lines, points and polygons together with a basic
+				Draw-Text is a simple webpage, that allows one to draw pictures using lines, points and polygons
+				together with a basic
 				coordinate-setting mini-language, then export the results to png/jpg or any other desired image format.
 			</p>
 
@@ -70,7 +74,8 @@
 			</ol>
 
 			<p>
-				Besides <code>background</code> (which is just an alias for a case of 'fill'), they are all independent.
+				Besides <code>background</code> (which is just an alias for a case of <code>fill</code>), they are all
+				independent.
 				Usage looks something like the following:
 			</p>
 
@@ -120,7 +125,7 @@
 			</p>
 
 			<p>
-				Also, note that only the first given colour will be used for 'fill'.
+				Also, note that only the first given colour will be used for <code>fill</code>.
 				Further ones are ignored, filling is done monotonically.
 			</p>
 
@@ -130,22 +135,17 @@
 					<textarea id="code"></textarea>
 				</div>
 				<div id="sizes">
-					<!-- ! NOTE: this probably will reuqire a Grid to be represented perfectly... -->
-					<div class="pair">
-						<label for="width">width: </label>
-						<input type="text" class="size" id="width">
-					</div>
-					<div class="pair">
-						<label for="height">height: </label>
-						<input type="text" class="size" id="height">
-					</div>
+					<label for="width">width: </label>
+					<input type="text" class="size" id="width">
+					<label for="height">height: </label>
+					<input type="text" class="size" id="height">
 				</div>
 			</div>
 			<div id="output_area">
 				<div id="second-align">
 					<canvas id="out"></canvas>
 					<div id="img-download">
-						<input id="img-format" type="text" placeholder="Format (png/jpg/other)">
+						<input id="img-format" type="text" placeholder="Format (default: png)">
 						<button id="download-button">Download</button>
 					</div>
 				</div>

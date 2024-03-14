@@ -1,6 +1,5 @@
 /* % Problems and notes:
-! 'padding' and 'margin' are also switched places here...; 
-^ IDEA: let the footer and header of the page 'cover' the blue rectangles slightly, so that there is a curious effect of fluid-abruptness, when they meet... (try that out later as well...); 
+^ REFACTOR this CSS (do when will be fixing the lack of proper support for mobile devices); Most of the code here was written in a from-top-to-bottom style, relative to HTML page. This causes issues with repetitiosness...; 
 */
 
 body {
@@ -18,6 +17,13 @@ header {
 	height: 6vh;
 	margin: 0;
 	align-items: center;
+	justify-content: flex-start;
+	gap: 3vh;
+}
+#pagetop * {
+	font-size: 18px;
+	margin: 0;
+	padding: 0;
 }
 
 #pagename {
@@ -49,7 +55,7 @@ main {
 }
 
 .blue-rect {
-	background-color: rgb(117, 220, 255);
+	background-color: rgb(142, 227, 255);
 	width: 15vw;
 	border-radius: 2vw;
 }
@@ -131,12 +137,18 @@ textarea#code {
 	min-width: 30vw;
 	min-height: 10vh;
 	resize: vertical;
+	background-color: aliceblue;
+	border-style: none;
+	border-radius: 6px;
 }
 
 #sizes {
-	display: flex;
-	flex-direction: column;
-	gap: 1vh;
+	display: grid;
+	grid-template-columns: 47.5% 52.5%;
+	grid-template-rows: repeat(2, 50%);
+}
+#sizes input[type="text"] {
+	width: 3.5vw;
 }
 
 .gappedol {
@@ -166,7 +178,6 @@ a {
 	font-family: "Josefin Sans", sans-serif;
 	color: blue;
 	text-decoration: none;
-	margin-left: 4vw;
 }
 a:visited {
 	color: white;
@@ -191,19 +202,58 @@ a:visited {
 
 #ghimg {
 	height: 4vh;
-	margin: 2vh;
+	margin: 0;
+	border-style: solid;
+	border-width: 1px;
+	border-radius: 6px;
+	border-color: yellow;
 }
 
 .img-download {
 	display: flex;
 	flex-direction: row;
-	gap: 1vh;
+	gap: 1vw;
 	margin-left: auto;
 }
 
 #second-align {
-	display: flex; 
-	flex-direction: column; 
-	justify-content: flex-start;	
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
 	gap: 2.5vh;
+}
+
+#pagetop-end {
+	display: flex;
+	flex-direction: row;
+	width: 100%;
+	justify-content: flex-end;
+}
+#pagetop-end p {
+	margin-right: 2vw;
+	color: white;
+}
+
+button#download-button,
+input[type="text"] {
+	font-family: "Josefin Sans", sans-serif;
+	border-style: none;
+	border-radius: 2px;
+	height: fit-content;
+	width: fit-content;
+	padding-top: 2px;
+}
+
+button#download-button {
+	background-color: rgb(90, 255, 200);
+	color: white;
+}
+
+input[type="text"] {
+	background-color: aliceblue;
+}
+
+input[type="text"]#img-format,
+button#download-button {
+	font-size: 16px;
 }

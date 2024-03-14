@@ -23,7 +23,6 @@ function parseConnections(string) {
 	const [presentConnections, colouredArrows] = ["arrow", "colorarrow"].map((x) =>
 		findSegments(string, regexps[x])
 	)
-	console.log(colouredArrows)
 	const colouredArrowsBegs = colouredArrows.map((x) => x[0])
 	const pairsinds = triplesInds(string)
 	return pairsinds.map((_x, i) => {

@@ -3,13 +3,7 @@ import parse from "./parser.mjs"
 import { validate, validateNumber } from "./parser.mjs"
 import { clear } from "./draw.mjs"
 
-// ^ The size of the image is equal to that of a canvas...;
-// ! adjust CSS in such a fashion so as to react properly to changes of canvas' sizes;
-// ? note: what about the user simply selecting the thing (again)? Althouth, yes, it would be far better if the sizes changed with the picture (seemingly) remaining untouched...;
-
 let lastCode = ""
-// ? the user isn't able to see the intermediate background values anyway... So, maybe, just clean them out?
-// ! to be used for background colour... (it's saved with 'background', then used for 'clear'/'erase');
 let background = "#ffffff"
 
 const [vh, vw] = ["Height", "Width"].map((x) =>
@@ -50,8 +44,8 @@ document.addEventListener("keyup", (_kevent) => {
 			)
 })
 
-// ? Allow user to do the thing with 'mime-types'?
-// ! validate the code for working with things besides png/jpg...;
+// ? Allow user to do the thing with other 'mime-types'? (not only 'image/')
+// ? validate the code for working with things besides png/jpg...;
 document.querySelector("#download-button").addEventListener("click", (_event) => {
 	const ext = document.querySelector("#img-format").value || "png"
 	const downloadA = document.createElement("a")

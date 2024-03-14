@@ -17,5 +17,5 @@
 	Ideally, the final thing ought to be something of a total-Canvas-drawing-API-wrapper, 
 		but reformulated purely in terms of shapes (that being, 
 			the entire programming paraphanalia is taken out - only these elementary instructions remain). 
-8. IDEA: add comments into the project's language's vocabulary...; 
+8. IDEA: add 'comment's into the project's language's vocabulary...; 
 	Useful for designation of particular elements of images, in the cases of certain complexity. 
