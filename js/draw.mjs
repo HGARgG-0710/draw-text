@@ -21,21 +21,23 @@ export default function draw(primitive, background) {
 	// ? Use a map of function instead of a 'switch'?
 	switch (command) {
 		case "contour":
+			console.log(primitive.points)
+			console.log(primitive.connected)
 			context.globalCompositeOperation = "source-over"
 			// ? Create separate Path2D's here, then do each one in a loop?
 			// ! THE 'fillStyle' is to be generalized!!! [to a particular colour for each one point of a polygon..., and for each arrow];
 			for (const key of Array.from(primitive.points.keys())) {
 				context.beginPath()
-				// * For point...
-				context.strokeStyle = "#000000"
+				// * For contour...
+				context.strokeStyle = primitive.connected[key][1] || "#000000"
 				context.moveTo(...primitive.points[key])
-				// * For polygon...
-				context.fillStyle = "#00000"
-				drawPoint(...primitive.points[key])
-				if (primitive.connected[key])
+				if (primitive.connected[key][0])
 					context.lineTo(
 						...primitive.points[(key + 1) % primitive.points.length]
 					)
+				// * For point...
+				context.fillStyle = primitive.points[key][2] || "#000000"
+				drawPoint(...primitive.points[key])
 				context.closePath()
 				context.stroke()
 			}
@@ -43,7 +45,12 @@ export default function draw(primitive, background) {
 		case "fill":
 			if (primitive.length) {
 				context.globalCompositeOperation = "source-over"
-				context.fillStyle = "#000000"
+				// ! take all these ugly zeros out of usage... replace with string.repeat();
+				context.fillStyle =
+					primitive
+						.map((x) => x[2])
+						.reduce((acc, curr) => (acc ? acc : curr ? curr : null), null) ||
+					"#000000"
 				context.beginPath()
 				context.moveTo(...primitive[0])
 				// ? Question: is this "moveTo" thing needed (because one believes not..., seen places that did without it); See if so - should be a good optimization for complex pictures...;

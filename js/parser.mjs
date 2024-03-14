@@ -3,17 +3,52 @@
 
 import { NGon } from "./primitives.mjs"
 
+// ^ IDEA: create a module for working with regexp tables [note: they could be used to construct the 'parser-type-recognition-tables' for parsers created by one of self's currently developed libraries...];
+// TODO: refactor these... [lots of repetition...];
+export const regexps = {
+	arrow: /->/,
+	colorarrow: /->( |\t)*\(#[0-9a-f]{3,}\)/,
+	triple: /\(( |\t)*[0-9]+,( |\t)*[0-9]+(,( |\t)*#[0-9a-f]{3,})?\)/g,
+	argseq: /((->(( )*\(#[0-9a-f]{3,}\))?)|(\(( |\t)*[0-9]+,( |\t)*[0-9]+(,( |\t)*#[0-9a-f]{3,})?\))|(\t)|( ))/g,
+	colorarg: /( |\t)*#[0-9a-f]{3,}( |\t)*/g,
+	decimal: /[0-9]+/g
+}
+export const commandList = ["contour", "fill", "clear", "erase", "background"]
+
+function extractFirst(string, from, to, regex) {
+	return string.slice(from, to).match(new RegExp(regex, "g"))[0]
+}
+
 function parseConnections(string) {
-	const presentConnections = findSegments(string, /->/)
-	const pairsinds = pairsInds(string)
-	return pairsinds
-		.slice(0, pairsinds.length)
-		.map(
-			(_x, i) =>
-				!!presentConnections[i] &&
-				(i > (i + 1) % pairsinds.length ||
-					presentConnections[i][0] < pairsinds[(i + 1) % pairsinds.length][0])
+	const [presentConnections, colouredArrows] = ["arrow", "colorarrow"].map((x) =>
+		findSegments(string, regexps[x])
+	)
+	console.log(colouredArrows)
+	const colouredArrowsBegs = colouredArrows.map((x) => x[0])
+	const pairsinds = triplesInds(string)
+	return pairsinds.map((_x, i) => {
+		const fel =
+			!!presentConnections[i] &&
+			(i > (i + 1) % pairsinds.length ||
+				presentConnections[i][0] < pairsinds[(i + 1) % pairsinds.length][0])
+		return [fel].concat(
+			fel
+				? [
+						colouredArrowsBegs.includes(presentConnections[i][0])
+							? ((x) =>
+									extractFirst(
+										string,
+										colouredArrowsBegs[x],
+										colouredArrowsBegs[x] + colouredArrows[x][1],
+										regexps.colorarg
+									))(
+									colouredArrowsBegs.indexOf(presentConnections[i][0])
+							  )
+							: false
+				  ]
+				: []
 		)
+	})
 }
 
 function findSegments(string, regex) {
@@ -25,21 +60,21 @@ function findSegments(string, regex) {
 	return segments
 }
 
-function pairsInds(string) {
-	return findSegments(string, /\([0-9]+, ?[0-9]+\)/)
+function triplesInds(string) {
+	return findSegments(string, regexps.triple)
 }
 
-function parsePairs(string) {
+function parseSemiTriples(string) {
 	// ? Extend to hexidecimal/different numeric notations supported by native JS number-conversion? Add own implementation, if that is too narrow?
-	return pairsInds(string)
+	return triplesInds(string)
 		.map((x) => string.slice(...x))
 		.map((pair) =>
 			pair
 				.slice(1, pair.length - 1)
-				.split(", ")
-				.join(",")
+				.split(" ")
+				.join("")
 				.split(",")
-				.map((x) => Number(x))
+				.map((x, i) => (i < 2 ? Number(x) : x))
 		)
 }
 
@@ -51,9 +86,7 @@ function isEntire(string, regex) {
 	)
 }
 
-// ! PROBLEM: for now, only the HEX colour notation is supported (RGB used...): ADD OTHER COLOUR SCHEMES... (possibly, ways of defining them??? via transformations, perhaps?);
 function isValid(text) {
-	// ! note : the '.split-.join-.filter' sequence appears for the second time. Refactor.
 	return getlines(text).every((line) => {
 		const r = commandList.map((command) => countOccurrencesStr(line, command))
 		const command = commandList[r.indexOf(1)]
@@ -61,16 +94,14 @@ function isValid(text) {
 			[commandList.length - 1, 1].every((x, i) => x === countOccurencesArr(r, i)) &&
 			isEntire(
 				line.split(command)[1],
-				command !== "background"
-					? /((->)|(\([0-9]+,( ?)[0-9]+\))|(\t)|( ))/g
-					: /( |\t)*#[0-9a-f]{3,}( |\t)*/g
+				regexps[command !== "background" ? "argseq" : "colorarg"]
 			)
 		)
 	})
 }
 
 export function validateNumber(string) {
-	return isEntire(string, /[0-9]+/g)
+	return isEntire(string, regexps.decimal)
 }
 
 export function validate(text, callback, validityCheck = isValid) {
@@ -92,13 +123,6 @@ function countOccurrencesStr(string, sub) {
 function countOccurencesArr(arr, elem) {
 	return arr.reduce((acc, curr) => acc + (curr === elem), 0)
 }
-
-export const commandList = ["contour", "fill", "clear", "erase", "background"]
-
-// TODO: more new features to include [parser, the 'draw' function]:
-// * 1. background-colour setting [parser - CHECK!];
-// ! Not supported by parser yet...
-// * 2. colour-setting for the nGons (last argument in a line, parsColours->'parseHexes|...' [add other colour schemes/representations/formats, think about prefixing them, maybe... make a CMYK- or RGB-default]);
 
 function getlines(text) {
 	return text
@@ -137,10 +161,9 @@ function deBackground(text) {
 }
 
 // ! Support more formats for colour-setting (CMYK, RGBA, grayscale and others...);
+// ! PROBLEM: for now, only the HEX colour notation is supported (RGB used...): ADD OTHER COLOUR SCHEMES... (possibly, ways of defining them??? via transformations, perhaps?);
 function parseColour(text, single = true) {
-	return (single ? (x) => x[0] : (x) => x)(
-		text.match(/( |\t)*#([0-9a-f]{3,}( |\t)*)/g) || ["#ffffff"]
-	)
+	return (single ? (x) => x[0] : (x) => x)(text.match(regexps.colorarg) || ["#ffffff"])
 }
 
 // ^ IDEA: add ability to specify the default colours;
@@ -158,7 +181,7 @@ export default function parse(text) {
 				command: commands[i + hasBackground],
 				argline: (!(commandInds[i + hasBackground] % 2)
 					? (y) => new NGon(y, parseConnections(x))
-					: (x) => x)(parsePairs(x.split(commands[i + hasBackground])[1]))
+					: (x) => x)(parseSemiTriples(x.split(commands[i + hasBackground])[1]))
 			}))
 		)
 }

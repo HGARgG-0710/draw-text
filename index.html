@@ -33,8 +33,8 @@
 			<h2>What is this?</h2>
 
 			<p>
-				Draw-Text is a simple webpage, that allows one to draw polygons with the usage of a basic
-				coordinate-setting format, then export the results to png/jpg or any other desired image format.
+				Draw-Text is a simple webpage, that allows one to draw pictures using lines, points and polygons together with a basic
+				coordinate-setting mini-language, then export the results to png/jpg or any other desired image format.
 			</p>
 
 			<h2>
@@ -78,15 +78,18 @@
 				<li>
 					<div class="nogapli">
 						<code>contour (x1, y1)...(xn, yn)</code>
+						<code>contour (x1, y1)->...->(xn, yn)-></code>
 						<code>contour (x1, y1, c1)...(xn, yn, cn)</code>
 						<code>contour (x1, y1, c1)->...->(xn, yn, cn)-></code>
-						<code>contour (x1, y1, c1)->(cc1)...->(ccn)(xn, yn, cn)-></code>
+						<code>contour (x1, y1, c1)->(cc1)...->(ccn-1)(xn, yn, cn)->(ccn)</code>
 					</div>
 				</li>
 				<li>
 					<div class="nogapli">
 						<code>fill (x1, y1)...(xn, yn)</code>
 						<code>fill (x1, y1, c1)...(xn, yn, cn)</code>
+						<code>fill (x1, y1, c)...(xn, yn)</code>
+						<code>fill (x1, y1)...(xk, yk, c)...(xn, yn)</code>
 					</div>
 				</li>
 				<li>
@@ -107,14 +110,18 @@
 				</li>
 			</ol>
 
-			<!-- ! WRITE THE FORMAT FOR SETTING A COLOUR!!! -->
 			<p>
 				Here, the <code>x</code> and <code>y</code> are the point coordinates, while <code>-></code> are the
 				connections between them
 				(to connect <code>i</code>'th coordinate with the next one, write an 'arrow' between them...).
-				The <code>c</code>, <code>c1...cn</code> are the colours' values.
+				The <code>c</code>, <code>c1...cn</code>, <code>cc1, ..., ccn</code> are the colours' values.
 				These are (currently) settable with hex as RGB color spectre values
 				(note: in future, more color schemes are intended for support).
+			</p>
+
+			<p>
+				Also, note that only the first given colour will be used for 'fill'.
+				Further ones are ignored, filling is done monotonically.
 			</p>
 
 			<div id="input_area">
