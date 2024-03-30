@@ -1,6 +1,8 @@
 const canvas = document.querySelector("canvas")
 const context = canvas.getContext("2d")
 
+context.imageSmoothingEnabled = false
+
 function drawPoint(x, y) {
 	context.fillRect(x, y, 1, 1)
 }
