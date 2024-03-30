@@ -59,7 +59,7 @@ export default function draw(primitive, background) {
 			}
 			break
 		// % note: the 'clear' "sorta" works, but it doesn't erase the thing completely (just makes it minorly thinner)
-		// ? QUESTION: rewrite 'clear' + 'erase' in terms of 'contour' + 'fill'? [Should be quite good, actually...];
+		// ? rewrite 'clear' + 'erase' in terms of 'contour' + 'fill'?
 		case "clear":
 			context.globalCompositeOperation = "source-atop"
 			context.beginPath()

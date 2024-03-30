@@ -57,7 +57,7 @@ main {
 .blue-rect {
 	background-color: rgb(142, 227, 255);
 	width: 15vw;
-	border-radius: 2vw;
+	border-radius: 0.75vw;
 }
 .blue-rect-left {
 	border-top-left-radius: 0;

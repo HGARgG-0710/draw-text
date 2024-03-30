@@ -1,19 +1,70 @@
 // TODO: later, refactor this parser using the parser library of one's own...;
 // ? This 'findSegments' is a good addition to the library in question...; Also - consider index-passing-based parsing (one, where one of inputs is an index, and so is one of outputs...);
+// ? Add a 'regex' module to it?
 
+import { and, or, occurences, global } from "./regex.mjs"
 import { NGon } from "./primitives.mjs"
 
 // ^ IDEA: create a module for working with regexp tables [note: they could be used to construct the 'parser-type-recognition-tables' for parsers created by one of self's currently developed libraries...];
 // TODO: refactor these... [lots of repetition...];
-export const regexps = {
+
+const reg = {
 	arrow: /->/,
-	colorarrow: /->( |\t)*\(#[0-9a-f]{3,}\)/,
-	triple: /\(( |\t)*[0-9]+,( |\t)*[0-9]+(,( |\t)*#[0-9a-f]{3,})?\)/g,
-	argseq: /((->(( )*\(#[0-9a-f]{3,}\))?)|(\(( |\t)*[0-9]+,( |\t)*[0-9]+(,( |\t)*#[0-9a-f]{3,})?\))|(\t)|( ))/g,
-	colorarg: /( |\t)*#[0-9a-f]{3,}( |\t)*/g,
-	decimal: /[0-9]+/g
+	space: /( |\t)*/,
+	opbrack: /\(/,
+	clbrack: /\)/,
+	color: /(#[0-9a-f]){3,}/,
+	varname: /[a-zA-Z0-9_\-]+/,
+	decimal: /[0-9]+/,
+	tab: /\t/,
+	spacebar: / /,
+	comma: /,/,
+	decimal: /[0-9]+/
 }
+
+export const regexps = {
+	arrow: reg.arrow
+}
+regexps.colorarrow = and(
+	...["arrow", "space", "opbrack"].map((x) => reg[x]),
+	or(["color", "varname"].map((x) => reg[x])),
+	reg.clbrack
+)
+regexps.triple = global(
+	and(
+		...["opbrack", "space"].map((x) => reg[x]),
+		or(...["decimal", "varname"].map((x) => reg[x])),
+		...["space", "comma", "space"].map((x) => reg[x]),
+		or(...["decimal", "varname"].map((x) => reg[x])),
+		occurences(
+			0,
+			1
+		)(
+			and(
+				["comma", "space"].map((x) => reg[x]),
+				or(...["varname", "color"].map((x) => reg[x]))
+			)
+		),
+		reg.clbrack
+	)
+)
+regexps.argseq = global(
+	or(
+		and(
+			["space", "arrow"].map((x) => reg[x]),
+			occurences(0, 1)(and(reg.space, reg.opbrack, reg.color, reg.clbrack))
+		),
+		regexps.triple
+	)
+)
+regexps.decimal = global(reg.decimal)
+regexps.colorarg = global(and(...["space", "color", "space"].map((x) => reg[x])))
 export const commandList = ["contour", "fill", "clear", "erase", "background"]
+
+const [connectionCommands, singleCommands] = [
+	["contour", "clear"],
+	["background", "variable"]
+].map((x) => new Set(x))
 
 function extractFirst(string, from, to, regex) {
 	return string.slice(from, to).match(new RegExp(regex, "g"))[0]
@@ -73,10 +124,10 @@ function parseSemiTriples(string) {
 				.split(" ")
 				.join("")
 				.split(",")
-				.map((x, i) => (i < 2 ? Number(x) : x))
 		)
 }
 
+// ! NOTE: this works ONLY with 'regex'es that break the string on parts WHOLLY!
 function isEntire(string, regex) {
 	return (
 		Array.from(string.matchAll(regex))
@@ -140,47 +191,37 @@ function deBackground(text) {
 	const backgroundIndexes = commands
 		.map((x, i) => (x === "background" ? i : -1))
 		.filter((x) => x >= 0)
-	const islen = !!backgroundIndexes.length
-	return [
-		islen
-			? [lines[backgroundIndexes[0]]].concat(
-					lines
-						.slice(0, backgroundIndexes[0])
-						.concat(lines.slice(backgroundIndexes[0] + 1))
-						.filter(
-							(_x, i) =>
-								!backgroundIndexes.includes(
-									i + (i >= backgroundIndexes[0])
-								)
-						)
-			  )
-			: lines,
-		islen
-	]
+	return !!backgroundIndexes.length
+		? [lines[backgroundIndexes[0]]].concat(
+				lines
+					.slice(0, backgroundIndexes[0])
+					.concat(lines.slice(backgroundIndexes[0] + 1))
+					.filter(
+						(_x, i) =>
+							!backgroundIndexes.includes(i + (i >= backgroundIndexes[0]))
+					)
+		  )
+		: lines
 }
 
 // ! Support more formats for colour-setting (CMYK, RGBA, grayscale and others...);
-// ! PROBLEM: for now, only the HEX colour notation is supported (RGB used...): ADD OTHER COLOUR SCHEMES... (possibly, ways of defining them??? via transformations, perhaps?);
-function parseColour(text, single = true) {
-	return (single ? (x) => x[0] : (x) => x)(text.match(regexps.colorarg) || ["#ffffff"])
-}
+// ! PROBLEM: for now, only the HEX colour notation is supported (RGB used...): ADD OTHER COLOUR SCHEMES... (ways of defining them? via transformations, perhaps?);
 
 // ^ IDEA: add ability to specify the default colours;
 export default function parse(text) {
-	const [lines, hasBackground] = deBackground(text)
+	const lines = deBackground(text)
 	const commandInds = lines.map((l) =>
 		commandList.map((command) => countOccurrencesStr(l, command)).indexOf(1)
 	)
 	const commands = lines.map((_x, i) => commandList[commandInds[i]])
-	return lines
-		.slice(0, hasBackground)
-		.map((x, i) => ({ command: commands[i], argline: parseColour(x).trim() }))
-		.concat(
-			lines.slice(hasBackground).map((x, i) => ({
-				command: commands[i + hasBackground],
-				argline: (!(commandInds[i + hasBackground] % 2)
-					? (y) => new NGon(y, parseConnections(x))
-					: (x) => x)(parseSemiTriples(x.split(commands[i + hasBackground])[1]))
-			}))
+	return lines.map((x, i) => ({
+		command: commands[i],
+		argline: (connectionCommands.has(commands[i])
+			? (y) => new NGon(y, parseConnections(x))
+			: (x) => x)(
+			(singleCommands.has(x) ? (x) => x : parseSemiTriples)(
+				x.split(commands[i])[1].trim()
+			)
 		)
+	}))
 }

@@ -1,26 +1,29 @@
 1. IDEA: re-do the thing in React? 
 	There's a lot of same 'types' (kinds/classes) of elements repeating throughout the HTMl of the page. 
 	Starts to bugger oneself a little bit. React-based refactoring could remedy it.
-2. Question: hosting? 
 
-	As the thing is serverless, one could use GitHub Pages... 
-
-3. IDEA: create means to program curves ... (?using functions/Infinite series? some recursive name-giving mini-language?); 
-4. IDEA: for README, draw something pretty! [in a minimalistic-cubistic-style? how about a Bloodborne hunter picture? Or one of one's characters?]
-5. IDEA: add more details to the page's HTML and CSS; 
+2. IDEA: create means to program curves ... (?using functions/Infinite series? some recursive name-giving mini-language?); 
+	Also - add circles (they would be EXTREMELY useful...); 
+	Consider how to factor them into the syntax... (?use '-' instead of '->' for them?);
+3. IDEA: for README, draw something pretty! [in a minimalistic-cubistic-style? how about a Bloodborne hunter picture? Or one of one's characters?]
+4. IDEA: add more details to the page's HTML and CSS; 
 	Examples: images for a more 'sophisticated' layout, gradient, multicolours, that kind of thing...;
-6. CSS is good (adaptive for SOME screens..., computer screens for instance...), but not good enough for the app to be easily (comfortably) used on mobile devices...;
+5. CSS is good (adaptive for SOME screens..., computer screens for instance...), but not good enough for the app to be easily (comfortably) used on mobile devices...;
 	For them - choose different proportions. 
 	The values of phones are FARRR too different. 
 	They are not height-oriented, but rather width-oriented...; 
-7. ?Add more canvas programmatic properties to the project? 
+6. ?Add more canvas programmatic properties to the project? 
 	Ideally, the final thing ought to be something of a total-Canvas-drawing-API-wrapper, 
 		but reformulated purely in terms of shapes (that being, 
 			the entire programming paraphanalia is taken out - only these elementary instructions remain). 
-8. IDEA: add 'comment's into the project's language's vocabulary...; 
+7. IDEA: add 'comment's into the project's language's vocabulary...; 
 	Useful for designation of particular elements of images, in the cases of certain complexity. 
-9. IDEA [visual design]: add a generation of random pattern to the sides of the page (current blue-rect); 
+8. IDEA [visual design]: add a generation of random pattern to the sides of the page (current blue-rect); 
 	Think whether the pattern would be recurring, or it would create new colours each time user would 
 		change the canvas size (thus increasing the page size...); 
 	Also - consider how they'd be generated (that is, how would the colour pattern be chosen...
 		What vector-function of 3 colour components - RGB - to pick/construct?)
+	
+9. Idea: add support for a 'point'-datatype to the parser; 
+
+	Allows one to store individual points instead of simply x/y coordinates of a point...;

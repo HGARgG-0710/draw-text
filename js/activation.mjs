@@ -1,5 +1,5 @@
-import draw from "./draw.mjs"
 import parse from "./parser.mjs"
+import process from "./process.mjs"
 import { validate, validateNumber } from "./parser.mjs"
 import { clear } from "./draw.mjs"
 
@@ -17,7 +17,7 @@ const [vh, vw] = ["Height", "Width"].map((x) =>
 
 const imgout = (text) => {
 	clear()
-	parse(text).forEach((x) => (background = draw(x, background) || background))
+	parse(text).forEach((x) => (background = process(x, background) || background))
 }
 
 const canvas = document.querySelector("canvas")
