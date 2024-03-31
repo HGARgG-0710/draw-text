@@ -4,39 +4,33 @@ import { regexps } from "./parser.mjs"
 const vars = new Map()
 
 export const parseSingle = (x) =>
-	(!isNaN(x)
+	(typeof x === "boolean"
+		? (x) => x
+		: !isNaN(x)
 		? Number
 		: vars.has(x)
-		? vars.get.bind(vars)
+		? (y) => parseSingle(vars.get(y))
 		: (text) => (text.match(regexps.colorarg) || ["#ffffff"])[0])(x)
 
-// ? Choose a different condition for length of 'x.split(",")'?
-const isPoint = (x) =>
-	x[0] === "(" && x[x.length - 1] === ")" && [2, 3].includes(x.split(",").length)
-
-const parseSemiTriples = (point) =>
-	point
-		.slice(1, point.length - 1)
-		.split(" ")
-		.join("")
-		.split(",")
-		.map(parseSingle)
-
 function substitute(expression) {
-	if (expression instanceof Array) return expression.map(parseSingle)
+	if (expression instanceof Array)
+		return expression.map((triple) => triple.map(parseSingle))
+	if (expression.connected)
+		return {
+			points: substitute(expression.points),
+			connected: substitute(expression.connected)
+		}
+	return { ...expression, argline: substitute(expression.argline) }
 }
 
 export default function process(expression, ...past) {
-	switch (expression.type) {
+	switch (expression.command) {
 		case "variable":
-			vars.set(
-				...expression.args
-					.split("\t")
-					.join(" ")
-					.split(" ")
-					.map((x, i) => (i && !isNaN(x) ? Number(x) : x))
-			)
+			const { argline } = expression
+			vars.set(argline[0], parseSingle(argline[1]))
 			break
+		case "background":
+			return draw(expression, ...past)
 		default:
 			return draw(substitute(expression), ...past)
 	}

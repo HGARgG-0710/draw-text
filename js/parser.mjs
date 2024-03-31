@@ -13,22 +13,23 @@ const reg = {
 	space: /( |\t)*/,
 	opbrack: /\(/,
 	clbrack: /\)/,
-	color: /(#[0-9a-f]){3,}/,
-	varname: /[a-zA-Z0-9_\-]+/,
-	decimal: /[0-9]+/,
+	color: /#[\da-f]{3,}/,
+	varname: /[a-zA-Z\d_]+/,
+	decimal: /[\d]+/,
 	tab: /\t/,
 	spacebar: / /,
-	comma: /,/,
-	decimal: /[0-9]+/
+	comma: /,/
 }
 
 export const regexps = {
 	arrow: reg.arrow
 }
 regexps.colorarrow = and(
-	...["arrow", "space", "opbrack"].map((x) => reg[x]),
-	or(["color", "varname"].map((x) => reg[x])),
-	reg.clbrack
+	...["arrow", "space"].map((x) => reg[x]),
+	occurences(
+		0,
+		1
+	)(and(reg.opbrack, or(...["color", "varname"].map((x) => reg[x])), reg.clbrack))
 )
 regexps.triple = global(
 	and(
@@ -41,37 +42,50 @@ regexps.triple = global(
 			1
 		)(
 			and(
-				["comma", "space"].map((x) => reg[x]),
-				or(...["varname", "color"].map((x) => reg[x]))
+				...["comma", "space"].map((x) => reg[x]),
+				or(...["color", "varname"].map((x) => reg[x]))
 			)
 		),
 		reg.clbrack
 	)
 )
-regexps.argseq = global(
-	or(
-		and(
-			["space", "arrow"].map((x) => reg[x]),
-			occurences(0, 1)(and(reg.space, reg.opbrack, reg.color, reg.clbrack))
-		),
-		regexps.triple
+regexps.argseq = occurences(
+	1,
+	""
+)(and(reg.space, regexps.triple, reg.space, occurences(0, 1)(regexps.colorarrow)))
+regexps.vararg = occurences(1)(
+	and(
+		...["varname", "space", "spacebar", "space"].map((x) => reg[x]),
+		or(...["color", "decimal", "varname"].map((x) => reg[x]))
 	)
 )
-regexps.decimal = global(reg.decimal)
-regexps.colorarg = global(and(...["space", "color", "space"].map((x) => reg[x])))
-export const commandList = ["contour", "fill", "clear", "erase", "background"]
 
-const [connectionCommands, singleCommands] = [
+// ! fix - must check for begining/end instead of this 'isEntire' thing...;
+regexps.decimal = global(reg.decimal)
+regexps.colorarg = global(
+	and(reg.space, or(...["color", "varname"].map((x) => reg[x])), reg.space)
+)
+regexps.colorarrowStrict = and(
+	...["arrow", "space"].map((x) => reg[x]),
+	reg.opbrack,
+	or(...["color", "varname"].map((x) => reg[x])),
+	reg.clbrack
+)
+
+export const commandList = ["contour", "fill", "clear", "erase", "background", "variable"]
+
+const [connectionCommands, singleCommands, pairCommands] = [
 	["contour", "clear"],
-	["background", "variable"]
+	["background"],
+	["variable"]
 ].map((x) => new Set(x))
 
 function extractFirst(string, from, to, regex) {
 	return string.slice(from, to).match(new RegExp(regex, "g"))[0]
 }
-
+// ! bug in this - fix; lack of clarity as to which regular expressions are responsible for what...;  ['colorarrow' here expects to count ONLY those which DEFINITELY have a color. Create a new regexp for that instead...];
 function parseConnections(string) {
-	const [presentConnections, colouredArrows] = ["arrow", "colorarrow"].map((x) =>
+	const [presentConnections, colouredArrows] = ["arrow", "colorarrowStrict"].map((x) =>
 		findSegments(string, regexps[x])
 	)
 	const colouredArrowsBegs = colouredArrows.map((x) => x[0])
@@ -123,6 +137,8 @@ function parseSemiTriples(string) {
 				.slice(1, pair.length - 1)
 				.split(" ")
 				.join("")
+				.split("\t")
+				.join("")
 				.split(",")
 		)
 }
@@ -137,15 +153,18 @@ function isEntire(string, regex) {
 }
 
 function isValid(text) {
-	return getlines(text).every((line) => {
+	return getlines(text).every((line, i) => {
 		const r = commandList.map((command) => countOccurrencesStr(line, command))
 		const command = commandList[r.indexOf(1)]
 		return (
 			[commandList.length - 1, 1].every((x, i) => x === countOccurencesArr(r, i)) &&
-			isEntire(
-				line.split(command)[1],
-				regexps[command !== "background" ? "argseq" : "colorarg"]
-			)
+			regexps[
+				command === "background"
+					? "colorarg"
+					: command === "variable"
+					? "vararg"
+					: "argseq"
+			].test(line.split(command)[1])
 		)
 	})
 }
@@ -219,9 +238,16 @@ export default function parse(text) {
 		argline: (connectionCommands.has(commands[i])
 			? (y) => new NGon(y, parseConnections(x))
 			: (x) => x)(
-			(singleCommands.has(x) ? (x) => x : parseSemiTriples)(
-				x.split(commands[i])[1].trim()
-			)
+			(singleCommands.has(commands[i])
+				? (x) => x
+				: pairCommands.has(commands[i])
+				? (x) =>
+						x
+							.split("\t")
+							.join("")
+							.split(" ")
+							.filter((x) => x.length)
+				: parseSemiTriples)(x.split(commands[i])[1].trim())
 		)
 	}))
 }

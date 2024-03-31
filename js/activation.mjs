@@ -3,7 +3,7 @@ import process from "./process.mjs"
 import { validate, validateNumber } from "./parser.mjs"
 import { clear } from "./draw.mjs"
 
-let lastCode = ""
+let lastText = ""
 let background = "#ffffff"
 
 const [vh, vw] = ["Height", "Width"].map((x) =>
@@ -27,9 +27,9 @@ canvas.setAttribute("width", String(60 * vw))
 document.addEventListener("keyup", (_kevent) => {
 	if (document.activeElement.id === "code") {
 		const v = document.activeElement.value.trim()
-		if (lastCode !== v) {
-			lastCode = v
-			validate(lastCode, imgout)
+		if (lastText !== v) {
+			lastText = v
+			validate(lastText, imgout)
 		}
 	}
 	for (const metric of ["width", "height"])
@@ -38,7 +38,7 @@ document.addEventListener("keyup", (_kevent) => {
 				document.activeElement.value.trim(),
 				(text) => {
 					canvas.setAttribute(metric, text)
-					imgout(lastCode)
+					imgout(lastText)
 				},
 				validateNumber
 			)

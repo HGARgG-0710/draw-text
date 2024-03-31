@@ -176,11 +176,8 @@ label {
 
 a {
 	font-family: "Josefin Sans", sans-serif;
-	color: blue;
-	text-decoration: none;
-}
-a:visited {
 	color: white;
+	text-decoration: none;
 }
 
 :focus {

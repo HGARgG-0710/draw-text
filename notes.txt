@@ -26,4 +26,13 @@
 	
 9. Idea: add support for a 'point'-datatype to the parser; 
 
-	Allows one to store individual points instead of simply x/y coordinates of a point...;
+	Allows one to store (in variables) individual points instead of simply x/y/color coordinates of a point...;
+
+10. A website Favicon - add it; 
+
+	Think of something pretty. Draw it with 'draw-text'; 
+	Then, use as a favicon (an .svg...); 
+
+11. Arithmetic! 
+
+	Add arithmetic for those expressions (simple addition, multiplication, division and subtraction ought to do it by now...); 
