@@ -2,7 +2,7 @@
 // ? This 'findSegments' is a good addition to the library in question...; Also - consider index-passing-based parsing (one, where one of inputs is an index, and so is one of outputs...);
 // ? Add a 'regex' module to it?
 
-import { and, or, occurences, global } from "./regex.mjs"
+import { and, or, occurences, global, begin, end } from "./regex.mjs"
 import { NGon } from "./primitives.mjs"
 
 // ^ IDEA: create a module for working with regexp tables [note: they could be used to construct the 'parser-type-recognition-tables' for parsers created by one of self's currently developed libraries...];
@@ -13,7 +13,7 @@ const reg = {
 	space: /( |\t)*/,
 	opbrack: /\(/,
 	clbrack: /\)/,
-	color: /#[\da-f]{3,}/,
+	color: /#[\da-fA-F]{3,}/,
 	varname: /[a-zA-Z\d_]+/,
 	decimal: /[\d]+/,
 	tab: /\t/,
@@ -61,7 +61,7 @@ regexps.vararg = occurences(1)(
 )
 
 // ! fix - must check for begining/end instead of this 'isEntire' thing...;
-regexps.decimal = global(reg.decimal)
+regexps.decimal = global(end(begin(reg.decimal)))
 regexps.colorarg = global(
 	and(reg.space, or(...["color", "varname"].map((x) => reg[x])), reg.space)
 )
@@ -244,7 +244,7 @@ export default function parse(text) {
 				? (x) =>
 						x
 							.split("\t")
-							.join("")
+							.join(" ")
 							.split(" ")
 							.filter((x) => x.length)
 				: parseSemiTriples)(x.split(commands[i])[1].trim())

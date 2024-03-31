@@ -22,7 +22,7 @@
 	Think whether the pattern would be recurring, or it would create new colours each time user would 
 		change the canvas size (thus increasing the page size...); 
 	Also - consider how they'd be generated (that is, how would the colour pattern be chosen...
-		What vector-function of 3 colour components - RGB - to pick/construct?)
+		What vector-function of n>=2 colour components - RGB/other - to pick/construct?)
 	
 9. Idea: add support for a 'point'-datatype to the parser; 
 
@@ -36,3 +36,5 @@
 11. Arithmetic! 
 
 	Add arithmetic for those expressions (simple addition, multiplication, division and subtraction ought to do it by now...); 
+
+12. Add input from file (giving a file with 'draw-text' code...);

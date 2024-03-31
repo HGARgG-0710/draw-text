@@ -52,30 +52,35 @@
 			</h2>
 
 			<p>
-				The language of the page contains five elementary commands:
+				The language of the page contains the following elementary commands:
 			</p>
 
 			<ol>
 				<li>
-					<code>contour</code>
+					<code>contour</code> - creates a contour from a set of points (connected or not, can be coloured)
 				</li>
 				<li>
-					<code>fill</code>
+					<code>fill</code> - fills a given contour with a colour
 				</li>
 				<li>
-					<code>clear</code>
+					<code>clear</code> - creates a contour which is coloured the same way as the background (works similarly to <code>contour</code>)
 				</li>
 				<li>
-					<code>erase</code>
+					<code>erase</code> - fills the given contour with background colour (works similarly to <code>fill</code>)
 				</li>
 				<li>
-					<code>background</code>
+					<code>background</code> - sets the background colour (only the first usage is taken in account - others are ignored)
+				</li>
+				<li>
+					<code>variable</code> - creates a variable to later reference in code (can be a colour, a number or another previously-defined variable)
 				</li>
 			</ol>
 
 			<p>
 				Besides <code>background</code> (which is just an alias for a case of <code>fill</code>), they are all
 				independent.
+				Commands are executed from top to bottom, points/arguments are being read from left to right. 
+				Tabs and spaces are (largely) ignored, except for few cases when they serve as needed delimiters (example - <code>variable</code>).
 				Usage looks something like the following:
 			</p>
 
@@ -111,6 +116,11 @@
 				<li>
 					<div class="nogapli">
 						<code>background c</code>
+					</div>
+				</li>
+				<li>
+					<div class=""nogapli>
+						<code>variable varname varvalue</code>
 					</div>
 				</li>
 			</ol>

@@ -24,25 +24,32 @@ const canvas = document.querySelector("canvas")
 canvas.setAttribute("height", String(60 * vh))
 canvas.setAttribute("width", String(60 * vw))
 
-document.addEventListener("keyup", (_kevent) => {
-	if (document.activeElement.id === "code") {
-		const v = document.activeElement.value.trim()
-		if (lastText !== v) {
-			lastText = v
-			validate(lastText, imgout)
-		}
+document.querySelector("#code").addEventListener("keydown", function (event) {
+	if (event.key === "Tab" && document.activeElement.id === "code") {
+		event.preventDefault()
+		this.setRangeText("\t", this.selectionStart, this.selectionStart, "end")
 	}
-	for (const metric of ["width", "height"])
-		if (document.activeElement.id === metric)
-			validate(
-				document.activeElement.value.trim(),
-				(text) => {
-					canvas.setAttribute(metric, text)
-					imgout(lastText)
-				},
-				validateNumber
-			)
 })
+
+document.querySelector("#code").addEventListener("keyup", (_kevent) => {
+	const v = document.activeElement.value.trim()
+	if (lastText !== v) {
+		lastText = v
+		validate(lastText, imgout)
+	}
+})
+
+for (const metric of ["width", "height"])
+	document.querySelector(`#${metric}`).addEventListener("keyup", (_kevent) => {
+		validate(
+			document.activeElement.value.trim(),
+			(text) => {
+				canvas.setAttribute(metric, text)
+				imgout(lastText)
+			},
+			validateNumber
+		)
+	})
 
 // ? Allow user to do the thing with other 'mime-types'? (not only 'image/')
 // ? validate the code for working with things besides png/jpg...;
