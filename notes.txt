@@ -3,8 +3,29 @@
 	Starts to bugger oneself a little bit. React-based refactoring could remedy it.
 
 2. IDEA: create means to program curves ... (?using functions/Infinite series? some recursive name-giving mini-language?); 
-	Also - add circles (they would be EXTREMELY useful...); 
 	Consider how to factor them into the syntax... (?use '-' instead of '->' for them?);
+
+	ABOUT CIRCLES: 
+
+		More general - replace them with ellipses. 
+		Input shape: 
+
+			(startX, startY)-(angle, ?startAngle, ?endAngle, ?rotation)(endX, endY)
+		
+		1. 'angle' - angle between the point that is to be the center of the future ellipse and '(startX, startY)'. 
+			Together with the end coordinate, sufficient to find the required data to draw the ellipse on the path using 'ellipse'; 
+		2.-4. (rotation, startAngle, endAngle) are the same as in 'ellipse' documentation of Canvas
+
+		By default, first argument is 'startAngle', 'rotation' is 0 and 'endAngle' is 2*pi ('startAngle' is 0 too so as to make a full ellipse...);
+
+		
+	ALSO - additional functionality: 
+
+		1. Bezier curves (quadraticCurveTo and bezierCurveTo do a quadratic and cubic one correspondently, see if others are feasible to either implement using it or manually...); 
+		2. roundRect (for pretty things and UI...);
+		3. strokeText [add text to draw-text...]; 
+		4. setLineDash (for dotted lines)
+		5. fillText;
 3. IDEA: for README, draw something pretty! [in a minimalistic-cubistic-style? how about a Bloodborne hunter picture? Or one of one's characters?]
 4. IDEA: add more details to the page's HTML and CSS; 
 	Examples: images for a more 'sophisticated' layout, gradient, multicolours, that kind of thing...;
