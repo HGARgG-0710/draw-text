@@ -2,7 +2,7 @@
 // ? This 'findSegments' is a good addition to the library in question...; Also - consider index-passing-based parsing (one, where one of inputs is an index, and so is one of outputs...);
 // ? Add a 'regex' module to it?
 
-import { and, or, occurences, global, begin, end } from "./regex.mjs"
+import { and, or, occurences, global, begin, end, nlookbehind } from "./regex.mjs"
 import { NGon } from "./primitives.mjs"
 
 // ^ IDEA: create a module for working with regexp tables [note: they could be used to construct the 'parser-type-recognition-tables' for parsers created by one of self's currently developed libraries...];
@@ -18,7 +18,13 @@ const reg = {
 	decimal: /[\d]+/,
 	tab: /\t/,
 	spacebar: / /,
-	comma: /,/
+	comma: /,/,
+	hyphen: /-/
+}
+
+const regfun = {
+	variable: (...x) => or(...[...x, "varname"].map((x) => reg[x])),
+	brackets: (...x) => and(reg.opbrack, ...x, reg.clbrack)
 }
 
 export const regexps = {
@@ -26,93 +32,135 @@ export const regexps = {
 }
 regexps.colorarrow = and(
 	...["arrow", "space"].map((x) => reg[x]),
-	occurences(
-		0,
-		1
-	)(and(reg.opbrack, or(...["color", "varname"].map((x) => reg[x])), reg.clbrack))
+	occurences(0, 1)(regfun.brackets(regfun.variable("color")))
 )
 regexps.triple = global(
 	and(
-		...["opbrack", "space"].map((x) => reg[x]),
-		or(...["decimal", "varname"].map((x) => reg[x])),
-		...["space", "comma", "space"].map((x) => reg[x]),
-		or(...["decimal", "varname"].map((x) => reg[x])),
+		nlookbehind(and(...["hyphen", "space"].map((x) => reg[x]))),
+		regfun.brackets(
+			reg.space,
+			regfun.variable("decimal"),
+			...["space", "comma", "space"].map((x) => reg[x]),
+			regfun.variable("decimal"),
+			occurences(
+				0,
+				1
+			)(and(...["comma", "space"].map((x) => reg[x]), regfun.variable("color")))
+		)
+	)
+)
+regexps.argseq = occurences(
+	1,
+	""
+)(
+	and(
+		reg.space,
+		regexps.triple,
+		reg.space,
+		occurences(0, 1)(or(...["elliptic", "colorarrow"].map((x) => regexps[x])))
+	)
+)
+regexps.vararg = occurences(1)(
+	and(
+		...["varname", "space", "spacebar", "space"].map((x) => reg[x]),
+		regfun.variable("color", "decimal")
+	)
+)
+
+regexps.decimal = global(end(begin(reg.decimal)))
+regexps.colorarg = global(and(reg.space, regfun.variable("color"), reg.space))
+regexps.colorarrowStrict = and(
+	...["arrow", "space"].map((x) => reg[x]),
+	regfun.brackets(regfun.variable("color"))
+)
+
+regexps.elliptic = and(
+	...["hyphen", "space"].map((x) => reg[x]),
+	regfun.brackets(
+		reg.space,
+		regfun.variable("decimal"),
+		reg.space,
 		occurences(
 			0,
 			1
 		)(
 			and(
 				...["comma", "space"].map((x) => reg[x]),
-				or(...["color", "varname"].map((x) => reg[x]))
+				regfun.variable("decimal"),
+				occurences(
+					0,
+					1
+				)(
+					and(
+						...["comma", "space"].map((x) => reg[x]),
+						regfun.variable("decimal")
+					)
+				),
+				reg.space
 			)
-		),
-		reg.clbrack
+		)
 	)
-)
-regexps.argseq = occurences(
-	1,
-	""
-)(and(reg.space, regexps.triple, reg.space, occurences(0, 1)(regexps.colorarrow)))
-regexps.vararg = occurences(1)(
-	and(
-		...["varname", "space", "spacebar", "space"].map((x) => reg[x]),
-		or(...["color", "decimal", "varname"].map((x) => reg[x]))
-	)
-)
-
-// ! fix - must check for begining/end instead of this 'isEntire' thing...;
-regexps.decimal = global(end(begin(reg.decimal)))
-regexps.colorarg = global(
-	and(reg.space, or(...["color", "varname"].map((x) => reg[x])), reg.space)
-)
-regexps.colorarrowStrict = and(
-	...["arrow", "space"].map((x) => reg[x]),
-	reg.opbrack,
-	or(...["color", "varname"].map((x) => reg[x])),
-	reg.clbrack
 )
 
 export const commandList = ["contour", "fill", "clear", "erase", "background", "variable"]
 
-const [connectionCommands, singleCommands, pairCommands] = [
-	["contour", "clear"],
-	["background"],
+const [connectionCommands, pairCommands] = [
+	["contour", "fill", "clear", "erase"],
 	["variable"]
 ].map((x) => new Set(x))
 
 function extractFirst(string, from, to, regex) {
 	return string.slice(from, to).match(new RegExp(regex, "g"))[0]
 }
-// ! bug in this - fix; lack of clarity as to which regular expressions are responsible for what...;  ['colorarrow' here expects to count ONLY those which DEFINITELY have a color. Create a new regexp for that instead...];
 function parseConnections(string) {
-	const [presentConnections, colouredArrows] = ["arrow", "colorarrowStrict"].map((x) =>
-		findSegments(string, regexps[x])
-	)
-	const colouredArrowsBegs = colouredArrows.map((x) => x[0])
-	const pairsinds = triplesInds(string)
-	return pairsinds.map((_x, i) => {
-		const fel =
-			!!presentConnections[i] &&
-			(i > (i + 1) % pairsinds.length ||
-				presentConnections[i][0] < pairsinds[(i + 1) % pairsinds.length][0])
-		return [fel].concat(
-			fel
-				? [
-						colouredArrowsBegs.includes(presentConnections[i][0])
-							? ((x) =>
-									extractFirst(
-										string,
-										colouredArrowsBegs[x],
-										colouredArrowsBegs[x] + colouredArrows[x][1],
-										regexps.colorarg
-									))(
-									colouredArrowsBegs.indexOf(presentConnections[i][0])
-							  )
-							: false
-				  ]
-				: []
+	function retrieveType(type, parsingFunc = (x) => x) {
+		const [presentConnections, colouredConnections] = type.map((x) =>
+			findSegments(string, regexps[x])
 		)
-	})
+		const colouredBeginnings = colouredConnections.map((x) => x[0])
+		const pairsinds = triplesInds(string)
+		return pairsinds.map((_x, i) => {
+			const fel =
+				!!presentConnections[i] &&
+				(i > (i + 1) % pairsinds.length ||
+					presentConnections[i][0] < pairsinds[(i + 1) % pairsinds.length][0])
+			return [fel].concat(
+				fel
+					? [
+							colouredBeginnings.includes(presentConnections[i][0])
+								? ((x) =>
+										parsingFunc(
+											extractFirst(
+												string,
+												colouredBeginnings[x],
+												colouredBeginnings[x] +
+													colouredConnections[x][1],
+												regexps.colorarg
+											)
+										))(
+										colouredBeginnings.indexOf(
+											presentConnections[i][0]
+										)
+								  )
+								: false
+					  ]
+					: []
+			)
+		})
+	}
+	// ! Add the 'ellipticStrict' regexp... (analogous to 'colorarrowStrict' - targets only the 'elliptic' connections which have the argument attached to them...);
+	return {
+		arrows: retrieveType(["arrow", "colorarrowStrict"]),
+		elliptics: retrieveType(["elliptic", "ellipticStrict"], (x) =>
+			x
+				.slice(1, x.length - 1)
+				.split(" ")
+				.join("\t")
+				.split("\t")
+				.join("")
+				.split(",")
+		)
+	}
 }
 
 function findSegments(string, regex) {
@@ -144,6 +192,7 @@ function parseSemiTriples(string) {
 }
 
 // ! NOTE: this works ONLY with 'regex'es that break the string on parts WHOLLY!
+// ? Replace in the 'validateNumber' and get rid of altogether form codebase?
 function isEntire(string, regex) {
 	return (
 		Array.from(string.matchAll(regex))
@@ -236,18 +285,14 @@ export default function parse(text) {
 	return lines.map((x, i) => ({
 		command: commands[i],
 		argline: (connectionCommands.has(commands[i])
-			? (y) => new NGon(y, parseConnections(x))
-			: (x) => x)(
-			(singleCommands.has(commands[i])
-				? (x) => x
-				: pairCommands.has(commands[i])
-				? (x) =>
-						x
-							.split("\t")
-							.join(" ")
-							.split(" ")
-							.filter((x) => x.length)
-				: parseSemiTriples)(x.split(commands[i])[1].trim())
-		)
+			? (y) => new NGon(parseSemiTriples(y), parseConnections(x))
+			: pairCommands.has(commands[i])
+			? (x) =>
+					x
+						.split("\t")
+						.join(" ")
+						.split(" ")
+						.filter((x) => x.length)
+			: (x) => x)(x.split(commands[i])[1].trim())
 	}))
 }

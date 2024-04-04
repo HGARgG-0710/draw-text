@@ -15,12 +15,18 @@ export const parseSingle = (x) =>
 function substitute(expression) {
 	if (expression instanceof Array)
 		return expression.map((triple) => triple.map(parseSingle))
-	if (expression.connected)
+	const { argline, connections, points, arrows, elliptics } = expression
+	if (elliptics)
 		return {
-			points: substitute(expression.points),
-			connected: substitute(expression.connected)
+			arrows: substitute(arrows),
+			elliptics: substitute(elliptics)
 		}
-	return { ...expression, argline: substitute(expression.argline) }
+	if (connections)
+		return {
+			points: substitute(points),
+			connections: substitute(connections)
+		}
+	return { ...expression, argline: substitute(argline) }
 }
 
 export default function process(expression, ...past) {

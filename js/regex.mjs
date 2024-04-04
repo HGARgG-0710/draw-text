@@ -26,3 +26,13 @@ export const [begin, end] = ["^", "$"].map(
 	(marker, i) => (regex) =>
 		new RegExp(`${i ? "" : marker}${bracket(regex)}${i ? marker : ""}`)
 )
+
+export const [plookahead, nlookahead, plookbehind, nlookbehind] = [
+	"?=",
+	"?!",
+	"?<=",
+	"?<!"
+].map(
+	(sym, i) => (regex) =>
+		new RegExp(`${i < 2 ? "" : sym}${bracket(regex)}${i >= 2 ? "" : sym}`)
+)

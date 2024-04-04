@@ -23,14 +23,15 @@ export default function draw(primitive, background) {
 		// ^ NOTE: currently, no curves are supported, so the otherwise meaningful 'instanceof' check is dropped for sanity reasons.
 		// ? Use a map of function instead of a 'switch'?
 		switch (command) {
+			// ! REWRITE THE 'contour' and 'fill' COMMANDS - THEY MUST ALLOW FOR 'elliptic' CONNECTIONS [and the 'fill' must permit a king of non-monotonic colouring, think about how to implement it...]; 
 			case "contour":
 				context.globalCompositeOperation = "source-over"
 				for (const key of Array.from(primitive.points.keys())) {
 					context.beginPath()
 					// * For contour...
-					context.strokeStyle = primitive.connected[key][1] || "#000000"
+					context.strokeStyle = primitive.connections[key][1] || "#000000"
 					context.moveTo(...primitive.points[key])
-					if (primitive.connected[key][0])
+					if (primitive.connections[key][0])
 						context.lineTo(
 							...primitive.points[(key + 1) % primitive.points.length]
 						)
@@ -41,6 +42,7 @@ export default function draw(primitive, background) {
 					context.stroke()
 				}
 				break
+			// ? As one is going to add the 'arc' here as well as to the 'contour', why not allow for setting colours to the edges? [same with '-'-connecting?]
 			case "fill":
 				if (primitive.length) {
 					context.globalCompositeOperation = "source-over"
@@ -61,36 +63,55 @@ export default function draw(primitive, background) {
 					context.fill()
 				}
 				break
-			// % note: the 'clear' "sorta" works, but it doesn't erase the thing completely (just makes it minorly thinner)
-			// ? rewrite 'clear' + 'erase' in terms of 'contour' + 'fill'?
+			// ! refactor these two... (create a special 'lib.mjs' file, as always, for this...);
 			case "clear":
-				context.globalCompositeOperation = "source-atop"
-				context.beginPath()
-				for (const key of Array.from(primitive.points.keys())) {
-					context.moveTo(...primitive.points[key])
-					drawPoint(...primitive.points[key])
-					if (primitive.connected[key])
-						context.lineTo(
-							...primitive.points[(key + 1) % primitive.points.length]
-						)
-				}
-				context.closePath()
-				context.strokeStyle = background
-				context.stroke()
-				return background
+				return draw(
+					{
+						command: "contour",
+						argline: {
+							points: primitive.argline.points.map((x) => {
+								x[2] = background
+								return x
+							}),
+							connections: {
+								arrows: primitive.argline.arrows.map((arrow) => {
+									arrow[1] = background
+									return arrow
+								}),
+								elliptics: primitive.argline.connections.elliptics.map(
+									(elliptic) => {
+										elliptic[3] = background
+										return elliptic
+									}
+								)
+							}
+						}
+					},
+					background
+				)
 			case "erase":
-				if (primitive.length) {
-					context.globalCompositeOperation = "source-over"
-					context.fillStyle = background
-					context.beginPath()
-					context.moveTo(...primitive[0])
-					// ? Question: is this "moveTo" thing needed (because one believes not..., seen places that did without it); See if so - should be a good optimization for complex pictures...;
-					for (const key of Array.from(primitive.keys()))
-						context.lineTo(...primitive[(key + 1) % primitive.length])
-					context.closePath()
-					context.fill()
-				}
-				break
+				return draw(
+					{
+						command: "fill",
+						argline: {
+							points: primitive.argline.points.map((x) => {
+								x[2] = background
+								return x
+							}),
+							connections: {
+								arrows: primitive.argline.connections.arrows.map((x) => {
+									x[1] = background
+									return x
+								}),
+								elliptics: primitive.argline.elliptics.map((x) => {
+									x[3] = background
+									return x
+								})
+							}
+						}
+					},
+					background
+				)
 			case "background":
 				drawBackground(primitive)
 				return primitive
