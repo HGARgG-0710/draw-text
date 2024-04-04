@@ -1,7 +1,15 @@
+const black = `#${"0".repeat(3)}`
+
 const canvas = document.querySelector("canvas")
 const context = canvas.getContext("2d")
+context.globalCompositeOperation = "source-over"
 
 context.imageSmoothingEnabled = false
+
+// ^ idea: add a 'units' module to 'math-expression.mjs' (or make it a separate module?) - functions for general unit conversion, efficient means of internal unit-data-record-keeping;
+function toRadians(degs) {
+	return (degs / 180) * Math.PI
+}
 
 function drawPoint(x, y) {
 	context.fillRect(x, y, 1, 1)
@@ -18,47 +26,118 @@ function drawBackground(colour) {
 export default function draw(primitive, background) {
 	if (primitive) {
 		const { command } = primitive
+
+		const { points } = primitive
+		const { arrows, elliptics } = primitive.connections
 		primitive = primitive.argline
 
 		// ^ NOTE: currently, no curves are supported, so the otherwise meaningful 'instanceof' check is dropped for sanity reasons.
 		// ? Use a map of function instead of a 'switch'?
 		switch (command) {
-			// ! REWRITE THE 'contour' and 'fill' COMMANDS - THEY MUST ALLOW FOR 'elliptic' CONNECTIONS [and the 'fill' must permit a king of non-monotonic colouring, think about how to implement it...]; 
+			// ! REWRITE THE 'contour' and 'fill' COMMANDS - THEY MUST ALLOW FOR 'elliptic' CONNECTIONS;
 			case "contour":
-				context.globalCompositeOperation = "source-over"
 				for (const key of Array.from(primitive.points.keys())) {
 					context.beginPath()
 					// * For contour...
-					context.strokeStyle = primitive.connections[key][1] || "#000000"
+					context.strokeStyle = primitive.connections[key][1] || black
 					context.moveTo(...primitive.points[key])
 					if (primitive.connections[key][0])
 						context.lineTo(
 							...primitive.points[(key + 1) % primitive.points.length]
 						)
 					// * For point...
-					context.fillStyle = primitive.points[key][2] || "#000000"
+					context.fillStyle = primitive.points[key][2] || black
 					drawPoint(...primitive.points[key])
 					context.closePath()
 					context.stroke()
 				}
 				break
-			// ? As one is going to add the 'arc' here as well as to the 'contour', why not allow for setting colours to the edges? [same with '-'-connecting?]
 			case "fill":
-				if (primitive.length) {
-					context.globalCompositeOperation = "source-over"
-					// ! take all these ugly zeros out of usage... replace with string.repeat();
+				if (points.length) {
+					// ! FIX THAT ...
 					context.fillStyle =
 						primitive
 							.map((x) => x[2])
 							.reduce(
 								(acc, curr) => (acc ? acc : curr ? curr : null),
 								null
-							) || "#000000"
+							) || black
 					context.beginPath()
-					context.moveTo(...primitive[0])
-					// ? Question: is this "moveTo" thing needed (because one believes not..., seen places that did without it); See if so - should be a good optimization for complex pictures...;
-					for (const key of Array.from(primitive.keys()))
-						context.lineTo(...primitive[(key + 1) % primitive.length])
+					for (const key of Array.from(points.keys())) {
+						context.moveTo(...points[key])
+						if (arrows[key][0]) {
+							context.lineTo(...points[(key + 1) % points.length])
+							continue
+						}
+						if (elliptics[key][0]) {
+							const pair = [0, 1].map(
+								(i) => points[(key + i) % points.length]
+							)
+							const [x, y] = [0, 1].map((i) => pair.map((x) => x[i]))
+							// ^ idea: Add the appropriate 'casual' geometric functions/identities to future releases of 'math-expressions.js' (things like Pythagoreas, work with angles, trignonometry - this and other stuff...):
+							// ! PROOOOOBBBLLLEEEEMMmm - DOES it or does it (the maths) not handle cases when 'alpha >= 90'? Consider that. Re-do the maths...;
+							const [centerAngle, startAngle, endAngle] = elliptics[key]
+								.slice(1, 3)
+								.map((x) => x % 360)
+							const isLeftCenterAngle = x[1] >= x[0]
+							// ! USED FOR DETERMINING THE MATTER OF WHETHER TO ADD OR SUBTRACT THE DISTANCES FROM THE FIRST POINT...;
+							const controlCenterAngle =
+								(centerAngle * (-1) ** isLeftCenterAngle +
+									180 +
+									(isLeftCenterAngle ? 180 : 0)) %
+								360
+							const diagLen = Math.sqrt(
+								(x[1] - x[0]) ** 2 + (y[1] - y[0]) ** 2
+							)
+							const radius = ["cos", "sin"]
+								.map((x) => Math[x])
+								.map((f) => diagLen * f(centerAngle))
+							// ! CHECK FOR CORRRECTNESS!!! [probably correct only for one case of isLeftCenterAngle...];
+							const rotationAngle = toRadians(
+								270 + centerAngle - Math.asin((y[1] - y[0]) / diagLen)
+							)
+							const center = [
+								[x, "sin"],
+								[y, "cos"]
+							].map(
+								([z, f], i) =>
+									z[0] +
+									(-1) **
+										(!i
+											? [3, 0]
+													.map(
+														(x) =>
+															(x + 2 * !isLeftCenterAngle) %
+															4
+													)
+													.includes(
+														Math.floor(
+															controlCenterAngle / 90
+														)
+													)
+											: 1 +
+											  (Math.floor(controlCenterAngle / 180) %
+													2)) *
+										radius[0] *
+										Math[f](
+											centerAngle -
+												Math.acos(
+													Math.sqrt(
+														diagLen ** 2 - (y[1] - y[0]) ** 2
+													) / diagLen
+												)
+										)
+							)
+							// ? Is order (indexation) of 'radius' correct (and general) here? Check...
+							context.ellipse(
+								...center,
+								...radius,
+								rotationAngle,
+								startAngle,
+								endAngle
+							)
+						}
+					}
 					context.closePath()
 					context.fill()
 				}
@@ -69,21 +148,19 @@ export default function draw(primitive, background) {
 					{
 						command: "contour",
 						argline: {
-							points: primitive.argline.points.map((x) => {
+							points: points.map((x) => {
 								x[2] = background
 								return x
 							}),
 							connections: {
-								arrows: primitive.argline.arrows.map((arrow) => {
+								arrows: arrows.map((arrow) => {
 									arrow[1] = background
 									return arrow
 								}),
-								elliptics: primitive.argline.connections.elliptics.map(
-									(elliptic) => {
-										elliptic[3] = background
-										return elliptic
-									}
-								)
+								elliptics: elliptics.map((elliptic) => {
+									elliptic[3] = background
+									return elliptic
+								})
 							}
 						}
 					},
@@ -94,16 +171,16 @@ export default function draw(primitive, background) {
 					{
 						command: "fill",
 						argline: {
-							points: primitive.argline.points.map((x) => {
+							points: points.map((x) => {
 								x[2] = background
 								return x
 							}),
 							connections: {
-								arrows: primitive.argline.connections.arrows.map((x) => {
+								arrows: arrows.map((x) => {
 									x[1] = background
 									return x
 								}),
-								elliptics: primitive.argline.elliptics.map((x) => {
+								elliptics: elliptics.map((x) => {
 									x[3] = background
 									return x
 								})

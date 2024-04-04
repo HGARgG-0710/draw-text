@@ -52,7 +52,7 @@ for (const metric of ["width", "height"])
 	})
 
 // ? Allow user to do the thing with other 'mime-types'? (not only 'image/')
-// ? validate the code for working with things besides png/jpg...;
+// ! PROBLEM: need to add a MIME module for this 'image/${ext}' bit... - MUST ALLOW WORKING WITH 'svg'! [Create proper documentation for file types syntax];
 document.querySelector("#download-button").addEventListener("click", (_event) => {
 	const ext = document.querySelector("#img-format").value || "png"
 	const downloadA = document.createElement("a")

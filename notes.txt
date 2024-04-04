@@ -26,6 +26,9 @@
 		3. strokeText [add text to draw-text...]; 
 		4. setLineDash (for dotted lines)
 		5. fillText;
+		6. drawImage (images!!! - implement together with the paths, arguments variables and file-running instead of necessarily getting the text from 'textarea' field);
+		7. createPattern (return type - a 'colour');
+
 3. IDEA: for README, draw something pretty! [in a minimalistic-cubistic-style? how about a Bloodborne hunter picture? Or one of one's characters?]
 4. IDEA: add more details to the page's HTML and CSS; 
 	Examples: images for a more 'sophisticated' layout, gradient, multicolours, that kind of thing...;
@@ -56,6 +59,28 @@
 
 11. Arithmetic! 
 
-	Add arithmetic for those expressions (simple addition, multiplication, division and subtraction ought to do it by now...); 
+	Add arithmetic for those expressions (simple addition, multiplication, division, subtraction and modulo ought to do it by now...); 
+	Add simple case static/strong typezation typezation 
+		(or, more precisely, add another layer of correctness-checking - now the program would also have to be sound from type-standpoint of view, 
+			besides only just adequate parsibility); 
+	Also - when implementing, add the rationals (at least the finite ones) and additive inverses support (in particular - for angles). 
 
 12. Add input from file (giving a file with 'draw-text' code...);
+
+	In particular - add the predefined 'arguments' variables, that can be accessed. 
+	This way, one could run draw-text files/code with given arguments;
+
+	[useful with images];
+
+13. Add filereading: 
+
+	For text files only (getting stroke-Text strings, colours, numbers and points); 
+
+14. Add "string" type: 
+
+	Easier to parse this way. Would be used for textual information; 
+
+15. Add a simple 'compiler' program for draw-this code: 
+
+	Would, in truth, simply substitute the argument-variables for static values, provided by the user; 
+	Eliminates the need for further user input;
