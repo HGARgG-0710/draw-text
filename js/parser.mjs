@@ -22,8 +22,13 @@ const reg = {
 	hyphen: /-/
 }
 
+// ! later, use some properly defined alias space instead of something particular like this (math-expressions.js);
+function r(...args) {
+	return args.map((x) => reg[x])
+}
+
 const regfun = {
-	variable: (...x) => or(...[...x, "varname"].map((x) => reg[x])),
+	variable: (...x) => or(...r(...x, "varname")),
 	brackets: (...x) => and(reg.opbrack, ...x, reg.clbrack)
 }
 
@@ -31,24 +36,62 @@ export const regexps = {
 	arrow: reg.arrow
 }
 regexps.colorarrow = and(
-	...["arrow", "space"].map((x) => reg[x]),
+	...r("arrow", "space"),
 	occurences(0, 1)(regfun.brackets(regfun.variable("color")))
 )
 regexps.triple = global(
 	and(
-		nlookbehind(and(...["hyphen", "space"].map((x) => reg[x]))),
+		nlookbehind(and(...r("hyphen", "space"))),
 		regfun.brackets(
 			reg.space,
 			regfun.variable("decimal"),
-			...["space", "comma", "space"].map((x) => reg[x]),
+			...r("space", "comma", "space"),
 			regfun.variable("decimal"),
-			occurences(
-				0,
-				1
-			)(and(...["comma", "space"].map((x) => reg[x]), regfun.variable("color")))
+			occurences(0, 1)(and(...r("comma", "space"), regfun.variable("color")))
 		)
 	)
 )
+
+regexps.vararg = occurences(1)(
+	and(
+		...r("varname", "space", "spacebar", "space"),
+		regfun.variable("color", "decimal")
+	)
+)
+
+regexps.decimal = global(end(begin(reg.decimal)))
+regexps.colorarg = global(and(reg.space, regfun.variable("color"), reg.space))
+regexps.colorarrowStrict = and(
+	...r("arrow", "space"),
+	regfun.brackets(regfun.variable("color"))
+)
+
+regexps.elliptic = and(
+	...r("hyphen", "space"),
+	regfun.brackets(
+		reg.space,
+		regfun.variable("decimal"),
+		reg.space,
+		occurences(
+			0,
+			1
+		)(
+			and(
+				...r("comma", "space"),
+				regfun.variable("decimal"),
+				occurences(0, 1)(
+					and(...r("comma", "space"), regfun.variable("decimal")),
+					occurences(
+						0,
+						1
+					)(and(...r("comma", "space"), regfun.variable("color")))
+				),
+				reg.space
+			)
+		)
+	)
+)
+
 regexps.argseq = occurences(
 	1,
 	""
@@ -60,46 +103,6 @@ regexps.argseq = occurences(
 		occurences(0, 1)(or(...["elliptic", "colorarrow"].map((x) => regexps[x])))
 	)
 )
-regexps.vararg = occurences(1)(
-	and(
-		...["varname", "space", "spacebar", "space"].map((x) => reg[x]),
-		regfun.variable("color", "decimal")
-	)
-)
-
-regexps.decimal = global(end(begin(reg.decimal)))
-regexps.colorarg = global(and(reg.space, regfun.variable("color"), reg.space))
-regexps.colorarrowStrict = and(
-	...["arrow", "space"].map((x) => reg[x]),
-	regfun.brackets(regfun.variable("color"))
-)
-
-regexps.elliptic = and(
-	...["hyphen", "space"].map((x) => reg[x]),
-	regfun.brackets(
-		reg.space,
-		regfun.variable("decimal"),
-		reg.space,
-		occurences(
-			0,
-			1
-		)(
-			and(
-				...["comma", "space"].map((x) => reg[x]),
-				regfun.variable("decimal"),
-				occurences(0, 1)(
-					and(
-						...["comma", "space"].map((x) => reg[x]),
-						regfun.variable("decimal")
-					),
-					occurences(0, 1)(and(...["comma", "space"], regfun.variable("color")))
-				),
-				reg.space
-			)
-		)
-	)
-)
-
 export const commandList = ["contour", "fill", "clear", "erase", "background", "variable"]
 
 const [connectionCommands, pairCommands] = [
@@ -249,7 +252,7 @@ function getlines(text) {
 
 function deBackground(text) {
 	const lines = getlines(text)
-	// ? Generalize this as well? 
+	// ? Generalize this as well?
 	const commands = lines.map(
 		(l) => commandList[commandList.map((c) => countOccurrencesStr(l, c)).indexOf(1)]
 	)
@@ -270,7 +273,7 @@ function deBackground(text) {
 }
 
 // ! Support more color-schemes (CMYK, RGBA, grayscale and others...);
-// ! PROBLEM: for now, only the HEX colour notation is supported (RGB used...) - expand syntax; 
+// ! PROBLEM: for now, only the HEX colour notation is supported (RGB used...) - expand syntax;
 
 // ^ IDEA: add ability to specify the default colours;
 export default function parse(text) {
@@ -282,7 +285,7 @@ export default function parse(text) {
 	return lines.map((x, i) => ({
 		command: commands[i],
 		argline: (connectionCommands.has(commands[i])
-			? (y) => new Primitive(parseSemiTriples(y), parseConnections(x))
+			? (y) => Primitive(parseSemiTriples(y), parseConnections(x))
 			: pairCommands.has(commands[i])
 			? (x) =>
 					x

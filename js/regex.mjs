@@ -34,5 +34,5 @@ export const [plookahead, nlookahead, plookbehind, nlookbehind] = [
 	"?<!"
 ].map(
 	(sym, i) => (regex) =>
-		new RegExp(`${i < 2 ? "" : sym}${bracket(regex)}${i >= 2 ? "" : sym}`)
+		new RegExp(`(${i < 2 ? "" : sym}${bracket(regex)}${i >= 2 ? "" : sym})`)
 )

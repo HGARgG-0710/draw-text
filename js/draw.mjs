@@ -70,9 +70,9 @@ export default function draw(primitive, background) {
 	if (primitive) {
 		const { command } = primitive
 
-		const { points } = primitive
-		const { arrows, elliptics } = primitive.connections
-		primitive = primitive.argline
+		const { argline } = primitive
+		const { points, connections } = argline
+		const { arrows, elliptics } = connections ? connections : {}
 
 		// ? Use a map of functions instead of a 'switch'?
 		switch (command) {
@@ -95,21 +95,18 @@ export default function draw(primitive, background) {
 				if (points.length) {
 					context.fillStyle =
 						points
-							.map((_x, i) =>
-								arrows[i][0] ? arrows[i][2] : elliptics[i][4]
-							)
+							.map((x, i) => (x[2] ? x[2] : elliptics[i][4]))
 							.reduce(
 								(acc, curr) => (acc ? acc : curr ? curr : null),
 								null
 							) || black
 					context.beginPath()
 					for (const key of Array.from(points.keys())) {
-						context.moveTo(...points[key])
-						if (arrows[key][0]) {
-							context.lineTo(...points[(key + 1) % points.length])
+						if (elliptics[key][0]) {
+							ellipse(points, elliptics, key)
 							continue
 						}
-						if (elliptics[key][0]) ellipse(points, elliptics, key)
+						line(points, key)
 					}
 					context.closePath()
 					context.fill()
@@ -163,8 +160,8 @@ export default function draw(primitive, background) {
 					background
 				)
 			case "background":
-				drawBackground(primitive)
-				return primitive
+				drawBackground(argline)
+				return argline
 		}
 	}
 }
