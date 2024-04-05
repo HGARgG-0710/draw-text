@@ -3,7 +3,7 @@
 // ? Add a 'regex' module to it?
 
 import { and, or, occurences, global, begin, end, nlookbehind } from "./regex.mjs"
-import { NGon } from "./primitives.mjs"
+import { Primitive } from "./primitives.mjs"
 
 // ^ IDEA: create a module for working with regexp tables [note: they could be used to construct the 'parser-type-recognition-tables' for parsers created by one of self's currently developed libraries...];
 // TODO: refactor these... [lots of repetition...];
@@ -87,14 +87,12 @@ regexps.elliptic = and(
 			and(
 				...["comma", "space"].map((x) => reg[x]),
 				regfun.variable("decimal"),
-				occurences(
-					0,
-					1
-				)(
+				occurences(0, 1)(
 					and(
 						...["comma", "space"].map((x) => reg[x]),
 						regfun.variable("decimal")
-					)
+					),
+					occurences(0, 1)(and(...["comma", "space"], regfun.variable("color")))
 				),
 				reg.space
 			)
@@ -148,10 +146,9 @@ function parseConnections(string) {
 			)
 		})
 	}
-	// ! Add the 'ellipticStrict' regexp... (analogous to 'colorarrowStrict' - targets only the 'elliptic' connections which have the argument attached to them...);
 	return {
 		arrows: retrieveType(["arrow", "colorarrowStrict"]),
-		elliptics: retrieveType(["elliptic", "ellipticStrict"], (x) =>
+		elliptics: retrieveType(Array(2).fill("elliptic"), (x) =>
 			x
 				.slice(1, x.length - 1)
 				.split(" ")
@@ -252,7 +249,7 @@ function getlines(text) {
 
 function deBackground(text) {
 	const lines = getlines(text)
-	// ! GENERALIZE THIS AS WELL...
+	// ? Generalize this as well? 
 	const commands = lines.map(
 		(l) => commandList[commandList.map((c) => countOccurrencesStr(l, c)).indexOf(1)]
 	)
@@ -272,8 +269,8 @@ function deBackground(text) {
 		: lines
 }
 
-// ! Support more formats for colour-setting (CMYK, RGBA, grayscale and others...);
-// ! PROBLEM: for now, only the HEX colour notation is supported (RGB used...): ADD OTHER COLOUR SCHEMES... (ways of defining them? via transformations, perhaps?);
+// ! Support more color-schemes (CMYK, RGBA, grayscale and others...);
+// ! PROBLEM: for now, only the HEX colour notation is supported (RGB used...) - expand syntax; 
 
 // ^ IDEA: add ability to specify the default colours;
 export default function parse(text) {
@@ -285,7 +282,7 @@ export default function parse(text) {
 	return lines.map((x, i) => ({
 		command: commands[i],
 		argline: (connectionCommands.has(commands[i])
-			? (y) => new NGon(parseSemiTriples(y), parseConnections(x))
+			? (y) => new Primitive(parseSemiTriples(y), parseConnections(x))
 			: pairCommands.has(commands[i])
 			? (x) =>
 					x

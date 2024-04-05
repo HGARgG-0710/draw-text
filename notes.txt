@@ -29,6 +29,28 @@
 		6. drawImage (images!!! - implement together with the paths, arguments variables and file-running instead of necessarily getting the text from 'textarea' field);
 		7. createPattern (return type - a 'colour');
 
+		These ones are same as 'background' - they're 'properties'; 
+		Can be set multiple times throughout...; 
+		8 [ASAP!!!]. lineWidth ('width' property)
+		9 [asap, too]. rounding of the lines - in particular, WITH A DESIRED ACCURACY! ('line-radius' property)
+
+		10. A transparency argument...; 
+		11. lineJoin - as a post-point 'specifier'; One of the following: 
+
+			1. r - for rounded corners; 
+			2. b - for bevel corners; 
+			The miter corners are the default, so for them - no specifier...; 
+
+		12. miterLimit ('limit' property)
+		13. lineDashOffset ('dash-offset' property)
+		14. gradients - conic, linear and radial (those that Canvas supports); 
+		15. fill-rule (single-value property for setting fill rules - 'evenodd' or 'nonzero');
+		16. shadow (command for shadows; takes arguments' shape of '(offsetx, offsety) blur? color?')
+		17. font (property; for doing text-stroking/fillling); 
+
+		Whole separate, under question: 
+		18. Animations? [more complex, doing will require finding a finite set of elementary operations equivalent in power to multi-layer structures such as 'for-loops' in the sense of determining the algorithms...];
+
 3. IDEA: for README, draw something pretty! [in a minimalistic-cubistic-style? how about a Bloodborne hunter picture? Or one of one's characters?]
 4. IDEA: add more details to the page's HTML and CSS; 
 	Examples: images for a more 'sophisticated' layout, gradient, multicolours, that kind of thing...;
@@ -84,3 +106,17 @@
 
 	Would, in truth, simply substitute the argument-variables for static values, provided by the user; 
 	Eliminates the need for further user input;
+
+	Also - eliminates inner calls from other files 
+		(if they are available - puts the code inside with appropriate name collisions in vars fixed (when required), otherwise - a compiler error); 
+	
+16. Add file-running: 
+
+	Two directives: 
+
+		1. run filepath [...arguments] - runs a given file within the context of the present canvas (without merging variable spaces); 
+		2. paste filepath [...arguments] - pastes the code of the given file into the present one (note: IT DOES NOT HAVE TO BE CORRECT AS OF SELF, variables can be undefined, for instance);
+
+17. Add a way to access the command-properties (such as 'radius'): 
+
+	For instance, add a special symbol (like % or $, or @, or !) to get their values [those will be ignored by the 'validate' function]; 
