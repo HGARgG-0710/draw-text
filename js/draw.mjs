@@ -1,4 +1,4 @@
-const black = `#${"0".repeat(3)}`
+export const black = `#${"0".repeat(3)}`
 
 const canvas = document.querySelector("canvas")
 const context = canvas.getContext("2d")
@@ -13,41 +13,61 @@ function line(points, key) {
 function ellipse(points, elliptics, key) {
 	const pair = [0, 1].map((i) => points[(key + i) % points.length])
 	const [x, y] = [0, 1].map((i) => pair.map((x) => x[i]))
+	const [dx, dy] = [x, y].map((p) => p[1] - p[0])
+
 	// ^ idea: Add the appropriate 'casual' geometric functions/identities to future releases of 'math-expressions.js' (things like Pythagoreas, work with angles, trignonometry - this and other stuff...):
-	// ! PROOOOOBBBLLLEEEEMMmm - DOES it or does it (the maths) not handle cases when 'alpha >= 90'? Consider that. Re-do the maths...;
-	const [centerAngle, startAngle, endAngle] = elliptics[key]
-		.slice(1, 3)
-		.map((x) => x % 360)
-	const isLeftCenterAngle = x[1] >= x[0]
-	const controlCenterAngle =
-		(centerAngle * (-1) ** isLeftCenterAngle + 180 + (isLeftCenterAngle ? 180 : 0)) %
-		360
-	const diagLen = Math.sqrt((x[1] - x[0]) ** 2 + (y[1] - y[0]) ** 2)
-	const radius = ["cos", "sin"].map((x) => Math[x]).map((f) => diagLen * f(centerAngle))
-	// ! CHECK FOR CORRRECTNESS!!! [probably correct only for one case of isLeftCenterAngle...];
-	const rotationAngle = toRadians(
-		270 + centerAngle - Math.asin((y[1] - y[0]) / diagLen)
-	)
+	// ! PROBLEM WITH MATHS - somewhy draws the wrong ellipse - problem with (mainly) 'center' and (possibly, also) 'radius';
+	const preCenterAngle = elliptics[key][1] % 360
+	// ! not used... fix;
+	const isCenterAbove = preCenterAngle > 270
+	const centerAngle = (isCenterAbove ? (x) => x - 270 : (x) => x)(preCenterAngle)
+
+	const [startAngle, endAngle] = elliptics[key].slice(2, 4)
+	const [isLeftCenterAngle, isAbove] = [dx >= 0, 0 <= dy]
+	console.log(isAbove)
+
+	// ? What the hell is this even?
+	// const controlCenterAngle =
+	// 	() %
+	// 	360
+
+	const diagLen = Math.sqrt(dx ** 2 + dy ** 2)
+	const radius = ["cos", "sin"]
+		.map((x) => Math[x])
+		.map((f) => diagLen * f(toRadians(centerAngle)))
+	// ! Hogwash. Fix. 
+	const rotationAngle =
+		toRadians((isCenterAbove ? 270 : 0) + centerAngle) -
+		Math.asin(Math.abs(dy / diagLen))
+
 	const center = [
-		[x, "sin"],
-		[y, "cos"]
-	].map(
-		([z, f], i) =>
-			z[0] +
-			(-1) **
-				(!i
-					? [3, 0]
-							.map((x) => (x + 2 * !isLeftCenterAngle) % 4)
-							.includes(Math.floor(controlCenterAngle / 90))
-					: 1 + (Math.floor(controlCenterAngle / 180) % 2)) *
-				radius[0] *
+		[x, "cos"],
+		[y, "sin"]
+	].map(([z, f], i) => {
+		return (
+			z[+!isLeftCenterAngle] +
+			(-1) ** i *
+				radius[+!isLeftCenterAngle] *
 				Math[f](
-					centerAngle -
-						Math.acos(Math.sqrt(diagLen ** 2 - (y[1] - y[0]) ** 2) / diagLen)
+					toRadians(
+						(!isLeftCenterAngle ? (x) => 90 - x : (x) => x)(centerAngle)
+					) - Math.acos(Math.abs(dx / diagLen))
 				)
-	)
+		)
+	})
+
+
 	// ? Is order (indexation) of 'radius' correct (and general) here? Check...
-	context.ellipse(...center, ...radius, rotationAngle, startAngle, endAngle)
+	context.ellipse(
+		...center,
+		...radius,
+		rotationAngle,
+		toRadians(startAngle),
+		toRadians(endAngle)
+	)
+
+	// ! DEBUG CODE...
+	return [center, pair, radius]
 }
 
 // ^ idea: add a 'units' module to 'math-expression.mjs' (or make it a separate module?) - functions for general unit conversion, efficient means of internal unit-data-record-keeping;
@@ -56,7 +76,11 @@ function toRadians(degs) {
 }
 
 function drawPoint(x, y) {
-	context.fillRect(x, y, 1, 1)
+	// ! DELETE ! DEBUG CODE!
+	const fillStyle = context.fillStyle
+	context.fillStyle = "#ff0000"
+	context.fillRect(x, y, 3, 3)
+	context.fillStyle = fillStyle
 }
 
 function drawBackground(colour) {
@@ -93,6 +117,7 @@ export default function draw(primitive, background) {
 				break
 			case "fill":
 				if (points.length) {
+					let [center, pair] = []
 					context.fillStyle =
 						points
 							.map((x, i) => (x[2] ? x[2] : elliptics[i][4]))
@@ -103,13 +128,18 @@ export default function draw(primitive, background) {
 					context.beginPath()
 					for (const key of Array.from(points.keys())) {
 						if (elliptics[key][0]) {
-							ellipse(points, elliptics, key)
+							// ! DEBUG CODE!!!
+							;[center, pair] = ellipse(points, elliptics, key)
 							continue
 						}
 						line(points, key)
 					}
 					context.closePath()
 					context.fill()
+					// ! DEBUG CODE!!
+					drawPoint(...center)
+					drawPoint(...pair[0])
+					drawPoint(...pair[1])
 				}
 				break
 			// ! refactor these two... (create a special 'lib.mjs' file, as always, for this...);

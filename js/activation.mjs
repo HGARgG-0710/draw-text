@@ -4,7 +4,7 @@ import { validate, validateNumber } from "./parser.mjs"
 import { clear } from "./draw.mjs"
 
 let lastText = ""
-// ! BUG - it SAVES the background even after the instruction for it's setting is gone. The behaviour should be different; Fix it... [create a separate data structure implementation for instruction-variables]; 
+// ! BUG - it SAVES the background even after the instruction for it's setting is gone. The behaviour should be different; Fix it... [create a separate data structure implementation for instruction-variables];
 let background = "#ffffff"
 
 const [vh, vw] = ["Height", "Width"].map((x) =>
@@ -32,25 +32,29 @@ document.querySelector("#code").addEventListener("keydown", function (event) {
 	}
 })
 
-document.querySelector("#code").addEventListener("keyup", (_kevent) => {
-	const v = document.activeElement.value.trim()
+document.querySelector("#code").addEventListener("keyup", function (_kevent) {
+	const v = this.value.trim()
 	if (lastText !== v) {
 		lastText = v
 		validate(lastText, imgout)
 	}
 })
 
-for (const metric of ["width", "height"])
-	document.querySelector(`#${metric}`).addEventListener("keyup", (_kevent) => {
+for (const metric of ["width", "height"]) {
+	const change = function (_kevent) {
 		validate(
-			document.activeElement.value.trim(),
+			this.value.trim(),
 			(text) => {
 				canvas.setAttribute(metric, text)
 				imgout(lastText)
 			},
 			validateNumber
 		)
-	})
+	}
+	const metricInput = document.querySelector(`#${metric}`)
+	change.call(metricInput)
+	metricInput.addEventListener("input", change)
+}
 
 // ? Allow user to do the thing with other 'mime-types'? (not only 'image/')
 // ! PROBLEM: need to add a MIME module for this 'image/${ext}' bit... - MUST ALLOW WORKING WITH 'svg'! [Create proper documentation for file types syntax];

@@ -1,20 +1,22 @@
 import draw from "./draw.mjs"
 import { regexps } from "./parser.mjs"
+import { black } from "./draw.mjs"
 
 const vars = new Map()
 
 export const parseSingle = (x) =>
-	(typeof x === "boolean"
+	(x instanceof Array
+		? (x) => x.map(parseSingle)
+		: typeof x === "boolean"
 		? (x) => x
 		: !isNaN(x)
 		? Number
 		: vars.has(x)
 		? (y) => parseSingle(vars.get(y))
-		: (text) => (text.match(regexps.colorarg) || ["#ffffff"])[0])(x)
+		: (text) => text.match(regexps.colorarg)[0] || black)(x)
 
 function substitute(expression) {
-	if (expression instanceof Array)
-		return expression.map((triple) => triple.map(parseSingle))
+	if (expression instanceof Array) return expression.map(parseSingle)
 	const { argline, connections, points, arrows, elliptics } = expression
 	if (elliptics)
 		return {

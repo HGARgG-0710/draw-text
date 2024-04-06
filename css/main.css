@@ -37,6 +37,7 @@ header {
 #pagename h1 {
 	--tb: 2vh;
 	--lr: 2vw;
+
 	color: violet;
 	font-size: 3.2vh;
 	margin: 0;
@@ -50,35 +51,31 @@ header {
 }
 
 main {
+	background-color: rgb(142, 227, 255);
 	display: flex;
 	flex-direction: row;
 }
 
-.blue-rect {
-	background-color: rgb(142, 227, 255);
+.space-rect {
 	width: 15vw;
 	border-radius: 0.75vw;
 }
-.blue-rect-left {
-	border-top-left-radius: 0;
-	border-bottom-left-radius: 0;
-	border-bottom-right-radius: 0.5vw;
-}
-.blue-rect-right {
-	border-top-right-radius: 0;
-	border-bottom-right-radius: 0;
-	border-bottom-left-radius: 0.5vw;
-}
+/* ? Add a shadow? [See how it looks...] */
 .main-rect {
+	--r: 2vw;
+
 	background-color: white;
 	width: 70vw;
 	display: flex;
 	flex-direction: column;
 	padding-top: 3vh;
+	border-bottom-left-radius: var(--r);
+	border-bottom-right-radius: var(--r);
 }
 
 p {
 	--padlr: 5vw;
+
 	padding: 0;
 	padding-left: var(--padlr);
 	padding-right: var(--padlr);
@@ -108,6 +105,7 @@ p {
 
 ol {
 	--padlr: 9vw;
+
 	padding-left: var(--padlr);
 	padding-right: var(--padlr);
 	padding-top: 0;

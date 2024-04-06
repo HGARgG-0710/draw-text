@@ -59,7 +59,7 @@ regexps.vararg = occurences(1)(
 	)
 )
 
-regexps.decimal = global(end(begin(reg.decimal)))
+regexps.decimal = end(begin(reg.decimal))
 regexps.colorarg = global(and(reg.space, regfun.variable("color"), reg.space))
 regexps.colorarrowStrict = and(
 	...r("arrow", "space"),
@@ -79,12 +79,18 @@ regexps.elliptic = and(
 			and(
 				...r("comma", "space"),
 				regfun.variable("decimal"),
-				occurences(0, 1)(
-					and(...r("comma", "space"), regfun.variable("decimal")),
-					occurences(
-						0,
-						1
-					)(and(...r("comma", "space"), regfun.variable("color")))
+				occurences(
+					0,
+					1
+				)(
+					and(
+						...r("comma", "space"),
+						regfun.variable("decimal"),
+						occurences(
+							0,
+							1
+						)(and(...r("comma", "space"), regfun.variable("color")))
+					)
 				),
 				reg.space
 			)
@@ -113,14 +119,16 @@ const [connectionCommands, pairCommands] = [
 function extractFirst(string, from, to, regex) {
 	return string.slice(from, to).match(new RegExp(regex, "g"))[0]
 }
+// ! this one's somewhat ugly. Rewrite - first of all, create a special function which would parse the 'between' values, then - check for them, insert the missing defaults/parse-depending-on-the-type. The thing ends up being separated into a sequence of functions instead of getting written only just here...;
 function parseConnections(string) {
-	function retrieveType(type, parsingFunc = (x) => x) {
+	const pairsinds = triplesInds(string)
+	function retrieveType(type, parsingFunc = (x) => [x]) {
 		const [presentConnections, colouredConnections] = type.map((x) =>
 			findSegments(string, regexps[x])
 		)
 		const colouredBeginnings = colouredConnections.map((x) => x[0])
-		const pairsinds = triplesInds(string)
 		return pairsinds.map((_x, i) => {
+			// ! This condition is broken. Better just change the values for 'presentConnection' based off the second part of the '||'-expression... (include the missing ones, then shoren the 'fel' to !!presentConnections[i]);
 			const fel =
 				!!presentConnections[i] &&
 				(i > (i + 1) % pairsinds.length ||
@@ -128,7 +136,7 @@ function parseConnections(string) {
 			return [fel].concat(
 				fel
 					? [
-							colouredBeginnings.includes(presentConnections[i][0])
+							...(colouredBeginnings.includes(presentConnections[i][0])
 								? ((x) =>
 										parsingFunc(
 											extractFirst(
@@ -136,14 +144,14 @@ function parseConnections(string) {
 												colouredBeginnings[x],
 												colouredBeginnings[x] +
 													colouredConnections[x][1],
-												regexps.colorarg
+												regexps[type[0]]
 											)
 										))(
 										colouredBeginnings.indexOf(
 											presentConnections[i][0]
 										)
 								  )
-								: false
+								: false)
 					  ]
 					: []
 			)
@@ -152,13 +160,9 @@ function parseConnections(string) {
 	return {
 		arrows: retrieveType(["arrow", "colorarrowStrict"]),
 		elliptics: retrieveType(Array(2).fill("elliptic"), (x) =>
-			x
-				.slice(1, x.length - 1)
-				.split(" ")
-				.join("\t")
-				.split("\t")
-				.join("")
-				.split(",")
+			((x) => x.slice(2, x.length - 1).split(","))(
+				x.split(" ").join("\t").split("\t").join("")
+			)
 		)
 	}
 }
@@ -191,16 +195,6 @@ function parseSemiTriples(string) {
 		)
 }
 
-// ! NOTE: this works ONLY with 'regex'es that break the string on parts WHOLLY!
-// ? Replace in the 'validateNumber' and get rid of altogether form codebase?
-function isEntire(string, regex) {
-	return (
-		Array.from(string.matchAll(regex))
-			.map((x) => x[0])
-			.join("") === string
-	)
-}
-
 function isValid(text) {
 	return getlines(text).every((line, i) => {
 		const r = commandList.map((command) => countOccurrencesStr(line, command))
@@ -219,11 +213,12 @@ function isValid(text) {
 }
 
 export function validateNumber(string) {
-	return isEntire(string, regexps.decimal)
+	return regexps.decimal.test(string)
 }
 
 export function validate(text, callback, validityCheck = isValid) {
-	if (validityCheck(text)) return callback(text)
+	const t = validityCheck(text)
+	if (t) return callback(text)
 }
 
 // ! note: a useful general algorithm/alias to add to 'math-expressions.js'...;
