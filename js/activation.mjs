@@ -4,8 +4,6 @@ import { validate, validateNumber } from "./parser.mjs"
 import { clear } from "./draw.mjs"
 
 let lastText = ""
-// ! BUG - it SAVES the background even after the instruction for it's setting is gone. The behaviour should be different; Fix it... [create a separate data structure implementation for instruction-variables];
-let background = "#ffffff"
 
 const [vh, vw] = ["Height", "Width"].map((x) =>
 	Math.max(
@@ -18,7 +16,7 @@ const [vh, vw] = ["Height", "Width"].map((x) =>
 
 const imgout = (text) => {
 	clear()
-	parse(text).forEach((x) => (background = process(x, background) || background))
+	parse(text).forEach(process)
 }
 
 const canvas = document.querySelector("canvas")

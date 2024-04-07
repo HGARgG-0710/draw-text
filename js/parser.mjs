@@ -109,11 +109,22 @@ regexps.argseq = occurences(
 		occurences(0, 1)(or(...["elliptic", "colorarrow"].map((x) => regexps[x])))
 	)
 )
-export const commandList = ["contour", "fill", "clear", "erase", "background", "variable"]
+// ^ IDEA: it's getting big - rewrite the commandList via 'Array.from' of union of 'connectionCommands', 'pairCommands' and 'singleCommands' (background, line-width and line-cap currently...);
+export const commandList = [
+	"contour",
+	"fill",
+	"clear",
+	"erase",
+	"background",
+	"line-cap",
+	"line-width",
+	"variable",
+	"set-param"
+]
 
 const [connectionCommands, pairCommands] = [
 	["contour", "fill", "clear", "erase"],
-	["variable"]
+	["variable", "set-param"]
 ].map((x) => new Set(x))
 
 function extractFirst(string, from, to, regex) {
@@ -245,6 +256,8 @@ function getlines(text) {
 		.filter((x) => x.length)
 }
 
+// ^ IDEA: no, don't have that. Get rid of 'deBackground' altogether (let the user be capable of changing backgrounds dynamically!);
+// ^ IDEA: create a formatter for the thing (code format)?
 function deBackground(text) {
 	const lines = getlines(text)
 	// ? Generalize this as well?

@@ -1,7 +1,8 @@
-export const black = `#${"0".repeat(3)}`
+import { black } from "./colors.mjs"
+import params from "./params.mjs"
 
 const canvas = document.querySelector("canvas")
-const context = canvas.getContext("2d")
+export const context = canvas.getContext("2d")
 context.globalCompositeOperation = "source-over"
 
 context.imageSmoothingEnabled = false
@@ -10,52 +11,64 @@ function line(points, key) {
 	context.lineTo(...points[(key + 1) % points.length])
 }
 
+// ^ idea: Add the appropriate 'casual' geometric functions/identities to future releases of 'math-expressions.js' (things like Pythagoreas, work with angles, trignonometry - this and other stuff...):
 function ellipse(points, elliptics, key) {
 	const pair = [0, 1].map((i) => points[(key + i) % points.length])
 	const [x, y] = [0, 1].map((i) => pair.map((x) => x[i]))
 	const [dx, dy] = [x, y].map((p) => p[1] - p[0])
 
-	// ^ idea: Add the appropriate 'casual' geometric functions/identities to future releases of 'math-expressions.js' (things like Pythagoreas, work with angles, trignonometry - this and other stuff...):
-	// ! PROBLEM WITH MATHS - somewhy draws the wrong ellipse - problem with (mainly) 'center' and (possibly, also) 'radius';
 	const preCenterAngle = elliptics[key][1] % 360
-	// ! not used... fix;
-	const isCenterAbove = preCenterAngle > 270
-	const centerAngle = (isCenterAbove ? (x) => x - 270 : (x) => x)(preCenterAngle)
 
 	const [startAngle, endAngle] = elliptics[key].slice(2, 4)
-	const [isLeftCenterAngle, isAbove] = [dx >= 0, 0 <= dy]
-	console.log(isAbove)
+	const [isFirstLeft, isFirstAbove] = [dx >= 0, 0 < dy]
 
-	// ? What the hell is this even?
-	// const controlCenterAngle =
-	// 	() %
-	// 	360
+	// ! Definition is flawed. Fix; [Requires more bloody branching AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH!]
+	// ! FIX THOSE! They are supposed to be incompatible;
+	// ! CLEAN UP ALL THAT MESS - refactor using '.map's + fix the ternary sequence for 'center';
+	// ? Should one, though? This is good for semantics. Makes code far more intuitive...
+	// * How about the following - if this works, then (initially) oneself commits as-is, then cleans up.
+	const isCenterBelow = Math.abs(dx) > Math.abs(dy) && preCenterAngle < 90
+	const isCenterAbove = Math.abs(dx) > Math.abs(dy) && preCenterAngle > 270
+	const isCenterRight = Math.abs(dy) > Math.abs(dx) && preCenterAngle < 90
+	const isCenterLeft = Math.abs(dy) > Math.abs(dx) && preCenterAngle > 270
+
+	const centerAngle = (isCenterAbove ? (x) => x - 270 : (x) => x)(preCenterAngle)
 
 	const diagLen = Math.sqrt(dx ** 2 + dy ** 2)
 	const radius = ["cos", "sin"]
 		.map((x) => Math[x])
 		.map((f) => diagLen * f(toRadians(centerAngle)))
-	// ! Hogwash. Fix. 
-	const rotationAngle =
-		toRadians((isCenterAbove ? 270 : 0) + centerAngle) -
-		Math.asin(Math.abs(dy / diagLen))
+	// ! leave alone for now... Center's still fucked.
+	const rotationAngle = 0 /* toRadians(90 - centerAngle) + Math.acos(dx / diagLen) */
+
+	console.log("Above:")
+	console.log(isCenterAbove)
+	console.log("Below:")
+	console.log(isCenterBelow)
+	console.log("Left:")
+	console.log(isCenterLeft)
+	console.log("Right:")
+	console.log(isCenterRight)
+	console.log()
+	console.log("left center angle?")
+	console.log(isFirstLeft)
+	console.log("first above?")
+	console.log(isFirstAbove)
 
 	const center = [
 		[x, "cos"],
 		[y, "sin"]
 	].map(([z, f], i) => {
 		return (
-			z[+!isLeftCenterAngle] +
-			(-1) ** i *
-				radius[+!isLeftCenterAngle] *
+			z[+(isCenterAbove || isCenterBelow ? !isFirstLeft : !isFirstAbove)] +
+			(-1) ** (isCenterAbove ? i : isCenterRight ? 0 : isCenterBelow ? 0 : !i) *
+				radius[+(isCenterAbove || isCenterBelow ? !isFirstLeft : !isFirstAbove)] *
 				Math[f](
-					toRadians(
-						(!isLeftCenterAngle ? (x) => 90 - x : (x) => x)(centerAngle)
-					) - Math.acos(Math.abs(dx / diagLen))
+					toRadians((isFirstAbove ? (x) => x : (x) => 90 - x)(centerAngle)) +
+						Math.acos(Math.abs(dx / diagLen))
 				)
 		)
 	})
-
 
 	// ? Is order (indexation) of 'radius' correct (and general) here? Check...
 	context.ellipse(
@@ -83,14 +96,8 @@ function drawPoint(x, y) {
 	context.fillStyle = fillStyle
 }
 
-function drawBackground(colour) {
-	const prevFill = context.fillStyle
-	context.fillStyle = colour
-	context.fillRect(0, 0, canvas.width, canvas.height)
-	context.fillStyle = prevFill
-}
-
-export default function draw(primitive, background) {
+export default function draw(primitive) {
+	const background = params.get("background")[0]
 	if (primitive) {
 		const { command } = primitive
 
@@ -98,7 +105,7 @@ export default function draw(primitive, background) {
 		const { points, connections } = argline
 		const { arrows, elliptics } = connections ? connections : {}
 
-		// ? Use a map of functions instead of a 'switch'?
+		// ! Use a map of functions instead of a 'switch';
 		switch (command) {
 			case "contour":
 				for (const key of Array.from(points.keys())) {
@@ -144,54 +151,45 @@ export default function draw(primitive, background) {
 				break
 			// ! refactor these two... (create a special 'lib.mjs' file, as always, for this...);
 			case "clear":
-				return draw(
-					{
-						command: "contour",
-						argline: {
-							points: points.map((x) => {
-								x[2] = background
-								return x
+				return draw({
+					command: "contour",
+					argline: {
+						points: points.map((x) => {
+							x[2] = background
+							return x
+						}),
+						connections: {
+							arrows: arrows.map((arrow) => {
+								arrow[1] = background
+								return arrow
 							}),
-							connections: {
-								arrows: arrows.map((arrow) => {
-									arrow[1] = background
-									return arrow
-								}),
-								elliptics: elliptics.map((elliptic) => {
-									elliptic[3] = background
-									return elliptic
-								})
-							}
+							elliptics: elliptics.map((elliptic) => {
+								elliptic[3] = background
+								return elliptic
+							})
 						}
-					},
-					background
-				)
+					}
+				})
 			case "erase":
-				return draw(
-					{
-						command: "fill",
-						argline: {
-							points: points.map((x) => {
-								x[2] = background
+				return draw({
+					command: "fill",
+					argline: {
+						points: points.map((x) => {
+							x[2] = background
+							return x
+						}),
+						connections: {
+							arrows: arrows.map((x) => {
+								x[1] = background
 								return x
 							}),
-							connections: {
-								arrows: arrows.map((x) => {
-									x[1] = background
-									return x
-								}),
-								elliptics: elliptics.map((x) => {
-									x[3] = background
-									return x
-								})
-							}
+							elliptics: elliptics.map((x) => {
+								x[3] = background
+								return x
+							})
 						}
-					},
-					background
-				)
-			case "background":
-				drawBackground(argline)
-				return argline
+					}
+				})
 		}
 	}
 }

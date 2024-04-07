@@ -29,57 +29,76 @@
 		6. drawImage (images!!! - implement together with the paths, arguments variables and file-running instead of necessarily getting the text from 'textarea' field);
 		7. createPattern (return type - a 'colour');
 
-		These ones are same as 'background' - they're 'properties'; 
-		Can be set multiple times throughout...; 
-		8 [ASAP!!!]. lineWidth ('width' property)
-		9 [asap, too]. rounding of the lines - in particular, WITH A DESIRED ACCURACY! ('line-radius' property)
-
-		10. A transparency argument...; 
-		11. lineJoin - as a post-point 'specifier'; One of the following: 
+		8. A transparency argument...; 
+		9. lineJoin - as a post-point 'specifier'; One of the following: 
 
 			1. r - for rounded corners; 
 			2. b - for bevel corners; 
 			The miter corners are the default, so for them - no specifier...; 
 
-		12. miterLimit ('limit' property)
-		13. lineDashOffset ('dash-offset' property)
-		14. gradients - conic, linear and radial (those that Canvas supports); 
-		15. fill-rule (single-value property for setting fill rules - 'evenodd' or 'nonzero');
-		16. shadow (command for shadows; takes arguments' shape of '(offsetx, offsety) blur? color?')
-		17. font (property; for doing text-stroking/fillling); 
+		10. miterLimit ('limit' property)
+		11. lineDashOffset ('dash-offset' property)
+		12. gradients - conic, linear and radial (those that Canvas supports); 
+		13. fill-rule (single-value property for setting fill rules - 'evenodd' or 'nonzero');
+		14. shadow (command for shadows; takes arguments' shape of '(offsetx, offsety) blur? color?')
+		15. font (property; for doing text-stroking/fillling); 
 
 		Whole separate, under question: 
-		18. Animations? [more complex, doing will require finding a finite set of elementary operations equivalent in power to multi-layer structures such as 'for-loops' in the sense of determining the algorithms...];
+		16. Animations? [more complex, doing will require finding a finite set of elementary operations equivalent in power to multi-layer structures such as 'for-loops' in the sense of determining the algorithms...];
 
-3. IDEA: for README, draw something pretty! [in a minimalistic-cubistic-style? how about a Bloodborne hunter picture? Or one of one's characters?]
+			IDEA: add eleven instructions: 
+
+				1. computation {...} - a computation cycle - it [effectively] causes a re-computation of variables on each render (there is a special 'time' variable which tracks the current render frame); NOTE: the screen is updated, then flushed every frame;
+				2. start - for starting the computation
+				3. stop - for stopping the computation
+				4. do-when condition {...} - executes the block, when given condition is true (NOTE: this is asynchronous - that is, it tracks the state of the program and does something when a thing reaches it...);
+				5. jump-if condition label - if given condition is true, then jumps to the label (or line, if it's a number and no such label already) in question;
+				6. label labelname - creates a new label on a given line; 
+				7. do-if condition {...} - synchronous version of 'do-when'; condition checked only once
+				8. jump-when condition label - asynchronous version of 'jump-if', same as 'do-when' is for 'do-if';
+				9. loop {...} - defines an infinite loop; 
+				10. break - breaks out of current loop
+				11. do-every condition {...} - every step of a loop [any loop] checks for the given condition, and if true - does what is inside of a block...; 
+			
+			Idea: add capabilities of a small web-game engine? 
+				Can create a game with canvas, then - download as an iframe element that can be included onto a webpage (+styles for it...);
+				NOTE: this will require: 
+
+					1. draw-text code to JavaScript compilation; 
+					2. new [more sophisticated] editor - particularly, FOR SCREEN/WINDOW SIZES (dynamic ones, too)!
+					3. [not essential, but good to have] Ability to compile the game with desired paths for images and so forth. 
+					4. [KEY!] The user input capabilities; 
+			
+			Idea: for data-storage, one can use the client + JSON: 
+
+				1. json{...} - an expression, result of which is a JSON-string of whatever is passed to 'json'
+				2. from-json filepath - reads a filepath 
+
+3. IDEA: add an .svg of some draw-text example to the README...;
 4. IDEA: add more details to the page's HTML and CSS; 
 	Examples: images for a more 'sophisticated' layout, gradient, multicolours, that kind of thing...;
 5. CSS is good (adaptive for SOME screens..., computer screens for instance...), but not good enough for the app to be easily (comfortably) used on mobile devices...;
 	For them - choose different proportions. 
 	The values of phones are FARRR too different. 
 	They are not height-oriented, but rather width-oriented...; 
-6. ?Add more canvas programmatic properties to the project? 
-	Ideally, the final thing ought to be something of a total-Canvas-drawing-API-wrapper, 
-		but reformulated purely in terms of shapes (that being, 
-			the entire programming paraphanalia is taken out - only these elementary instructions remain). 
-7. IDEA: add 'comment's into the project's language's vocabulary...; 
+6. IDEA: add 'comment's into the project's language's vocabulary...; 
 	Useful for designation of particular elements of images, in the cases of certain complexity. 
-8. IDEA [visual design]: add a generation of random pattern to the sides of the page (current blue-rect); 
+7. IDEA [visual design]: add a generation of random pattern to the sides of the page (current blue-rect); 
 	Think whether the pattern would be recurring, or it would create new colours each time user would 
 		change the canvas size (thus increasing the page size...); 
 	Also - consider how they'd be generated (that is, how would the colour pattern be chosen...
 		What vector-function of n>=2 colour components - RGB/other - to pick/construct?)
 	
-9. Idea: add support for a 'point'-datatype to the parser; 
+8. Idea: add support for a 'point'-datatype to the parser; 
 
 	Allows one to store (in variables) individual points instead of simply x/y/color coordinates of a point...;
 
-10. A website Favicon - add it; 
+9. A website Favicon - add it; 
 
 	Think of something pretty. Draw it with 'draw-text'; 
 	Then, use as a favicon (an .svg...); 
 
-11. Arithmetic! 
+10. Arithmetic! 
 
 	Add arithmetic for those expressions (simple addition, multiplication, division, subtraction and modulo ought to do it by now...); 
 	Add simple case static/strong typezation typezation 
@@ -87,22 +106,24 @@
 			besides only just adequate parsibility); 
 	Also - when implementing, add the rationals (at least the finite ones) and additive inverses support (in particular - for angles). 
 
-12. Add input from file (giving a file with 'draw-text' code...);
+	Also - the booleans and trigonometric functions (sin, cos, tan); 
+
+11. Add input from file (giving a file with 'draw-text' code...);
 
 	In particular - add the predefined 'arguments' variables, that can be accessed. 
 	This way, one could run draw-text files/code with given arguments;
 
 	[useful with images];
 
-13. Add filereading: 
+12. Add filereading: 
 
 	For text files only (getting stroke-Text strings, colours, numbers and points); 
 
-14. Add "string" type: 
+13. Add "string" type: 
 
 	Easier to parse this way. Would be used for textual information; 
 
-15. Add a simple 'compiler' program for draw-this code: 
+14. Add a simple 'compiler' program for draw-this code: 
 
 	Would, in truth, simply substitute the argument-variables for static values, provided by the user; 
 	Eliminates the need for further user input;
@@ -110,13 +131,43 @@
 	Also - eliminates inner calls from other files 
 		(if they are available - puts the code inside with appropriate name collisions in vars fixed (when required), otherwise - a compiler error); 
 	
-16. Add file-running: 
+15. Add file-running: 
 
 	Two directives: 
 
 		1. run filepath [...arguments] - runs a given file within the context of the present canvas (without merging variable spaces); 
 		2. paste filepath [...arguments] - pastes the code of the given file into the present one (note: IT DOES NOT HAVE TO BE CORRECT AS OF SELF, variables can be undefined, for instance);
 
-17. Add a way to access the command-properties (such as 'radius'): 
+16. Add a way to access the command-properties (such as 'radius'): 
 
 	For instance, add a special symbol (like % or $, or @, or !) to get their values [those will be ignored by the 'validate' function]; 
+
+17. Add more complex data structures: 
+
+	For instance - arrays: 
+
+		1. array x [...] - expression for defining an array
+		2. x[...] - indexation
+		3. array x ind1 val1, ind2 val2, ... - set a value for an array's index (can be repeated)
+		4. array x ind - delete index 'ind' from array (performs backwards shift of all the latter values);
+		5. enumeration x start next-ind {...} - enumerates all the items in the array, where 'start' is the initial index and 'next-ind' is the gap value for each next index to enumerate (an expression, evaluated at every turn);
+			This is particularly powerul and useful, because in a single stroke it elegantly generalizes: 
+
+				1. classical for-loops (just use '1');
+				2. every 'nth' item of the array (use 'n');
+				3. other, more complex cases;
+	
+		6?. Some functions for arrays (like, 'slice' or 'map'? Would make development far easier, however, would increase the number of operators...):
+	
+18. Idea [possibly, not good]: functions!
+
+	They would be evaluated as a set of compilation-structures, 
+		namely - for them there'd exist a separate process for putting those out as a script in an alternative file (so as to replace 'function's with 'run's);
+	This'd be a special 'de-function' code operation (for it, too, a script would be written...); 
+	There'd also exist an alternative implementation that uses JS functions: 
+
+		function name {
+			...
+		}
+	
+	The i'th argument of n-level function is accessed via "$[repeat n]$i", whereas "$i" is used for script argument [0-level function];

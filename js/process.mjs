@@ -1,8 +1,10 @@
 import draw from "./draw.mjs"
 import { regexps } from "./parser.mjs"
-import { black } from "./draw.mjs"
+import { context } from "./draw.mjs"
+import { black } from "./colors.mjs"
+import params from "./params.mjs"
 
-const vars = new Map()
+export const vars = new Map()
 
 export const parseSingle = (x) =>
 	(x instanceof Array
@@ -32,14 +34,29 @@ function substitute(expression) {
 }
 
 export default function process(expression, ...past) {
-	switch (expression.command) {
+	const { command, argline } = expression
+	switch (command) {
+		case "set-param":
+			const paramName = argline[0]
+			if (params.has(paramName)) {
+				const param = params.get(paramName)
+				const [paramContent, newParamValue] = [param, argline].map((x) => x[1])
+				if (paramContent[1](newParamValue)) {
+					paramContent[0] = parseSingle(newParamValue)
+					paramContent[2].call(context, newParamValue)
+				}
+			}
+			break
 		case "variable":
-			const { argline } = expression
 			vars.set(argline[0], parseSingle(argline[1]))
 			break
-		case "background":
-			return draw(expression, ...past)
 		default:
+			// TODO: allow [in parser] all the params to be commands themselves (to keep compatibility with old syntax...):
+			if (params.has(command))
+				return process({
+					command: "set-param",
+					argline: [command].concat(argline)
+				})
 			return draw(substitute(expression), ...past)
 	}
 }
