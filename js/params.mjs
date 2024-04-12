@@ -1,4 +1,5 @@
 import { white } from "./colors.mjs"
+import { canvas, context } from "./draw.mjs"
 
 export function drawBackground(colour) {
 	const prevFill = context.fillStyle
@@ -13,22 +14,20 @@ const params = new Map([
 		"background",
 		[
 			white,
-			(x) => {
-				// ! CHECK FOR CORRECTNESS PROPERLY... [implement a mini-typesystem with according predicates already];
-				return true
-			},
+			// ? Check for correctness properly? [presently, will just paint it black...];
+			() => true,
 			drawBackground
 		]
 	],
 	[
-		("line-width",
+		"line-width",
 		[
 			1,
 			(x) => typeof x === "number" || x instanceof Number,
 			function (widthValue) {
 				this.lineWidth = widthValue
 			}
-		])
+		]
 	],
 	[
 		"line-cap",

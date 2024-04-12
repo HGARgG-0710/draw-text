@@ -40,10 +40,10 @@ export default function process(expression, ...past) {
 			const paramName = argline[0]
 			if (params.has(paramName)) {
 				const param = params.get(paramName)
-				const [paramContent, newParamValue] = [param, argline].map((x) => x[1])
-				if (paramContent[1](newParamValue)) {
-					paramContent[0] = parseSingle(newParamValue)
-					paramContent[2].call(context, newParamValue)
+				const newParamValue = parseSingle(argline[1])
+				if (param[1](newParamValue)) {
+					param[0] = newParamValue
+					param[2].call(context, newParamValue)
 				}
 			}
 			break

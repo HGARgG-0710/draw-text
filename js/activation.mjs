@@ -23,6 +23,7 @@ const canvas = document.querySelector("canvas")
 canvas.setAttribute("height", String(60 * vh))
 canvas.setAttribute("width", String(60 * vw))
 
+// ^ Idea: create an npm-library with common expressions/aliases/tasks for working with DOM API [like here - allowing the Tab insertion inside a 'textarea' element]; 
 document.querySelector("#code").addEventListener("keydown", function (event) {
 	if (event.key === "Tab" && document.activeElement.id === "code") {
 		event.preventDefault()

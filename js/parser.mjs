@@ -35,6 +35,9 @@ const regfun = {
 export const regexps = {
 	arrow: reg.arrow
 }
+
+regexps.vardecimal = regfun.variable("decimal")
+regexps.varcolor = regfun.variable("color")
 regexps.colorarrow = and(
 	...r("arrow", "space"),
 	occurences(0, 1)(regfun.brackets(regfun.variable("color")))
@@ -44,10 +47,10 @@ regexps.triple = global(
 		nlookbehind(and(...r("hyphen", "space"))),
 		regfun.brackets(
 			reg.space,
-			regfun.variable("decimal"),
+			regexps.vardecimal,
 			...r("space", "comma", "space"),
-			regfun.variable("decimal"),
-			occurences(0, 1)(and(...r("comma", "space"), regfun.variable("color")))
+			regexps.vardecimal,
+			occurences(0, 1)(and(...r("comma", "space"), regexps.varcolor))
 		)
 	)
 )
@@ -60,17 +63,14 @@ regexps.vararg = occurences(1)(
 )
 
 regexps.decimal = end(begin(reg.decimal))
-regexps.colorarg = global(and(reg.space, regfun.variable("color"), reg.space))
-regexps.colorarrowStrict = and(
-	...r("arrow", "space"),
-	regfun.brackets(regfun.variable("color"))
-)
+regexps.colorarg = and(reg.space, regexps.varcolor, reg.space)
+regexps.colorarrowStrict = and(...r("arrow", "space"), regfun.brackets(regexps.varcolor))
 
 regexps.elliptic = and(
 	...r("hyphen", "space"),
 	regfun.brackets(
 		reg.space,
-		regfun.variable("decimal"),
+		regexps.vardecimal,
 		reg.space,
 		occurences(
 			0,
@@ -78,18 +78,15 @@ regexps.elliptic = and(
 		)(
 			and(
 				...r("comma", "space"),
-				regfun.variable("decimal"),
+				regexps.varcolor,
 				occurences(
 					0,
 					1
 				)(
 					and(
 						...r("comma", "space"),
-						regfun.variable("decimal"),
-						occurences(
-							0,
-							1
-						)(and(...r("comma", "space"), regfun.variable("color")))
+						regexps.vardecimal,
+						occurences(0, 1)(and(...r("comma", "space"), regexps.vardecimal))
 					)
 				),
 				reg.space
@@ -109,23 +106,19 @@ regexps.argseq = occurences(
 		occurences(0, 1)(or(...["elliptic", "colorarrow"].map((x) => regexps[x])))
 	)
 )
-// ^ IDEA: it's getting big - rewrite the commandList via 'Array.from' of union of 'connectionCommands', 'pairCommands' and 'singleCommands' (background, line-width and line-cap currently...);
-export const commandList = [
-	"contour",
-	"fill",
-	"clear",
-	"erase",
-	"background",
-	"line-cap",
-	"line-width",
-	"variable",
-	"set-param"
-]
 
-const [connectionCommands, pairCommands] = [
+// ? Separate the 'regexps' on more semantic divisions?
+regexps.caparg = /(b|r|s)/
+
+const [connectionCommands, singleCommands, pairCommands] = [
 	["contour", "fill", "clear", "erase"],
+	["background", "line-cap", "line-width"],
 	["variable", "set-param"]
 ].map((x) => new Set(x))
+
+export const commandList = [connectionCommands, singleCommands, pairCommands]
+	.map((x) => Array.from(x))
+	.flat()
 
 function extractFirst(string, from, to, regex) {
 	return string.slice(from, to).match(new RegExp(regex, "g"))[0]
@@ -133,7 +126,7 @@ function extractFirst(string, from, to, regex) {
 // ! this one's somewhat ugly. Rewrite - first of all, create a special function which would parse the 'between' values, then - check for them, insert the missing defaults/parse-depending-on-the-type. The thing ends up being separated into a sequence of functions instead of getting written only just here...;
 function parseConnections(string) {
 	const pairsinds = triplesInds(string)
-	function retrieveType(type, parsingFunc = (x) => [x]) {
+	function retrieveType(type, parsingFunc) {
 		const [presentConnections, colouredConnections] = type.map((x) =>
 			findSegments(string, regexps[x])
 		)
@@ -146,30 +139,25 @@ function parseConnections(string) {
 					presentConnections[i][0] < pairsinds[(i + 1) % pairsinds.length][0])
 			return [fel].concat(
 				fel
-					? [
-							...(colouredBeginnings.includes(presentConnections[i][0])
-								? ((x) =>
-										parsingFunc(
-											extractFirst(
-												string,
-												colouredBeginnings[x],
-												colouredBeginnings[x] +
-													colouredConnections[x][1],
-												regexps[type[0]]
-											)
-										))(
-										colouredBeginnings.indexOf(
-											presentConnections[i][0]
-										)
-								  )
-								: false)
-					  ]
+					? colouredBeginnings.includes(presentConnections[i][0])
+						? ((x) =>
+								parsingFunc(
+									extractFirst(
+										string,
+										colouredBeginnings[x],
+										colouredBeginnings[x] + colouredConnections[x][1],
+										regexps[type[1]]
+									)
+								))(colouredBeginnings.indexOf(presentConnections[i][0]))
+						: [false]
 					: []
 			)
 		})
 	}
 	return {
-		arrows: retrieveType(["arrow", "colorarrowStrict"]),
+		arrows: retrieveType(["arrow", "colorarrowStrict"], (x) =>
+			x.slice(3, x.length - 1)
+		),
 		elliptics: retrieveType(Array(2).fill("elliptic"), (x) =>
 			((x) => x.slice(2, x.length - 1).split(","))(
 				x.split(" ").join("\t").split("\t").join("")
@@ -206,19 +194,24 @@ function parseSemiTriples(string) {
 		)
 }
 
+const validityMap = {
+	background: "colorarg",
+	variable: "vararg",
+	"line-width": "vardecimal",
+	"line-cap": "caparg",
+	contour: "argseq",
+	fill: "argseq",
+	erase: "argseq",
+	clear: "argseq"
+}
+
 function isValid(text) {
 	return getlines(text).every((line, i) => {
 		const r = commandList.map((command) => countOccurrencesStr(line, command))
 		const command = commandList[r.indexOf(1)]
 		return (
 			[commandList.length - 1, 1].every((x, i) => x === countOccurencesArr(r, i)) &&
-			regexps[
-				command === "background"
-					? "colorarg"
-					: command === "variable"
-					? "vararg"
-					: "argseq"
-			].test(line.split(command)[1])
+			regexps[validityMap[command]].test(line.split(command)[1])
 		)
 	})
 }
@@ -228,8 +221,7 @@ export function validateNumber(string) {
 }
 
 export function validate(text, callback, validityCheck = isValid) {
-	const t = validityCheck(text)
-	if (t) return callback(text)
+	if (validityCheck(text)) return callback(text)
 }
 
 // ! note: a useful general algorithm/alias to add to 'math-expressions.js'...;
@@ -243,7 +235,7 @@ function countOccurrencesStr(string, sub) {
 		}
 	return counted
 }
-
+// ! another useful alias...;
 function countOccurencesArr(arr, elem) {
 	return arr.reduce((acc, curr) => acc + (curr === elem), 0)
 }
@@ -256,36 +248,14 @@ function getlines(text) {
 		.filter((x) => x.length)
 }
 
-// ^ IDEA: no, don't have that. Get rid of 'deBackground' altogether (let the user be capable of changing backgrounds dynamically!);
 // ^ IDEA: create a formatter for the thing (code format)?
-function deBackground(text) {
-	const lines = getlines(text)
-	// ? Generalize this as well?
-	const commands = lines.map(
-		(l) => commandList[commandList.map((c) => countOccurrencesStr(l, c)).indexOf(1)]
-	)
-	const backgroundIndexes = commands
-		.map((x, i) => (x === "background" ? i : -1))
-		.filter((x) => x >= 0)
-	return !!backgroundIndexes.length
-		? [lines[backgroundIndexes[0]]].concat(
-				lines
-					.slice(0, backgroundIndexes[0])
-					.concat(lines.slice(backgroundIndexes[0] + 1))
-					.filter(
-						(_x, i) =>
-							!backgroundIndexes.includes(i + (i >= backgroundIndexes[0]))
-					)
-		  )
-		: lines
-}
 
 // ! Support more color-schemes (CMYK, RGBA, grayscale and others...);
 // ! PROBLEM: for now, only the HEX colour notation is supported (RGB used...) - expand syntax;
 
-// ^ IDEA: add ability to specify the default colours;
+// ^ IDEA: add ability to specify the default colours [as a parameter];
 export default function parse(text) {
-	const lines = deBackground(text)
+	const lines = getlines(text)
 	const commandInds = lines.map((l) =>
 		commandList.map((command) => countOccurrencesStr(l, command)).indexOf(1)
 	)
@@ -301,6 +271,6 @@ export default function parse(text) {
 						.join(" ")
 						.split(" ")
 						.filter((x) => x.length)
-			: (x) => x)(x.split(commands[i])[1].trim())
+			: (x) => [x])(x.split(commands[i])[1].trim())
 	}))
 }

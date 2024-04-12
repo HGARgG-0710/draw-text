@@ -30,6 +30,10 @@
 		7. createPattern (return type - a 'colour');
 
 		8. A transparency argument...; 
+
+			Allow ALL the places that use colours (including the 'background' and others), 
+			to have a transparency argument. will allofr for some powerful effects
+
 		9. lineJoin - as a post-point 'specifier'; One of the following: 
 
 			1. r - for rounded corners; 
