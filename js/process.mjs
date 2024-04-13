@@ -43,7 +43,8 @@ export default function process(expression, ...past) {
 				const newParamValue = parseSingle(argline[1])
 				if (param[1](newParamValue)) {
 					param[0] = newParamValue
-					param[2].call(context, newParamValue)
+					if (typeof param[2] === "function")
+						param[2].call(context, newParamValue)
 				}
 			}
 			break

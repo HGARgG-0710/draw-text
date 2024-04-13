@@ -6,7 +6,7 @@ body {
 	margin: 0;
 }
 
-header {
+uni-header {
 	margin: 0;
 	padding: 0;
 }
@@ -71,6 +71,7 @@ main {
 	padding-top: 3vh;
 	border-bottom-left-radius: var(--r);
 	border-bottom-right-radius: var(--r);
+	padding-bottom: 4.25vh;
 }
 
 p {
@@ -115,7 +116,7 @@ ol {
 }
 
 #input_area {
-	padding-top: 2vh;
+	padding-top: 4.25vh;
 	display: flex;
 	flex-direction: row;
 	justify-content: center;
@@ -187,7 +188,6 @@ a {
 	flex-direction: column;
 	align-items: center;
 	margin-top: 5vh;
-	margin-bottom: 4.25vh;
 }
 #output_area canvas {
 	border-style: dashed;
@@ -248,4 +248,14 @@ input[type="text"] {
 input[type="text"]#img-format,
 button#download-button {
 	font-size: 16px;
+}
+
+.description p {
+	margin-top: 1vh;
+	font-size: 15px;
+	padding-left: 2vw;
+}
+
+ol ol {
+	padding-left: 6vw;
 }

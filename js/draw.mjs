@@ -8,7 +8,8 @@ export const context = canvas.getContext("2d")
 context.globalCompositeOperation = "source-over"
 
 // ^ IDEA: ADD PARAMETERS FOR POINT-DRAWING (they cannot be seen on many of the drawn pictures);
-// * parameters: 1. point-size (a pair of 'width' and 'height'); 2. point-shape (either 'rect' for rectangular or 'ellipse' for an ellipse); 3. draw-points (true/false - if false, then does not draw, otherwise - draw...);
+// * parameters: 1. point-size (a single number); 2. point-shape (either 'rect' for square or 'circ' for circular); 3. draw-points (true/false - if false, then does not draw, otherwise - draw... default: false);
+// ! PROBLEM - no way to add round angles to 'fill' contours currently (or so it seems) - test, then do something about it...; 
 const drawMap = {
 	contour: function (points, arrows, elliptics) {
 		for (const key of Array.from(points.keys())) {
@@ -99,18 +100,12 @@ function ellipse(points, elliptics, key) {
 
 	const preCenterAngle = elliptics[key][1] % 360
 
-	// ! change places the 'color' argument in an ellipse and these two angles?
 	const angles = elliptics[key].slice(3, 5)
 	const [startAngle, endAngle] = [angles[0] || 0, angles[1] || 360].map(toRadians)
 	const [isFirstLeft, isFirstAbove] = [dx >= 0, 0 < dy]
 
 	const isAlternate = preCenterAngle > 270
 
-	// ! Definition is flawed. Fix; [Requires more bloody branching AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH!]
-	// ! FIX THOSE! They are supposed to be incompatible;
-	// ! CLEAN UP ALL THAT MESS - refactor using '.map's + fix the ternary sequence for 'center';
-	// ? Should one, though? This is good for semantics. Makes code far more intuitive...
-	// * How about the following - if this works, then (initially) oneself commits as-is, then cleans up.
 	const isCenterBelow = Math.abs(dx) > Math.abs(dy) && !isAlternate
 	const isCenterAbove = Math.abs(dx) > Math.abs(dy) && isAlternate
 	const isCenterRight = Math.abs(dy) > Math.abs(dx) && !isAlternate
@@ -131,7 +126,6 @@ function ellipse(points, elliptics, key) {
 
 	const first = pair[0]
 
-	// ? refactor further... [when doing major refactoring, throughout the project...];
 	const center = first.map(
 		(x, i) =>
 			x +
@@ -201,11 +195,7 @@ function ellipse(points, elliptics, key) {
 				: +isFirstAbove
 		](rotationBase)
 
-	// ? Is order (indexation) of 'radius' correct (and general) here? Check...
 	context.ellipse(...center, ..._radius, rotationAngle, startAngle, endAngle)
-
-	// ! DEBUG CODE...
-	return [center, pair, radius]
 }
 
 // ^ idea: add a 'units' module to 'math-expression.mjs' (or make it into a separate package?) - functions for general unit conversion, efficient means of internal unit-data-record-keeping;

@@ -4,7 +4,7 @@
 <head>
 	<title>Draw-Text!</title>
 	<link rel="stylesheet" href="./css/main.css">
-	</style>
+	<script src="./js/components/header.mjs" type="module"></script>
 	<script src="./js/activation.mjs" type="module"></script>
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,135 +14,24 @@
 </head>
 
 <body>
-	<header>
-		<div id="pagetop">
-			<map name="ghicon">
-				<area href="https://github.com/HGARgG-0710/draw-text" shape="rect" coords="0,0,80,80">
-			</map>
-			<img src="./img/github.svg" usemap="#ghicon" id="ghimg" target="_blank">
-			<!-- TODO: add the personal page here (while it's still undone - the personal GitHub page...); -->
-			<a href="https://github.com/HGARgG-0710/">Me</a>
-			<div id="pagetop-end">
-				<p>&copy; Igor Kuznetsov, 2024</p>
-			</div>
-		</div>
-		<div id="pagename">
-			<h1>draw-text</h1>
-		</div>
-	</header>
+	<uni-header></uni-header>
 	<main>
+		<!-- TODO: make a separate page with documentation [this is no longer covering it...] -->
 		<div class="space-rect"></div>
 		<div class="main-rect">
 			<h2>What is this?</h2>
 
 			<p>
-				Draw-Text is a simple webpage, that allows one to draw pictures using lines, points and polygons
-				together with a basic
-				coordinate-setting mini-language, then export the results to png/jpg or any other desired image format.
+				Draw-Text is a simple webpage that allows one to draw pictures using lines, points, polygons
+				and ellipses together with a mini programming language,
+				then export the results to png/jpg or any other desired image format.
 			</p>
 
 			<h2>
 				Why?
 			</h2>
 
-			<p>Why not? It's fun, try!</p>
-
-			<h2>
-				Vocabulary
-			</h2>
-
-			<p>
-				The language of the page contains the following elementary commands:
-			</p>
-
-			<ol>
-				<li>
-					<code>contour</code> - creates a contour from a set of points (connected or not, can be coloured)
-				</li>
-				<li>
-					<code>fill</code> - fills a given contour with a colour
-				</li>
-				<li>
-					<code>clear</code> - creates a contour which is coloured the same way as the background (works similarly to <code>contour</code>)
-				</li>
-				<li>
-					<code>erase</code> - fills the given contour with background colour (works similarly to <code>fill</code>)
-				</li>
-				<li>
-					<code>background</code> - sets the background colour (only the first usage is taken in account - others are ignored)
-				</li>
-				<li>
-					<code>variable</code> - creates a variable to later reference in code (can be a colour, a number or another previously-defined variable)
-				</li>
-			</ol>
-
-			<p>
-				Besides <code>background</code> (which is just an alias for a case of <code>fill</code>), they are all
-				independent.
-				Commands are executed from top to bottom, points/arguments are being read from left to right. 
-				Tabs and spaces are (largely) ignored, except for few cases when they serve as needed delimiters (example - <code>variable</code>).
-				Usage looks something like the following:
-			</p>
-
-			<ol class="gappedol">
-				<li>
-					<div class="nogapli">
-						<code>contour (x1, y1)...(xn, yn)</code>
-						<code>contour (x1, y1)->...->(xn, yn)-></code>
-						<code>contour (x1, y1, c1)...(xn, yn, cn)</code>
-						<code>contour (x1, y1, c1)->...->(xn, yn, cn)-></code>
-						<code>contour (x1, y1, c1)->(cc1)...->(ccn-1)(xn, yn, cn)->(ccn)</code>
-					</div>
-				</li>
-				<li>
-					<div class="nogapli">
-						<code>fill (x1, y1)...(xn, yn)</code>
-						<code>fill (x1, y1, c1)...(xn, yn, cn)</code>
-						<code>fill (x1, y1, c)...(xn, yn)</code>
-						<code>fill (x1, y1)...(xk, yk, c)...(xn, yn)</code>
-					</div>
-				</li>
-				<li>
-					<div class="nogapli">
-						<code>clear (x1, y1)...(xn, yn)</code>
-						<code>clear (x1, y1)->...->(xn, yn)-></code>
-					</div>
-				</li>
-				<li>
-					<div class="nogapli">
-						<code>erase (x1, y1)...(xn, yn)</code>
-					</div>
-				</li>
-				<li>
-					<div class="nogapli">
-						<code>background c</code>
-					</div>
-				</li>
-				<li>
-					<div class=""nogapli>
-						<code>variable varname varvalue</code>
-					</div>
-				</li>
-			</ol>
-
-			<p>
-				Here, the <code>x</code> and <code>y</code> are the point coordinates, while <code>-></code> are the
-				connections between them
-				(to connect <code>i</code>'th coordinate with the next one, write an 'arrow' between them...).
-				The <code>c</code>, <code>c1...cn</code>, <code>cc1, ..., ccn</code> are the colours' values.
-				These are (currently) settable with hex as RGB color spectre values
-				(note: in future, more color schemes are intended for support).
-			</p>
-
-			<p>
-				Also, note that only the first given colour will be used for <code>fill</code>.
-				Further ones are ignored, filling is done monotonically.
-			</p>
-
-			<p>
-				For examples of usage or syntax, you can visit the project's repository ('examples' directory contains
-				code and canvas dimensions).
-			</p>
+			<p>Why not? It's fun, try! (Read the docs first though, the project's grown quite a bit...)</p>
 
 			<div id="input_area">
 				<div id="draw_input">

@@ -2,6 +2,7 @@ import parse from "./parser.mjs"
 import process from "./process.mjs"
 import { validate, validateNumber } from "./parser.mjs"
 import { clear } from "./draw.mjs"
+import { mimeMap } from "./mime.mjs"
 
 let lastText = ""
 
@@ -23,7 +24,7 @@ const canvas = document.querySelector("canvas")
 canvas.setAttribute("height", String(60 * vh))
 canvas.setAttribute("width", String(60 * vw))
 
-// ^ Idea: create an npm-library with common expressions/aliases/tasks for working with DOM API [like here - allowing the Tab insertion inside a 'textarea' element]; 
+// ^ Idea: create an npm-library with common expressions/aliases/tasks for working with DOM API [like here - allowing the Tab insertion inside a 'textarea' element];
 document.querySelector("#code").addEventListener("keydown", function (event) {
 	if (event.key === "Tab" && document.activeElement.id === "code") {
 		event.preventDefault()
@@ -55,13 +56,12 @@ for (const metric of ["width", "height"]) {
 	metricInput.addEventListener("input", change)
 }
 
-// ? Allow user to do the thing with other 'mime-types'? (not only 'image/')
-// ! PROBLEM: need to add a MIME module for this 'image/${ext}' bit... - MUST ALLOW WORKING WITH 'svg'! [Create proper documentation for file types syntax];
 document.querySelector("#download-button").addEventListener("click", (_event) => {
+	console.log(document.querySelector("#img-format").value)
 	const ext = document.querySelector("#img-format").value || "png"
 	const downloadA = document.createElement("a")
 	downloadA.setAttribute("download", `draw-this.${ext}`)
 	downloadA.hidden = true
-	downloadA.setAttribute("href", canvas.toDataURL(`image/${ext}`))
+	downloadA.setAttribute("href", canvas.toDataURL(mimeMap[ext]))
 	downloadA.click()
 })

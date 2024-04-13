@@ -4,6 +4,18 @@
 
 import { and, or, occurences, global, begin, end, nlookbehind } from "./regex.mjs"
 import { Primitive } from "./primitives.mjs"
+import params from "./params.mjs"
+
+const validityMap = {
+	background: "colorarg",
+	variable: "vararg",
+	"line-width": "vardecimal",
+	"line-cap": "caparg",
+	contour: "argseq",
+	fill: "argseq",
+	erase: "argseq",
+	clear: "argseq"
+}
 
 // ^ IDEA: create a module for working with regexp tables [note: they could be used to construct the 'parser-type-recognition-tables' for parsers created by one of self's currently developed libraries...];
 // TODO: refactor these... [lots of repetition...];
@@ -110,11 +122,14 @@ regexps.argseq = occurences(
 // ? Separate the 'regexps' on more semantic divisions?
 regexps.caparg = /(b|r|s)/
 
+// ^ IDEA: add a special category of commands - 'set'-commands; They'd be defined DIRECTLY by the 'params', and each have a given signature; This would free one from having to add them manually into the parser...;
 const [connectionCommands, singleCommands, pairCommands] = [
 	["contour", "fill", "clear", "erase"],
-	["background", "line-cap", "line-width"],
+	[],
 	["variable", "set-param"]
 ].map((x) => new Set(x))
+
+Array.from(params.keys()).forEach((x) => singleCommands.add(x))
 
 export const commandList = [connectionCommands, singleCommands, pairCommands]
 	.map((x) => Array.from(x))
@@ -192,17 +207,6 @@ function parseSemiTriples(string) {
 				.join("")
 				.split(",")
 		)
-}
-
-const validityMap = {
-	background: "colorarg",
-	variable: "vararg",
-	"line-width": "vardecimal",
-	"line-cap": "caparg",
-	contour: "argseq",
-	fill: "argseq",
-	erase: "argseq",
-	clear: "argseq"
 }
 
 function isValid(text) {

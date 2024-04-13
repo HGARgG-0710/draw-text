@@ -1,8 +1,4 @@
-1. IDEA: re-do the thing in React? 
-	There's a lot of same 'types' (kinds/classes) of elements repeating throughout the HTMl of the page. 
-	Starts to bugger oneself a little bit. React-based refactoring could remedy it.
-
-2. IDEA: create means to program curves ... (?using functions/Infinite series? some recursive name-giving mini-language?); 
+1. IDEA: create means to program curves ... (?using functions/Infinite series? some recursive name-giving mini-language?); 
 	Consider how to factor them into the syntax... (?use '-' instead of '->' for them?);
 
 	ABOUT CIRCLES: 
@@ -47,8 +43,11 @@
 		14. shadow (command for shadows; takes arguments' shape of '(offsetx, offsety) blur? color?')
 		15. font (property; for doing text-stroking/fillling); 
 
+		16. filter; 
+		17. clip; 
+
 		Whole separate, under question: 
-		16. Animations? [more complex, doing will require finding a finite set of elementary operations equivalent in power to multi-layer structures such as 'for-loops' in the sense of determining the algorithms...];
+		18. Animations? [more complex, doing will require finding a finite set of elementary operations equivalent in power to multi-layer structures such as 'for-loops' in the sense of determining the algorithms...];
 
 			IDEA: add eleven instructions: 
 
@@ -78,31 +77,31 @@
 				1. json{...} - an expression, result of which is a JSON-string of whatever is passed to 'json'
 				2. from-json filepath - reads a filepath 
 
-3. IDEA: add an .svg of some draw-text example to the README...;
-4. IDEA: add more details to the page's HTML and CSS; 
+2. IDEA: add an .svg of some draw-text example to the README...;
+3. IDEA: add more details to the page's HTML and CSS; 
 	Examples: images for a more 'sophisticated' layout, gradient, multicolours, that kind of thing...;
-5. CSS is good (adaptive for SOME screens..., computer screens for instance...), but not good enough for the app to be easily (comfortably) used on mobile devices...;
+4. CSS is good (adaptive for SOME screens..., computer screens for instance...), but not good enough for the app to be easily (comfortably) used on mobile devices...;
 	For them - choose different proportions. 
 	The values of phones are FARRR too different. 
 	They are not height-oriented, but rather width-oriented...; 
-6. IDEA: add 'comment's into the project's language's vocabulary...; 
+5. IDEA: add 'comment's into the project's language's vocabulary...; 
 	Useful for designation of particular elements of images, in the cases of certain complexity. 
-7. IDEA [visual design]: add a generation of random pattern to the sides of the page (current blue-rect); 
+6. IDEA [visual design]: add a generation of random pattern to the sides of the page (current blue-rect); 
 	Think whether the pattern would be recurring, or it would create new colours each time user would 
 		change the canvas size (thus increasing the page size...); 
 	Also - consider how they'd be generated (that is, how would the colour pattern be chosen...
 		What vector-function of n>=2 colour components - RGB/other - to pick/construct?)
 	
-8. Idea: add support for a 'point'-datatype to the parser; 
+7. Idea: add support for a 'point'-datatype to the parser; 
 
 	Allows one to store (in variables) individual points instead of simply x/y/color coordinates of a point...;
 
-9. A website Favicon - add it; 
+8. A website Favicon - add it; 
 
 	Think of something pretty. Draw it with 'draw-text'; 
 	Then, use as a favicon (an .svg...); 
 
-10. Arithmetic! 
+9. Arithmetic! 
 
 	Add arithmetic for those expressions (simple addition, multiplication, division, subtraction and modulo ought to do it by now...); 
 	Add simple case static/strong typezation typezation 
@@ -112,22 +111,22 @@
 
 	Also - the booleans and trigonometric functions (sin, cos, tan); 
 
-11. Add input from file (giving a file with 'draw-text' code...);
+10. Add input from file (giving a file with 'draw-text' code...);
 
 	In particular - add the predefined 'arguments' variables, that can be accessed. 
 	This way, one could run draw-text files/code with given arguments;
 
 	[useful with images];
 
-12. Add filereading: 
+11. Add filereading: 
 
 	For text files only (getting stroke-Text strings, colours, numbers and points); 
 
-13. Add "string" type: 
+12. Add "string" type: 
 
 	Easier to parse this way. Would be used for textual information; 
 
-14. Add a simple 'compiler' program for draw-this code: 
+13. Add a simple 'compiler' program for draw-this code: 
 
 	Would, in truth, simply substitute the argument-variables for static values, provided by the user; 
 	Eliminates the need for further user input;
@@ -135,18 +134,18 @@
 	Also - eliminates inner calls from other files 
 		(if they are available - puts the code inside with appropriate name collisions in vars fixed (when required), otherwise - a compiler error); 
 	
-15. Add file-running: 
+14. Add file-running: 
 
 	Two directives: 
 
 		1. run filepath [...arguments] - runs a given file within the context of the present canvas (without merging variable spaces); 
 		2. paste filepath [...arguments] - pastes the code of the given file into the present one (note: IT DOES NOT HAVE TO BE CORRECT AS OF SELF, variables can be undefined, for instance);
 
-16. Add a way to access the command-properties (such as 'radius'): 
+15. Add a way to access the command-properties (such as 'radius'): 
 
 	For instance, add a special symbol (like % or $, or @, or !) to get their values [those will be ignored by the 'validate' function]; 
 
-17. Add more complex data structures: 
+16. Add more complex data structures: 
 
 	For instance - arrays: 
 
@@ -163,7 +162,7 @@
 	
 		6?. Some functions for arrays (like, 'slice' or 'map'? Would make development far easier, however, would increase the number of operators...):
 	
-18. Idea [possibly, not good]: functions!
+17. Idea [possibly, not good]: functions!
 
 	They would be evaluated as a set of compilation-structures, 
 		namely - for them there'd exist a separate process for putting those out as a script in an alternative file (so as to replace 'function's with 'run's);
