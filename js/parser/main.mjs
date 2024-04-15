@@ -1,139 +1,11 @@
-// TODO: later, refactor this parser using the parser library of one's own...;
-// ? This 'findSegments' is a good addition to the library in question...; Also - consider index-passing-based parsing (one, where one of inputs is an index, and so is one of outputs...);
-// ? Add a 'regex' module to it?
-
-import { and, or, occurences, global, begin, end, nlookbehind } from "./regex.mjs"
-import { Primitive } from "./primitives.mjs"
-import params from "./params.mjs"
-
-const validityMap = {
-	background: "colorarg",
-	variable: "vararg",
-	"line-width": "vardecimal",
-	"line-cap": "caparg",
-	contour: "argseq",
-	fill: "argseq",
-	erase: "argseq",
-	clear: "argseq"
-}
-
-// ^ IDEA: create a module for working with regexp tables [note: they could be used to construct the 'parser-type-recognition-tables' for parsers created by one of self's currently developed libraries...];
-// TODO: refactor these... [lots of repetition...];
-
-const reg = {
-	arrow: /->/,
-	space: /( |\t)*/,
-	opbrack: /\(/,
-	clbrack: /\)/,
-	color: /#[\da-fA-F]{3,}/,
-	varname: /[a-zA-Z\d_]+/,
-	decimal: /[\d]+/,
-	tab: /\t/,
-	spacebar: / /,
-	comma: /,/,
-	hyphen: /-/
-}
-
-// ! later, use some properly defined alias space instead of something particular like this (math-expressions.js);
-function r(...args) {
-	return args.map((x) => reg[x])
-}
-
-const regfun = {
-	variable: (...x) => or(...r(...x, "varname")),
-	brackets: (...x) => and(reg.opbrack, ...x, reg.clbrack)
-}
-
-export const regexps = {
-	arrow: reg.arrow
-}
-
-regexps.vardecimal = regfun.variable("decimal")
-regexps.varcolor = regfun.variable("color")
-regexps.colorarrow = and(
-	...r("arrow", "space"),
-	occurences(0, 1)(regfun.brackets(regfun.variable("color")))
-)
-regexps.triple = global(
-	and(
-		nlookbehind(and(...r("hyphen", "space"))),
-		regfun.brackets(
-			reg.space,
-			regexps.vardecimal,
-			...r("space", "comma", "space"),
-			regexps.vardecimal,
-			occurences(0, 1)(and(...r("comma", "space"), regexps.varcolor))
-		)
-	)
-)
-
-regexps.vararg = occurences(1)(
-	and(
-		...r("varname", "space", "spacebar", "space"),
-		regfun.variable("color", "decimal")
-	)
-)
-
-regexps.decimal = end(begin(reg.decimal))
-regexps.colorarg = and(reg.space, regexps.varcolor, reg.space)
-regexps.colorarrowStrict = and(...r("arrow", "space"), regfun.brackets(regexps.varcolor))
-
-regexps.elliptic = and(
-	...r("hyphen", "space"),
-	regfun.brackets(
-		reg.space,
-		regexps.vardecimal,
-		reg.space,
-		occurences(
-			0,
-			1
-		)(
-			and(
-				...r("comma", "space"),
-				regexps.varcolor,
-				occurences(
-					0,
-					1
-				)(
-					and(
-						...r("comma", "space"),
-						regexps.vardecimal,
-						occurences(0, 1)(and(...r("comma", "space"), regexps.vardecimal))
-					)
-				),
-				reg.space
-			)
-		)
-	)
-)
-
-regexps.argseq = occurences(
-	1,
-	""
-)(
-	and(
-		reg.space,
-		regexps.triple,
-		reg.space,
-		occurences(0, 1)(or(...["elliptic", "colorarrow"].map((x) => regexps[x])))
-	)
-)
-
-// ? Separate the 'regexps' on more semantic divisions?
-regexps.caparg = /(b|r|s)/
-
-// ^ IDEA: add a special category of commands - 'set'-commands; They'd be defined DIRECTLY by the 'params', and each have a given signature; This would free one from having to add them manually into the parser...;
-const [connectionCommands, singleCommands, pairCommands] = [
-	["contour", "fill", "clear", "erase"],
-	[],
-	["variable", "set-param"]
-].map((x) => new Set(x))
-
-Array.from(params.keys()).forEach((x) => singleCommands.add(x))
-
-export const commandList = [connectionCommands, singleCommands, pairCommands]
-	.map((x) => Array.from(x))
-	.flat()
+import { Primitive } from "../primitives.mjs"
+import {
+	regexps,
+	validityMap,
+	commandList,
+	pairCommands,
+	connectionCommands
+} from "./syntax.mjs"
 
 function extractFirst(string, from, to, regex) {
 	return string.slice(from, to).match(new RegExp(regex, "g"))[0]
@@ -232,11 +104,12 @@ export function validate(text, callback, validityCheck = isValid) {
 // * (can be easily achieved via '.indexesOf(...).length' - same algorithm, but more general, for unlimited types...);
 function countOccurrencesStr(string, sub) {
 	let counted = 0
-	out: for (let i = 0; i < string.length; i++)
+	out: for (let i = 0; i < string.length; i++) {
 		for (let j = 0; j < sub.length; j++) {
 			if (string[i + j] !== sub[j]) continue out
-			if (j === sub.length - 1) counted++
 		}
+		counted++
+	}
 	return counted
 }
 // ! another useful alias...;

@@ -18,290 +18,337 @@
 	<main>
 		<div class="space-rect"></div>
 		<div class="main-rect">
-			<h2>
-				Vocabulary
-			</h2>
+			<div id="text">
+				<h2>
+					Vocabulary
+				</h2>
 
-			<p>
-				The language of the page contains the following elementary commands:
-			</p>
+				<p>
+					The language of the page contains the following elementary commands:
+				</p>
 
-			<!-- ? Re-conceptualize 'clear' and 'erase' as commands on the level of documentation? [Call them 'aliases', define aliases separately, create a general structure, refactor the code? Pray think...] -->
-			<!-- TODO: add 'nogapli' to all the li-elements of 'ol'... -->
-			<ol>
-				<li>
-					<code>contour</code> - creates a contour from a set of points (connected or not, can be coloured)
-				</li>
-				<li>
-					<code>fill</code> - fills a given contour with a colour
-				</li>
-				<li>
-					<code>clear</code> - creates a contour which is coloured the same way as the background (works
-					similarly to <code>contour</code>)
-				</li>
-				<li>
-					<code>erase</code> - fills the given contour with background colour (works similarly to
-					<code>fill</code>)
-				</li>
-				<li>
-					<code>variable</code> - creates a variable to later reference in code (can be a colour, a number or
-					another previously-defined variable)
-				</li>
-				<li>
-					<code>set-param</code> - sets a value for a 'parameter', an specialized variable, which affects the
-					way that the canvas and other commands behave. There is a number of avaliable parameters.
-				</li>
-			</ol>
+				<!-- ? Re-conceptualize 'clear' and 'erase' as commands on the level of documentation? [Call them 'aliases', define aliases separately, create a general structure, refactor the code? Pray think...] -->
+				<!-- TODO: add 'nogapli' to all the li-elements of 'ol'... -->
+				<ol>
+					<li>
+						<code>contour</code> - creates a contour from a set of points (connected or not, can be
+						coloured)
+					</li>
+					<li>
+						<code>fill</code> - fills a given contour with a colour
+					</li>
+					<li>
+						<code>clear</code> - creates a contour which is coloured the same way as the background (works
+						similarly to <code>contour</code>)
+					</li>
+					<li>
+						<code>erase</code> - fills the given contour with background colour (works similarly to
+						<code>fill</code>)
+					</li>
+					<li>
+						<code>variable</code> - creates a variable to later reference in code (can be a colour, a number
+						or
+						another previously-defined variable)
+					</li>
+					<li>
+						<code>set-param</code> - sets a value for a 'parameter', an specialized variable, which affects
+						the
+						way that the canvas and other commands behave. There is a number of avaliable parameters.
+					</li>
+				</ol>
 
-			<p>
-				Commands are separated by newline symbols and are executed from top to bottom, points/arguments
-				being read from left to right.
-				Additional tabs and spaces are ignored.
-			</p>
+				<p>
+					Commands are separated by newline symbols and are executed from top to bottom, points/arguments
+					being read from left to right.
+					Additional tabs and spaces are ignored.
+				</p>
 
-			<p>
-				The input area of the website will not work until the moment that the code given by the user is
-				syntactically correct (valid). This will prevent the canvas from trying to render premature changes.
-			</p>
+				<p>
+					The input area of the website will not work until the moment that the code given by the user is
+					syntactically correct (valid). This will prevent the canvas from trying to render premature changes.
+				</p>
 
-			<p>
-				Precise signature looks something like the following:
-			</p>
+				<p>
+					Precise signature looks something like the following:
+				</p>
 
-			<ol class="gappedol">
-				<li>
-					<div class="nogapli">
-						<div class="description">
-							<code>contour (x1, y1)...(xn, yn)</code>
-							<p>Where <code>(x1, y1), ..., (xn, yn)</code> are point coordinates.
-								This will draw the contour with all points unconnected.</p>
-						</div>
+				<ol class="gappedol">
+					<li>
+						<div class="nogapli">
+							<div class="description">
+								<code>contour (x1, y1)...(xn, yn)</code>
+								<p>Where <code>(x1, y1), ..., (xn, yn)</code> are point coordinates.
+									This will draw the contour with all points unconnected.</p>
+							</div>
 
-						<div class="description">
-							<code>contour (x1, y1)->...->(xn, yn)-></code>
-							<p>
-								To connect them with a straight line, you can add a <code>-></code> between the points.
-							</p>
-						</div>
-						<div class="description">
-							<code>contour (x1, y1, c1)...(xn, yn, cn)</code>
-							<p>
-								To make the points coloured, add a third argument (here, the <code>c1, ..., cn</code>).
-							</p>
-						</div>
+							<div class="description">
+								<code>contour (x1, y1)->...->(xn, yn)-></code>
+								<p>
+									To connect them with a straight line, you can add a <code>-></code> between the
+									points.
+								</p>
+							</div>
+							<div class="description">
+								<code>contour (x1, y1, c1)...(xn, yn, cn)</code>
+								<p>
+									To make the points coloured, add a third argument (here, the
+									<code>c1, ..., cn</code>).
+								</p>
+							</div>
 
-						<div class="description">
-							<code>contour (x1, y1, c1)->(cc1)...->(ccn-1)(xn, yn, cn)->(ccn)-></code>
-							<p>
-								To add colour to the straight-line connections between points, add colour to them as a
-								first argument.
-							</p>
-						</div>
+							<div class="description">
+								<code>contour (x1, y1, c1)->(cc1)...->(ccn-1)(xn, yn, cn)->(ccn)-></code>
+								<p>
+									To add colour to the straight-line connections between points, add colour to them as
+									a
+									first argument.
+								</p>
+							</div>
 
-						<div class="description">
-							<code>contour (x1, y1)-(alpha1, c1, sa1, ea1)...-(alphan, cn, san, ean)(xn, yn)-(alphan, cn, san, ean)</code>
-							<p>
-								To add an elliptic connection of colour given by <code>c1, ..., cn</code>
-								with an angle between the line connecting them and the center of the ellipse of
-								<code>alpha1, ..., alphan</code> (either <code>0 < alpha < 90</code> or
-								<code>270 < alpha < 360</code>), with only the ellipse-portions between angles of
-								<code>sa1, ..., san</code> and <code>ea1, ..., ean</code> which to draw being between
-								two
-								points, add the <code>-</code>, followed by bracketed arguments.
-							</p>
-							<p>
-								Note: the final point of the connection will not be the second one given by the user,
-								but instead it is determined via the angles (<code>sa1, ..., san</code> and
-								<code>ea1, ..., ean</code>)
-							</p>
+							<div class="description">
+								<code>contour (x1, y1)-(alpha1, c1, sa1, ea1)...-(alphan, cn, san, ean)(xn, yn)-(alphan, cn, san, ean)</code>
+								<p>
+									To add an elliptic connection of colour given by <code>c1, ..., cn</code>
+									with an angle between the line connecting them and the center of the ellipse of
+									<code>alpha1, ..., alphan</code> (either <code>0 < alpha < 90</code> or
+									<code>270 < alpha < 360</code>), with only the ellipse-portions between angles of
+									<code>sa1, ..., san</code> and <code>ea1, ..., ean</code> which to draw being
+									between
+									two
+									points, add the <code>-</code>, followed by bracketed arguments.
+								</p>
+								<p>
+									Note: the final point of the connection will not be the second one given by the
+									user,
+									but instead it is determined via the angles (<code>sa1, ..., san</code> and
+									<code>ea1, ..., ean</code>)
+								</p>
+							</div>
 						</div>
-					</div>
-				</li>
-				<li>
-					<div class="nogapli">
-						<div class="description">
-							<code>fill (x1, y1)...(xn, yn)</code>
-							<p>
-								To add a straight line to the path that will be used for filling, put one shape close to
-								the next.
-							</p>
+					</li>
+					<li>
+						<div class="nogapli">
+							<div class="description">
+								<code>fill (x1, y1)...(xn, yn)</code>
+								<p>
+									To add a straight line to the path that will be used for filling, put one shape
+									close to
+									the next.
+								</p>
+							</div>
+							<div class="description">
+								<code>fill (x1, y1, c1)...(xn, yn, cn)</code>
+								<p>
+									Colours for filling can be given as well (third argument). However, only the first
+									appearing will be taken into account, others will remain ignored. The
+									<code>fill</code>
+									colouring is monotonic. (For multiple colours, apply several <code>fill</code>s one
+									after the other for appropriate shapes and colours)
+								</p>
+							</div>
+							<div class="description">
+								<code>fill (x1, y1)-(alpha1, c1, sa1, ea1)...-(alphan, cn, san, ean)(xn, yn)</code>
+								<p>
+									Same as with <code>contour</code> - create an elliptic connection on the path that
+									is to
+									be filled.
+								</p>
+							</div>
 						</div>
-						<div class="description">
-							<code>fill (x1, y1, c1)...(xn, yn, cn)</code>
-							<p>
-								Colours for filling can be given as well (third argument). However, only the first
-								appearing will be taken into account, others will remain ignored. The <code>fill</code>
-								colouring is monotonic. (For multiple colours, apply several <code>fill</code>s one
-								after the other for appropriate shapes and colours)
-							</p>
+					</li>
+					<li>
+						<div class="nogapli">
+							<div class="description">
+								<code>clear (x1, y1)...(xn, yn)</code>
+								<p>
+									The signatures are <em>exactly</em> the same as in <code>contour</code>. The only
+									difference between the two commands is that <code>clear</code> uses the background
+									colour (and so, the user's colour input is ignored), while contour does not.
+								</p>
+							</div>
 						</div>
-						<div class="description">
-							<code>fill (x1, y1)-(alpha1, c1, sa1, ea1)...-(alphan, cn, san, ean)(xn, yn)</code>
-							<p>
-								Same as with <code>contour</code> - create an elliptic connection on the path that is to
-								be filled.
-							</p>
+					</li>
+					<li>
+						<div class="nogapli">
+							<div class="description">
+								<code>erase (x1, y1)...(xn, yn)</code>
+								<p>
+									Same to <code>fill</code> as what <code>clear</code> is to <code>contour</code>.
+									Signatures match exactly.
+								</p>
+							</div>
 						</div>
-					</div>
-				</li>
-				<li>
-					<div class="nogapli">
-						<div class="description">
-							<code>clear (x1, y1)...(xn, yn)</code>
-							<p>
-								The signatures are <em>exactly</em> the same as in <code>contour</code>. The only
-								difference between the two commands is that <code>clear</code> uses the background
-								colour (and so, the user's colour input is ignored), while contour does not.
-							</p>
+					</li>
+					<li>
+						<div class="nogapli">
+							<div class="description">
+								<code>variable varname varvalue</code>
+								<p>
+									Creates a new variable. Variables are all user-defined and are used by their name.
+									They
+									are of the same level of significance as all the otehr values, meaning - that
+									variables
+									too, are considered values (So, for instance, variables can use other variables and
+									one
+									can use them for refactoring repeating values).
+								</p>
+								<p>
+									Here <code>varname</code> is the name of the variable, while <code>varvalue</code>
+									is
+									its new value.
+									Both arguments are mandatory.
+								</p>
+							</div>
 						</div>
-					</div>
-				</li>
-				<li>
-					<div class="nogapli">
-						<div class="description">
-							<code>erase (x1, y1)...(xn, yn)</code>
-							<p>
-								Same to <code>fill</code> as what <code>clear</code> is to <code>contour</code>.
-								Signatures match exactly.
-							</p>
-						</div>
-					</div>
-				</li>
-				<li>
-					<div class="nogapli">
-						<div class="description">
-							<code>variable varname varvalue</code>
-							<p>
-								Creates a new variable. Variables are all user-defined and are used by their name. They
-								are of the same level of significance as all the otehr values, meaning - that variables
-								too, are considered values (So, for instance, variables can use other variables and one
-								can use them for refactoring repeating values).
-							</p>
-							<p>
-								Here <code>varname</code> is the name of the variable, while <code>varvalue</code> is
-								its new value.
-								Both arguments are mandatory.
-							</p>
-						</div>
-					</div>
-				</li>
-				<li>
-					<div class="nogapli">
-						<div class="description">
-							<code>
+					</li>
+					<li>
+						<div class="nogapli">
+							<div class="description">
+								<code>
 								set-param param-name paramarg1 ...							
 							</code>
-							<p>
-								Here, <code>param-name</code> is the name of the parameter being set.
-							</p>
-							<p>
-								One can also omit the <code>set-param</code> and use the parameter names
-								as-are to set the new values for them. The <code>paramarg1, ...</code> are the arguments
-								of the parameter, each of which has their own signature, consisting of types of
-								arguments, as well as of their number and optionality (default values, typically).
+								<p>
+									Here, <code>param-name</code> is the name of the parameter being set.
+								</p>
+								<p>
+									One can also omit the <code>set-param</code> and use the parameter names
+									as-are to set the new values for them. The <code>paramarg1, ...</code> are the
+									arguments
+									of the parameter, each of which has their own signature, consisting of types of
+									arguments, as well as of their number and optionality (default values, typically).
 
-								Currently supported parameters:
-							</p>
+									Currently supported parameters:
+								</p>
 
-							<ol>
-								<li>
-									<div class="description">
-										<code>background c</code>
-										<p>
-											Changes background colour to the value of mandatory argument <code>c</code>
-											(a colour).
-										</p>
-									</div>
-								</li>
-								<li>
-									<div class="description">
-										<code>points-size n</code>
-										<p>
-											Changes size of points to the value of mandatory paramater <code>n</code>
-											(a number)
-										</p>
-									</div>
-								</li>
-								<li>
-									<div class="description">
-										<code>line-width n</code>
-										<p>
-											Changes the value of lines' width to the value of mandatory argument
-											<code>n</code>
-											(a number).
-										</p>
-									</div>
-								</li>
-								<li>
-									<div class="description">
-										<code>line-cap v</code>
-										<p>Changes the "cap" of lines in contours. Possible values of <code>v</code>:
-										</p>
-										<ol>
-											<li><code>b</code> (default) - no cap</li>
-											<li><code>r</code> - rounded cap at lines' ends</li>
-											<li><code>s</code> - square cap at lines' ends (prolongs them slightly)</li>
-										</ol>
-									</div>
-								</li>
-								<li>
-									<div class="description">
-										<code>draw-points v</code>
-										<p>
-											Affects whether or not should the points of contours be drawn. Possible
-											values for mandatory argument <code>v</code>:
-										</p>
-										<ol>
-											<li><code>false</code> (default) - do not draw the points</li>
-											<li><code>true</code> - draw the points</li>
-										</ol>
-									</div>
-								</li>
-								<li>
-									<div class="description">
-										<code>point-shape v</code>
-										<p>
-											Set the shapes that should be drawn instead of points. Possible values for
-											mandatory argument <code>v</code>:
-										</p>
-										<ol>
-											<li>
-												rect (default) - rectangular; draws a square with the half diagonal of
-												<code>point-size</code>
-											</li>
-											<li>
-												circ - circular, draw circles with a center in a point in question; the
-												radius is given by <code>point-size</code>
-											</li>
-										</ol>
-									</div>
-								</li>
-
-							</ol>
+								<ol>
+									<li>
+										<div class="description">
+											<code>background c</code>
+											<p>
+												Changes background colour to the value of mandatory argument
+												<code>c</code>
+												(a colour).
+											</p>
+										</div>
+									</li>
+									<li>
+										<div class="description">
+											<code>point-size n</code>
+											<p>
+												Changes size of points to the value of mandatory paramater
+												<code>n</code>
+												(a number)
+											</p>
+										</div>
+									</li>
+									<li>
+										<div class="description">
+											<code>line-width n</code>
+											<p>
+												Changes the value of lines' width to the value of mandatory argument
+												<code>n</code>
+												(a number).
+											</p>
+										</div>
+									</li>
+									<li>
+										<div class="description">
+											<code>line-cap v</code>
+											<p>Changes the "cap" of lines in contours. Possible values of
+												<code>v</code>:
+											</p>
+											<ol>
+												<li><code>b</code> (default) - no cap</li>
+												<li><code>r</code> - rounded cap at lines' ends</li>
+												<li><code>s</code> - square cap at lines' ends (prolongs them slightly)
+												</li>
+											</ol>
+										</div>
+									</li>
+									<li>
+										<div class="description">
+											<code>draw-points v</code>
+											<p>
+												Affects whether or not should the points of contours be drawn. Possible
+												values for mandatory argument <code>v</code>:
+											</p>
+											<ol>
+												<li><code>false</code> (default) - do not draw the points</li>
+												<li><code>true</code> - draw the points</li>
+											</ol>
+										</div>
+									</li>
+									<li>
+										<div class="description">
+											<code>point-shape v</code>
+											<p>
+												Set the shapes that should be drawn instead of points. Possible values
+												for
+												mandatory argument <code>v</code>:
+											</p>
+											<ol>
+												<li>
+													rect (default) - rectangular; draws a square with the half diagonal
+													of
+													<code>point-size</code>
+												</li>
+												<li>
+													circ - circular, draw circles with a center in a point in question;
+													the
+													radius is given by <code>point-size</code>
+												</li>
+											</ol>
+										</div>
+									</li>
+									<li>
+										<div class="description">
+											<code>base-color c</code>
+											<p>
+												Changes the colour which is used as the default (in absence of it).
+												By default, the <code>code-color</code> is black.
+												The only parameter <code>c</code> - the new colour - is mandatory.
+											</p>
+										</div>
+									</li>
+								</ol>
+							</div>
 						</div>
-					</div>
-				</li>
-			</ol>
+					</li>
+				</ol>
 
-			<p>
-				Here, the <code>x</code> and <code>y</code> are the point coordinates, while <code>-></code> are the
-				connections between them
-				(to connect <code>i</code>'th coordinate with the next one, write an 'arrow' between them...).
-				The <code>c</code>, <code>c1...cn</code>, <code>cc1, ..., ccn</code> are the colours' values.
-				These are (currently) settable with hex as RGB color spectre values
-				(note: in future, more color schemes are intended for support).
-			</p>
+				<p>
+					Here, the <code>x</code> and <code>y</code> are the point coordinates, while <code>-></code> are the
+					connections between them
+					(to connect <code>i</code>'th coordinate with the next one, write an 'arrow' between them...).
+					The <code>c</code>, <code>c1...cn</code>, <code>cc1, ..., ccn</code> are the colours' values.
+					These are (currently) settable with hex as RGB color spectre values
+					(note: in future, more color schemes are intended for support).
+				</p>
 
-			<p>
-				Also, note that only the first given colour will be used for <code>fill</code>.
-				Further ones are ignored, filling is done monotonically.
-			</p>
+				<p>
+					Also, note that only the first given colour will be used for <code>fill</code>.
+					Further ones are ignored, filling is done monotonically.
+				</p>
 
-			<p>
-				For examples of usage or syntax, you can visit the project's repository ('examples' directory contains
-				code and canvas dimensions).
-			</p>
+				<p>
+					For examples of usage or syntax, you can visit the project's repository ('examples' directory
+					contains
+					code and canvas dimensions).
+				</p>
 
+				<h2>Export support</h2>
+
+				<p>Currently, the website allows the code to be converted to the following media types:</p>
+				<ol>
+					<li>SVG (<code>svg</code>)</li>
+					<li>PNG (<code>png</code>)</li>
+					<li>JPEG (<code>jpeg</code> or <code>jpg</code>)</li>
+					<li>WEBP (<code>webp</code>)</li>
+				</ol>
+
+				<p>In the future, new formats may appear.</p>
+
+			</div>
 		</div>
 		<div class="space-rect"></div>
 	</main>

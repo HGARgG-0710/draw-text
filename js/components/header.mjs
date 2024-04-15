@@ -4,21 +4,10 @@
 // 2. main-rect component [for CSS pseudo-class only];
 // 3. uni-main component (the current 'main') - for refactoring only...; Would add all of its' elements to the 'main-rect' child;
 // ! 4. refactor others as well... [those 'div.nogapli' and 'ol.gappedol', and the rest...]:
-// * 5. the 'uni-input' component + the 'uni-export' and other drawing-related components..; 
-// ^ Effectively, REWRITE THE WEBSITE ENTIRELY USING THE Web Components API; 
+// * 5. the 'uni-input' component + the 'uni-export' and other drawing-related components..;
+// ^ Effectively, REWRITE THE WEBSITE ENTIRELY USING THE Web Components API;
 
-// ^ IDEA: make a mini-module with those aliases (or put them somewhere, anyway; this functional-like style of mutating functions is very beautiful)
-const appendpar = (element) => (child) => {
-	element.append(child)
-	return element
-}
-const append = (element) => (child) => element.appendChild(child)
-const create = document.createElement.bind(document)
-const attribute = (element) => (name, value) => {
-	element.setAttribute(name, value)
-	return element
-}
-const text = document.createTextNode.bind(document)
+import { append, appendpar, create, text, attribute } from "./lib.mjs"
 
 export class header extends HTMLElement {
 	constructor() {

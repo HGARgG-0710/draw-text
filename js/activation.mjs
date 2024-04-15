@@ -1,8 +1,21 @@
-import parse from "./parser.mjs"
+import {
+	clear as childClear,
+	create,
+	append,
+	appendpar,
+	text,
+	cquery
+} from "./components/lib.mjs"
+import parse from "./parser/main.mjs"
 import process from "./process.mjs"
-import { validate, validateNumber } from "./parser.mjs"
-import { clear } from "./draw.mjs"
-import { mimeMap } from "./mime.mjs"
+import { validate, validateNumber } from "./parser/main.mjs"
+import { clear, canvas } from "./draw.mjs"
+import { svgURI } from "./svg.mjs"
+
+const filelists = document.querySelectorAll(".file-list")
+
+// ? Make a separate files with all the constants?
+const maxFilenameLength = 25
 
 let lastText = ""
 
@@ -15,12 +28,26 @@ const [vh, vw] = ["Height", "Width"].map((x) =>
 	)
 )
 
-const imgout = (text) => {
-	clear()
-	parse(text).forEach(process)
+const outSingle = (text) => {
+	validate(text, (text) => parse(text).forEach(process))
+}
+const outList = (list) => {
+	list.forEach(outSingle)
+}
+const readFiles = async (files) => {
+	return await Promise.all(files.map(async (file) => (await file.arrayBuffer()).text()))
 }
 
-const canvas = document.querySelector("canvas")
+const imgout = async (text) => {
+	clear()
+	const [filesPre, filesAfter] = filelists
+		.map(cquery("input[type='file']"))
+		.map((x) => x.files)
+	outList(await readFiles(filesPre))
+	outSingle(text)
+	outList(await readFiles(filesAfter))
+}
+
 canvas.setAttribute("height", String(60 * vh))
 canvas.setAttribute("width", String(60 * vw))
 
@@ -56,12 +83,56 @@ for (const metric of ["width", "height"]) {
 	metricInput.addEventListener("input", change)
 }
 
+const mimeMap = {
+	png: "image/png",
+	jpg: "image/jpeg",
+	jpeg: "image/jpeg",
+	webp: "image/webp"
+}
+
+// TODO: write a documentation on the precise list of available MIME-types;
+// ! refactor that thing with the 'download'-a element...; Then, use the output from
 document.querySelector("#download-button").addEventListener("click", (_event) => {
-	console.log(document.querySelector("#img-format").value)
-	const ext = document.querySelector("#img-format").value || "png"
-	const downloadA = document.createElement("a")
-	downloadA.setAttribute("download", `draw-this.${ext}`)
-	downloadA.hidden = true
-	downloadA.setAttribute("href", canvas.toDataURL(mimeMap[ext]))
-	downloadA.click()
+	const ext = document.querySelector("#img-format").value
+	// ? [later] make ternary conditional into a function-map? [possibly, add the '.avif' support later...];
+	download(
+		ext,
+		ext === "svg"
+			? svgURI(parse(document.querySelector("#code").value))
+			: canvas.toDataURL(ext in mimeMap ? mimeMap[ext] : "image/png")
+	)
 })
+
+// ! add somewhere (to a module/library... very useful and commonplace...);
+export function download(ext, dataUrl) {
+	const downloadA = document.createElement("a")
+	downloadA.setAttribute("download", `draw-text.${ext}`)
+	downloadA.hidden = true
+	downloadA.setAttribute("href", dataUrl)
+	downloadA.click()
+}
+
+// TODO: implement running from file; [create more examples - then implement and test...];
+filelists.forEach((fileList) =>
+	fileList
+		.querySelector("input[type='file']")
+		.addEventListener("change", function (event) {
+			const list = childClear(fileList.querySelector("ul"))
+			const { target } = event
+			const { files } = target
+			Array.from(files)
+				.map((f) => f.name)
+				.forEach((name) =>
+					append(list)(
+						appendpar(create("li"))(
+							text(
+								`${name.slice(0, maxFilenameLength)}${
+									name.length > maxFilenameLength ? "..." : ""
+								}`
+							)
+						)
+					)
+				)
+			imgout(lastText)
+		})
+)

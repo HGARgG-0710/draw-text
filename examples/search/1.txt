@@ -5,7 +5,6 @@ variable gem 		#2ae30e
 
 variable handleEnd 	240
 
-
 fill (100, handleEnd, handleColour) (90, handleEnd) (117, 175) (120, 180) (127, 178)
 contour (200, 15, frame)->(frame)(230, 130, frame)->(frame)(120, 180, frame)->(frame)(90, 70, frame)->(frame)
 contour (127, 178, handleColour)->(handleColour)(100, handleEnd, handleColour)

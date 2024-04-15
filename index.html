@@ -19,41 +19,60 @@
 		<!-- TODO: make a separate page with documentation [this is no longer covering it...] -->
 		<div class="space-rect"></div>
 		<div class="main-rect">
-			<h2>What is this?</h2>
+			<div id="text">
+				<h2>What is this?</h2>
 
-			<p>
-				Draw-Text is a simple webpage that allows one to draw pictures using lines, points, polygons
-				and ellipses together with a mini programming language,
-				then export the results to png/jpg or any other desired image format.
-			</p>
+				<p>
+					Draw-Text is a simple webpage that allows one to draw pictures using lines, points, polygons
+					and ellipses together with a mini programming language,
+					then export the results to png/jpg or any other desired image format.
+				</p>
 
-			<h2>
-				Why?
-			</h2>
+				<h2>
+					Why?
+				</h2>
 
-			<p>Why not? It's fun, try! (Read the docs first though, the project's grown quite a bit...)</p>
-
-			<div id="input_area">
-				<div id="draw_input">
-					<label for="code">Input:</label>
-					<textarea id="code"></textarea>
-				</div>
-				<div id="sizes">
-					<label for="width">width: </label>
-					<input type="text" class="size" id="width">
-					<label for="height">height: </label>
-					<input type="text" class="size" id="height">
-				</div>
+				<p>Why not? It's fun, try! (Read the docs first though, the project's grown quite a bit...)</p>
 			</div>
-			<div id="output_area">
-				<div id="second-align">
-					<canvas id="out"></canvas>
-					<div id="img-download">
-						<input id="img-format" type="text" placeholder="Format (default: png)">
-						<button id="download-button">Download</button>
+
+			<div id="post-text">
+				<div id="input_area">
+					<div id="draw_input">
+						<label for="code">Input:</label>
+						<textarea id="code"></textarea>
+					</div>
+					<div id="sizes">
+						<label for="width">width: </label>
+						<input type="text" class="size" id="width">
+						<label for="height">height: </label>
+						<input type="text" class="size" id="height">
+					</div>
+				</div>
+				<div id="files_area">
+					<div id="files">
+						<div class="file-list">
+							<label for="pre-file" class="file-input">Files (before Input):</label>
+							<input type="file" id="pre-file" hidden multiple />
+							<ul></ul>
+						</div>
+						<div class="file-list">
+							<label for="post-file" class="file-input">Files (after Input):</label>
+							<input type="file" id="post-file" hidden multiple />
+							<ul></ul>
+						</div>
+					</div>
+				</div>
+				<div id="output_area">
+					<div id="second-align">
+						<canvas id="out"></canvas>
+						<div id="img-download">
+							<input id="img-format" type="text" placeholder="Format (default: png)">
+							<button id="download-button">Download</button>
+						</div>
 					</div>
 				</div>
 			</div>
+
 		</div>
 		<div class="space-rect"></div>
 	</main>

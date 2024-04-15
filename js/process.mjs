@@ -1,21 +1,9 @@
 import draw from "./draw.mjs"
-import { regexps } from "./parser.mjs"
 import { context } from "./draw.mjs"
-import { black } from "./colors.mjs"
+import { parseSingle } from "./parser/types.mjs"
 import params from "./params.mjs"
 
 export const vars = new Map()
-
-export const parseSingle = (x) =>
-	(x instanceof Array
-		? (x) => x.map(parseSingle)
-		: typeof x === "boolean"
-		? (x) => x
-		: !isNaN(x)
-		? Number
-		: vars.has(x)
-		? (y) => parseSingle(vars.get(y))
-		: (text) => text.match(regexps.colorarg)[0] || black)(x)
 
 function substitute(expression) {
 	if (expression instanceof Array) return expression.map(parseSingle)

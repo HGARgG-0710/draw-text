@@ -45,9 +45,13 @@
 
 		16. filter; 
 		17. clip; 
+		18. transform - useful for skewing something; 
+			This one - as a pure 'points-only' operator with the sintax: 
+				'T(a,b,c,d,e,f)(x, y)'
+			Value - new point. 
 
 		Whole separate, under question: 
-		18. Animations? [more complex, doing will require finding a finite set of elementary operations equivalent in power to multi-layer structures such as 'for-loops' in the sense of determining the algorithms...];
+		19. Animations? [more complex, doing will require finding a finite set of elementary operations equivalent in power to multi-layer structures such as 'for-loops' in the sense of determining the algorithms...];
 
 			IDEA: add eleven instructions: 
 
@@ -174,3 +178,31 @@
 		}
 	
 	The i'th argument of n-level function is accessed via "$[repeat n]$i", whereas "$i" is used for script argument [0-level function];
+
+18. Add code highlighting for the on-the-website editor? 
+
+	Keywords-colouring, at least, and underline matching brackets when near them...;
+
+19. Extend the module for svg support!
+
+	The 'js/svg.mjs' is a module needed to ensure the svg support on the website; 
+
+	As the Canvas API doesn't natively support working with SVG API 
+		(and the code in widely used libraries is largely total crap), 
+		one is going to write a library of one's own 
+			(first as a submodule of Draw-Text, then - as a separate thing...)
+		
+20. IDEA: separate the website code and the code of the PL: 	
+
+	Create a separate repo of DTPL (draw-text programming language), 
+	specifically for everything related to the language; 
+
+	Then, keep the website ONLY as the usage of all that functionality + components...; 
+
+	Note: code structure is starting to get too messy and unwieldy. 
+
+21. IDEA [possibly, a bad one]: Add 3d! 
+
+	After having completed the game engine, animation and all the other functionalities, 
+		add the third dimension.
+	[?webgl for this cause, mayhaps?]
