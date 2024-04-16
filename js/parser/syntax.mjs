@@ -2,8 +2,8 @@
 // ? This 'findSegments' is a good addition to the library in question...; Also - consider index-passing-based parsing (one, where one of inputs is an index, and so is one of outputs...);
 // ? Add a 'regex' module to it?
 
-import { and, or, occurences, global, begin, end, nlookbehind } from "../regex.mjs"
-import params from "../params.mjs"
+import { and, or, occurences, global, begin, end, nlookbehind } from "../lib/regex.mjs"
+import params from "../process/state/params.mjs"
 
 // ! Fix that somehow... [a proper typesystem is in order, less chaotic];
 export const validityMap = {
@@ -49,7 +49,7 @@ const regfun = {
 	brackets: (...x) => and(reg.opbrack, ...x, reg.clbrack)
 }
 
-// ? More semantic subdivisions? Some of these things are types/command-arguments, while some are mere tokens. There should be separation...; 
+// ? More semantic subdivisions? Some of these things are types/command-arguments, while some are mere tokens. There should be separation...;
 export const regexps = {
 	arrow: reg.arrow,
 	vardecimal: regfun.variable("decimal"),

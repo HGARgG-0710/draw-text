@@ -1,3 +1,5 @@
+// ? Can it be, though? [Really looks like useless... Unless new things appar soon - delete...];
+
 // ^ extend! This can be made more powerful (draiwng with curves defined by Infinite Series and all that...);
 // * Use math-expressions.mjs, once it's completed...;
 // ? Re-organize? Temporarily, as the infinite series and function-defined curves aren't quite there yet...;

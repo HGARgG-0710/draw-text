@@ -4,15 +4,19 @@ import {
 	append,
 	appendpar,
 	text,
-	cquery
+	cquery,
+	attribute
 } from "./components/lib.mjs"
 import parse from "./parser/main.mjs"
-import process from "./process.mjs"
+import process from "./process/canvas/process.mjs"
 import { validate, validateNumber } from "./parser/main.mjs"
-import { clear, canvas } from "./draw.mjs"
-import { svgURI } from "./svg.mjs"
+import { clear, canvas } from "./process/canvas/draw.mjs"
+import { svgURI } from "./process/svg/uri.mjs"
 
+const imgExt = document.querySelector("#img-format")
+const codeElem = document.querySelector("#code")
 const filelists = document.querySelectorAll(".file-list")
+const downloadButton = document.querySelector("#download-button")
 
 // ? Make a separate files with all the constants?
 const maxFilenameLength = 25
@@ -52,14 +56,14 @@ canvas.setAttribute("height", String(60 * vh))
 canvas.setAttribute("width", String(60 * vw))
 
 // ^ Idea: create an npm-library with common expressions/aliases/tasks for working with DOM API [like here - allowing the Tab insertion inside a 'textarea' element];
-document.querySelector("#code").addEventListener("keydown", function (event) {
+codeElem.addEventListener("keydown", function (event) {
 	if (event.key === "Tab" && document.activeElement.id === "code") {
 		event.preventDefault()
 		this.setRangeText("\t", this.selectionStart, this.selectionStart, "end")
 	}
 })
 
-document.querySelector("#code").addEventListener("keyup", function (_kevent) {
+codeElem.addEventListener("keyup", function (_kevent) {
 	const v = this.value.trim()
 	if (lastText !== v) {
 		lastText = v
@@ -92,24 +96,29 @@ const mimeMap = {
 
 // TODO: write a documentation on the precise list of available MIME-types;
 // ! refactor that thing with the 'download'-a element...; Then, use the output from
-document.querySelector("#download-button").addEventListener("click", (_event) => {
-	const ext = document.querySelector("#img-format").value
+downloadButton.addEventListener("click", async (_event) => {
+	const ext = imgExt.value
 	// ? [later] make ternary conditional into a function-map? [possibly, add the '.avif' support later...];
 	download(
 		ext,
 		ext === "svg"
-			? svgURI(parse(document.querySelector("#code").value))
+			? svgURI(
+					parse(
+						(await readFiles(filelists[0]))
+							.concat([codeElem.value])
+							.concat(await readFiles(filelists[1]))
+							.join("\n")
+					)
+			  )
 			: canvas.toDataURL(ext in mimeMap ? mimeMap[ext] : "image/png")
 	)
 })
 
-// ! add somewhere (to a module/library... very useful and commonplace...);
+// ! add the generalization somewhere (to a module/library... very useful and commonplace...);
 export function download(ext, dataUrl) {
-	const downloadA = document.createElement("a")
-	downloadA.setAttribute("download", `draw-text.${ext}`)
-	downloadA.hidden = true
-	downloadA.setAttribute("href", dataUrl)
-	downloadA.click()
+	attribute(
+		attribute(attribute(create("a"))("download", `draw-text.${ext}`))("hidden", "")
+	)("href", dataUrl).click()
 }
 
 // TODO: implement running from file; [create more examples - then implement and test...];

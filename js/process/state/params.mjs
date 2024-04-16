@@ -1,5 +1,5 @@
-import { black, white } from "./colors.mjs"
-import { canvas, context } from "./draw.mjs"
+import { black, white } from "../../lib/colors.mjs"
+import { canvas, context } from "../canvas/draw.mjs"
 
 export function drawBackground(colour) {
 	const prevFill = context.fillStyle
@@ -46,4 +46,17 @@ const params = new Map(
 		["base-color", black, (x) => typeof x === "string"]
 	].map((paramargs) => Parameter(...paramargs))
 )
+
+export function setParam(paramName, value, context) {
+	if (params.has(paramName)) {	
+	const param = params.get(paramName)
+	const newParamValue = parseSingle(value)
+	if (param[1](newParamValue)) {
+		param[0] = newParamValue
+		if (typeof param[2] === "function" && context)
+			param[2].call(context, newParamValue)
+	}
+	}
+}
+
 export { params as default }
