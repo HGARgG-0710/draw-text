@@ -26,7 +26,7 @@ const params = new Map(
 		[
 			"line-width",
 			1,
-			(x) => typeof x === "number" || x instanceof Number,
+			(x) => typeof x === "number",
 			function (widthValue) {
 				this.lineWidth = widthValue
 			}
@@ -41,21 +41,37 @@ const params = new Map(
 			}
 		],
 		["draw-points", false, (x) => [false, true].includes(x)],
-		["point-size", 1, (x) => typeof x === "number" || x instanceof Number],
+		["point-size", 1, (x) => typeof x === "number"],
 		["point-shape", "rect", (x) => ["rect", "circ"].includes(x)],
-		["base-color", black, (x) => typeof x === "string"]
+		["base-color", black, (x) => typeof x === "string"],
+		[
+			"line-join",
+			"m",
+			(x) => ["r", "b", "m"].includes(x),
+			function (joinValue) {
+				this.lineJoin = joinValue
+			}
+		],
+		[
+			"miter-limit",
+			0,
+			(x) => typeof x === "number",
+			function (miterValue) {
+				this.miterLimit = miterValue
+			}
+		]
 	].map((paramargs) => Parameter(...paramargs))
 )
 
 export function setParam(paramName, value, context) {
-	if (params.has(paramName)) {	
-	const param = params.get(paramName)
-	const newParamValue = parseSingle(value)
-	if (param[1](newParamValue)) {
-		param[0] = newParamValue
-		if (typeof param[2] === "function" && context)
-			param[2].call(context, newParamValue)
-	}
+	if (params.has(paramName)) {
+		const param = params.get(paramName)
+		const newParamValue = parseSingle(value)
+		if (param[1](newParamValue)) {
+			param[0] = newParamValue
+			if (typeof param[2] === "function" && context)
+				param[2].call(context, newParamValue)
+		}
 	}
 }
 

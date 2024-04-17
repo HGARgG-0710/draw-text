@@ -1,8 +1,5 @@
-// ? Rename this module into 'drawcanvas'? That is due to the fact that it (essentially), implements the canvas interface. The website, then, would only use the API as a special case...;
-// ! continue refactoring...;
-
 import { colour, drawReplaceBackground, drawReplaceBackground } from "../../lib/lib.mjs"
-import { ellipseData } from "../../lib/math.mjs"
+import { ellipseData, rectData } from "../../lib/math.mjs"
 import params from "../state/params.mjs"
 
 export const canvas = document.querySelector("canvas")
@@ -10,7 +7,6 @@ export const context = canvas.getContext("2d")
 context.globalCompositeOperation = "source-over"
 
 // ! added the point-drawing parameter definition; All that is left is to test them out...;
-// ! PROBLEM - no way to add round angles to 'fill' contours currently (or so it seems) - test, then do something about it...;
 const drawMap = {
 	contour: function (points, arrows, elliptics) {
 		for (const key of Array.from(points.keys())) {
@@ -69,19 +65,17 @@ function ellipse(points, elliptics, key) {
 
 function drawPoint(x, y) {
 	if (params.get("draw-points")[0]) {
-		const path = new Path2D()
 		const size = params.get("point-size")[0]
 		switch (params.get("point-shape")[0]) {
 			case "circ":
+				const path = new Path2D()
 				path.arc(x, y, size)
+				context.fill(path)
 				break
 			case "rect":
-				const [delta, side] = [(x, y) => x / y, (x, y) => x * y].map((f) =>
-					f(size, Math.sqrt(2))
-				)
-				context.fillRect(...[x, y].map((t) => t - delta), Array(2).fill(side))
+				const { x: xleft, y: ytop, width, height } = rectData(size)
+				context.fillRect(xleft, ytop, width, height)
 		}
-		context.fill(path)
 	}
 }
 

@@ -17,8 +17,18 @@
 		
 	ALSO - additional functionality: 
 
-		1. Bezier curves (quadraticCurveTo and bezierCurveTo do a quadratic and cubic one correspondently, see if others are feasible to either implement using it or manually...); 
-		2. roundRect (for pretty things and UI...);
+		1. Bezier curve; 	
+
+			Use the already present quadraticCurve/cubicBezierCurve to define higher order curves
+			(use recursive definition + points construction...); 
+
+		2. generalization of 'roundRect' (for pretty things and UI...) - 'roundPolygon';
+
+			line-join is good, however, it can make creating complex shapes with changing of round-sharp corners somewhat unconventional; 
+			Due to this, one would like to use the 'lineJoin' only as the default, while the temporary changes are also possible via this new construction; 
+
+			To set a given point '(...)' to 'round' do "r(...)", for other values - corresponding modifiers. 
+
 		3. strokeText [add text to draw-text...]; 
 		4. setLineDash (for dotted lines)
 		5. fillText;
@@ -30,28 +40,22 @@
 			Allow ALL the places that use colours (including the 'background' and others), 
 			to have a transparency argument. will allofr for some powerful effects
 
-		9. lineJoin - as a post-point 'specifier'; One of the following: 
+		9. miterLimit ('limit' property)
+		10. lineDashOffset ('dash-offset' property)
+		11. gradients - conic, linear and radial (those that Canvas supports); 
+		12. fill-rule (single-value property for setting fill rules - 'evenodd' or 'nonzero');
+		13. shadow (command for shadows; takes arguments' shape of '(offsetx, offsety) blur? color?')
+		14. font (property; for doing text-stroking/fillling); 
 
-			1. r - for rounded corners; 
-			2. b - for bevel corners; 
-			The miter corners are the default, so for them - no specifier...; 
-
-		10. miterLimit ('limit' property)
-		11. lineDashOffset ('dash-offset' property)
-		12. gradients - conic, linear and radial (those that Canvas supports); 
-		13. fill-rule (single-value property for setting fill rules - 'evenodd' or 'nonzero');
-		14. shadow (command for shadows; takes arguments' shape of '(offsetx, offsety) blur? color?')
-		15. font (property; for doing text-stroking/fillling); 
-
-		16. filter; 
-		17. clip; 
-		18. transform - useful for skewing something; 
+		15. filter; 
+		16. clip; 
+		17. transform - useful for skewing something; 
 			This one - as a pure 'points-only' operator with the sintax: 
 				'T(a,b,c,d,e,f)(x, y)'
 			Value - new point. 
 
 		Whole separate, under question: 
-		19. Animations? [more complex, doing will require finding a finite set of elementary operations equivalent in power to multi-layer structures such as 'for-loops' in the sense of determining the algorithms...];
+		18. Animations? [more complex, doing will require finding a finite set of elementary operations equivalent in power to multi-layer structures such as 'for-loops' in the sense of determining the algorithms...];
 
 			IDEA: add eleven instructions: 
 
@@ -208,3 +212,13 @@
 	After having completed the game engine, animation and all the other functionalities, 
 		add the third dimension.
 	[?webgl for this cause, mayhaps?]
+
+22. IDEA [SVG-extension]: 
+
+	Previously (in 1.), features from Canvas were decided to be added to the website as wrappers (namely, the extension of the power of draw-text); 
+	Now, as one started implementing the SVG compatibility of the format, it is time to consider doing the same with it; 
+	Only those that do not contradict the concept of the project's generality + syntax-minimalism and 'flatness' + predominant native types (such as colours); 
+
+	Current list of new features (tags/attributes) to add: 
+
+		1. <textPath>

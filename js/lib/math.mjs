@@ -111,3 +111,19 @@ export function ellipseData(points, angle, startAngle, endAngle) {
 		endAngle: radAngs[1]
 	}
 }
+
+export function rectData(x, y, size) {
+	const [delta, side] = [(x, y) => x / y, (x, y) => x * y].map((f) =>
+		f(size, Math.sqrt(2))
+	)
+	const [height, width] = Array(2).fill(side)
+	const [xleft, ytop] = [x, y].map((t) => t - delta)
+	return {
+		delta,
+		side,
+		height,
+		width,
+		x: xleft,
+		y: ytop
+	}
+}
