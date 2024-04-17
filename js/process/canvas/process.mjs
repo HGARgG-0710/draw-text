@@ -1,10 +1,10 @@
 import draw from "./draw.mjs"
-import { context } from "./draw.mjs"
+import { context as drawcontext } from "./draw.mjs"
 import { parseSingle } from "../../parser/types.mjs"
 import params, { setParam } from "../state/params.mjs"
 import { vars, substitute } from "../state/vars.mjs"
 
-export default function process(expression, ...past) {
+export default function process(expression, context = drawcontext) {
 	const { command, argline } = expression
 	switch (command) {
 		case "set-param":
@@ -20,6 +20,6 @@ export default function process(expression, ...past) {
 					command: "set-param",
 					argline: [command].concat(argline)
 				})
-			return draw(substitute(expression), ...past)
+			return draw(substitute(expression))
 	}
 }

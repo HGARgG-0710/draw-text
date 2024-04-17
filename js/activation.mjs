@@ -4,19 +4,20 @@ import {
 	append,
 	appendpar,
 	text,
+	query,
 	cquery,
-	attribute
-} from "./components/lib.mjs"
-import parse from "./parser/main.mjs"
+	attribute,
+	mquery
+} from "./lib/components.mjs"
+import parse, { validate, validateNumber } from "./parser/main.mjs"
 import process from "./process/canvas/process.mjs"
-import { validate, validateNumber } from "./parser/main.mjs"
 import { clear, canvas } from "./process/canvas/draw.mjs"
 import { svgURI } from "./process/svg/uri.mjs"
 
-const imgExt = document.querySelector("#img-format")
-const codeElem = document.querySelector("#code")
-const filelists = document.querySelectorAll(".file-list")
-const downloadButton = document.querySelector("#download-button")
+const [imgExt, codeElem, downloadButton] = ["img-format", "code", "download-button"]
+	.map((x) => `#${x}`)
+	.map(query())
+const filelists = mquery()(".file-list")
 
 // ? Make a separate files with all the constants?
 const maxFilenameLength = 25
@@ -52,8 +53,7 @@ const imgout = async (text) => {
 	outList(await readFiles(filesAfter))
 }
 
-canvas.setAttribute("height", String(60 * vh))
-canvas.setAttribute("width", String(60 * vw))
+attribute(attribute(canvas)("height", String(60 * vh)))("width", String(60 * vw))
 
 // ^ Idea: create an npm-library with common expressions/aliases/tasks for working with DOM API [like here - allowing the Tab insertion inside a 'textarea' element];
 codeElem.addEventListener("keydown", function (event) {
@@ -122,26 +122,25 @@ export function download(ext, dataUrl) {
 }
 
 // TODO: implement running from file; [create more examples - then implement and test...];
+// ! take the '...'-bit out somewhere (useful for 'common patterns' on a webpage/somewhere else, where UX is concerned...); 
 filelists.forEach((fileList) =>
-	fileList
-		.querySelector("input[type='file']")
-		.addEventListener("change", function (event) {
-			const list = childClear(fileList.querySelector("ul"))
-			const { target } = event
-			const { files } = target
-			Array.from(files)
-				.map((f) => f.name)
-				.forEach((name) =>
-					append(list)(
-						appendpar(create("li"))(
-							text(
-								`${name.slice(0, maxFilenameLength)}${
-									name.length > maxFilenameLength ? "..." : ""
-								}`
-							)
+	query(fileList)("input[type='file']").addEventListener("change", function (event) {
+		const list = childClear(query(fileList)("ul"))
+		const { target } = event
+		const { files } = target
+		Array.from(files)
+			.map((f) => f.name)
+			.forEach((name) =>
+				append(list)(
+					appendpar(create("li"))(
+						text(
+							`${name.slice(0, maxFilenameLength)}${
+								name.length > maxFilenameLength ? "..." : ""
+							}`
 						)
 					)
 				)
-			imgout(lastText)
-		})
+			)
+		imgout(lastText)
+	})
 )

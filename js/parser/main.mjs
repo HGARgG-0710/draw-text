@@ -1,4 +1,4 @@
-import { Primitive } from "../primitives.mjs"
+import { Primitive } from "../lib/lib.mjs"
 import {
 	regexps,
 	validityMap,

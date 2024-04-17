@@ -1,6 +1,7 @@
 // ? Rename this module into 'drawcanvas'? That is due to the fact that it (essentially), implements the canvas interface. The website, then, would only use the API as a special case...;
 // ! continue refactoring...;
 
+import { colour, drawReplaceBackground, drawReplaceBackground } from "../../lib/lib.mjs"
 import { ellipseData } from "../../lib/math.mjs"
 import params from "../state/params.mjs"
 
@@ -28,11 +29,7 @@ const drawMap = {
 		}
 	},
 	fill: function (points, _arrows, elliptics) {
-		context.fillStyle =
-			points
-				.map((x, i) => (x[2] ? x[2] : elliptics[i][2]))
-				.reduce((acc, curr) => (acc ? acc : curr ? curr : null), null) ||
-			params.get("base-color")[0]
+		context.fillStyle = colour(points, elliptics, params)
 		context.beginPath()
 		for (const key of Array.from(points.keys())) {
 			if (elliptics[key][0]) {
@@ -44,47 +41,10 @@ const drawMap = {
 		context.closePath()
 		context.fill()
 	},
-	// ! refactor these two;
 	clear: (points, arrows, elliptics, background) =>
-		draw({
-			command: "contour",
-			argline: {
-				points: points.map((x) => {
-					x[2] = background
-					return x
-				}),
-				connections: {
-					arrows: arrows.map((arrow) => {
-						arrow[1] = background
-						return arrow
-					}),
-					elliptics: elliptics.map((elliptic) => {
-						elliptic[3] = background
-						return elliptic
-					})
-				}
-			}
-		}),
+		drawReplaceBackground("contour")(background)(points, arrows, elliptics),
 	erase: (points, arrows, elliptics, background) =>
-		draw({
-			command: "fill",
-			argline: {
-				points: points.map((x) => {
-					x[2] = background
-					return x
-				}),
-				connections: {
-					arrows: arrows.map((x) => {
-						x[1] = background
-						return x
-					}),
-					elliptics: elliptics.map((x) => {
-						x[3] = background
-						return x
-					})
-				}
-			}
-		})
+		drawReplaceBackground("fill")(background)(points, arrows, elliptics)
 }
 
 context.imageSmoothingEnabled = false

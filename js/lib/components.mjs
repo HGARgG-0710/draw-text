@@ -20,8 +20,9 @@ export const clear = (el) => {
 	Array.from(el.children).forEach((x) => remove(el)(x))
 	return el
 }
-export const query = (x) => (q) => x.querySelector(q)
-export const cquery = (q) => (x) => x.querySelector(q)
+export const query = (x = document) => (q) => x.querySelector(q)
+export const cquery = (q) => (x = document) => x.querySelector(q)
+export const mquery = (x = document) => (q) => x.querySelectorAll(q)
 
 export const prop = (obj) => (prop, val) => {
 	obj[prop] = val

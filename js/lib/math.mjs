@@ -100,8 +100,6 @@ export function ellipseData(points, angle, startAngle, endAngle) {
 				? +!isFirstAbove
 				: +isFirstAbove
 		](rotationBase)
-	
-	
 
 	return {
 		center,

@@ -90,11 +90,14 @@
 	They are not height-oriented, but rather width-oriented...; 
 5. IDEA: add 'comment's into the project's language's vocabulary...; 
 	Useful for designation of particular elements of images, in the cases of certain complexity. 
-6. IDEA [visual design]: add a generation of random pattern to the sides of the page (current blue-rect); 
+6. IDEA [visual design]: add a generation of random pattern to the sides of the page (current space-rect); 
 	Think whether the pattern would be recurring, or it would create new colours each time user would 
 		change the canvas size (thus increasing the page size...); 
 	Also - consider how they'd be generated (that is, how would the colour pattern be chosen...
 		What vector-function of n>=2 colour components - RGB/other - to pick/construct?)
+	
+	NOTE UPDATE: now, it comes down to changing the background - the task became more chanllenging, but also far more fun! 
+	Think about it...; 
 	
 7. Idea: add support for a 'point'-datatype to the parser; 
 
@@ -115,12 +118,11 @@
 
 	Also - the booleans and trigonometric functions (sin, cos, tan); 
 
-10. Add input from file (giving a file with 'draw-text' code...);
+10. Add arguments; 
 
-	In particular - add the predefined 'arguments' variables, that can be accessed. 
-	This way, one could run draw-text files/code with given arguments;
+	Syntax: [! or % or $ or @]n, where 'n' is the number of the argument...; 'n' can be an expression (so is, for instance, calculated); 
 
-	[useful with images];
+	[useful with images, paths and filereading];
 
 11. Add filereading: 
 
@@ -138,7 +140,7 @@
 	Also - eliminates inner calls from other files 
 		(if they are available - puts the code inside with appropriate name collisions in vars fixed (when required), otherwise - a compiler error); 
 	
-14. Add file-running: 
+14. Add file-running commands: 
 
 	Two directives: 
 

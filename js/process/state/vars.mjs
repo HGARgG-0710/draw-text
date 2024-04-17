@@ -1,3 +1,5 @@
+import { parseSingle } from "../../parser/types.mjs"
+
 export const vars = new Map()
 
 export function substitute(expression) {
