@@ -49,12 +49,13 @@ const params = new Map(
 			"m",
 			(x) => ["r", "b", "m"].includes(x),
 			function (joinValue) {
-				this.lineJoin = joinValue
+				this.lineJoin =
+					joinValue === "r" ? "round" : joinValue === "b" ? "bevel" : "miter"
 			}
 		],
 		[
 			"miter-limit",
-			0,
+			4,
 			(x) => typeof x === "number",
 			function (miterValue) {
 				this.miterLimit = miterValue

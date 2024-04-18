@@ -1,4 +1,4 @@
-import { colour, drawReplaceBackground, drawReplaceBackground } from "../../lib/lib.mjs"
+import { colour, drawReplaceBackground } from "../../lib/lib.mjs"
 import { ellipseData, rectData } from "../../lib/math.mjs"
 import params from "../state/params.mjs"
 

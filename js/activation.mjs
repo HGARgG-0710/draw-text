@@ -13,6 +13,7 @@ import parse, { validate, validateNumber } from "./parser/main.mjs"
 import process from "./process/canvas/process.mjs"
 import { clear, canvas } from "./process/canvas/draw.mjs"
 import { svgURI } from "./process/svg/uri.mjs"
+import { download } from "./lib/components.mjs"
 
 const [imgExt, codeElem, downloadButton] = ["img-format", "code", "download-button"]
 	.map((x) => `#${x}`)
@@ -40,12 +41,22 @@ const outList = (list) => {
 	list.forEach(outSingle)
 }
 const readFiles = async (files) => {
-	return await Promise.all(files.map(async (file) => (await file.arrayBuffer()).text()))
+	return await Promise.all(
+		Array.from(files).map(async (file) => (await file.arrayBuffer()).text())
+	)
+}
+
+const outOnChange = function (_kevent) {
+	const v = this.value.trim()
+	if (lastText !== v) {
+		lastText = v
+		validate(lastText, imgout)
+	}
 }
 
 const imgout = async (text) => {
 	clear()
-	const [filesPre, filesAfter] = filelists
+	const [filesPre, filesAfter] = Array.from(filelists)
 		.map(cquery("input[type='file']"))
 		.map((x) => x.files)
 	outList(await readFiles(filesPre))
@@ -63,13 +74,8 @@ codeElem.addEventListener("keydown", function (event) {
 	}
 })
 
-codeElem.addEventListener("keyup", function (_kevent) {
-	const v = this.value.trim()
-	if (lastText !== v) {
-		lastText = v
-		validate(lastText, imgout)
-	}
-})
+codeElem.addEventListener("keyup", outOnChange)
+outOnChange.call(codeElem)
 
 for (const metric of ["width", "height"]) {
 	const change = function (_kevent) {
@@ -82,7 +88,7 @@ for (const metric of ["width", "height"]) {
 			validateNumber
 		)
 	}
-	const metricInput = document.querySelector(`#${metric}`)
+	const metricInput = query()(`#${metric}`)
 	change.call(metricInput)
 	metricInput.addEventListener("input", change)
 }
@@ -110,19 +116,13 @@ downloadButton.addEventListener("click", async (_event) => {
 							.join("\n")
 					)
 			  )
-			: canvas.toDataURL(ext in mimeMap ? mimeMap[ext] : "image/png")
+			: canvas.toDataURL(ext in mimeMap ? mimeMap[ext] : "image/png"),
+		ext === "SVG"
 	)
 })
 
-// ! add the generalization somewhere (to a module/library... very useful and commonplace...);
-export function download(ext, dataUrl) {
-	attribute(
-		attribute(attribute(create("a"))("download", `draw-text.${ext}`))("hidden", "")
-	)("href", dataUrl).click()
-}
-
 // TODO: implement running from file; [create more examples - then implement and test...];
-// ! take the '...'-bit out somewhere (useful for 'common patterns' on a webpage/somewhere else, where UX is concerned...); 
+// ! take the '...'-bit out somewhere (useful for 'common patterns' on a webpage/somewhere else, where UX is concerned...);
 filelists.forEach((fileList) =>
 	query(fileList)("input[type='file']").addEventListener("change", function (event) {
 		const list = childClear(query(fileList)("ul"))

@@ -1,13 +1,12 @@
 import { svgTag } from "./svg.mjs"
 import { svgProcess } from "./process.mjs"
+import { canvas } from "../canvas/draw.mjs"
 
 export function svgURI(parsed) {
-	return encodeURI(
-		`data:image/svg+xml;base64,${encodeURIComponent(
-			new DOMParser().parseFromString(
-				svgTag(parsed.map(svgProcess).join("\n")),
-				"image/svg+xml"
-			).documentURI
-		)}`
+	// ! a temp variable...; 
+	const svgCode = svgTag(parsed.map(svgProcess).join("\n"), canvas)	
+	console.log(svgCode)
+	return URL.createObjectURL(
+		new Blob([svgCode])
 	)
 }

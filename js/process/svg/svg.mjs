@@ -3,14 +3,15 @@
 import { substitute } from "../state/vars.mjs"
 import params from "../state/params.mjs"
 import svg from "../../lib/svg.mjs"
-import { replaceBackground, colour } from "../../lib/lib.mjs"
-import { arcData } from "./lib.mjs"
+import { replaceBackground, colour, currpair } from "../../lib/lib.mjs"
+import { arcData, xy } from "./lib.mjs"
 import { rectData } from "../../lib/math.mjs"
 import { svgColour } from "../../lib/colors.mjs"
 
-const commandpair = ([command, params]) => {
-	command, params
-}
+const commandpair = ([command, params]) => ({
+	command,
+	params
+})
 
 const tag = (tagName, attrs, children) => ({ tag: tagName, attrs, children })
 
@@ -38,29 +39,24 @@ function svgPoint(x, y, colour) {
 	}
 }
 
-// ! COMPLETE!!! [this is supposed to also work with the 'params']
-// * 	Params that are not yet supported as data [FIX]:
-// 		1. line-cap (strokes-linecap);
-// 		2. line-width (stroke-width);
-// 		3. line-join (stroke-linejoin: use only just the 'round', 'miter' and 'bevel');
-// 		4. miter-limit (not done in Canvas either yet...);
-// ! Add defaults for colours and other things...;
 const ASTmap = {
 	contour: function (points, arrows, elliptics) {
 		const subShapes = []
 		const baseColour = params.get("base-color")[0]
+		// ! REFACTOR;
+		const isPresent = (x) => x && x[0]
 		for (let i = 0; i < points.length; ++i) {
-			while (arrows[i][0]) {
+			while (isPresent(arrows[i])) {
 				subShapes.push(
 					tag("polyline", {
-						points: currpair(i).map(xy),
+						points: currpair(points, i).map(xy),
 						fill: "none",
 						stroke: arrows[i][1] || baseColour
 					})
 				)
 				svgPoint(...points[i++])
 			}
-			while (elliptics[i][0]) {
+			while (isPresent(elliptics[i])) {
 				subShapes.push(
 					tag("path", {
 						d: [
@@ -70,7 +66,7 @@ const ASTmap = {
 									point: xy(points[i])
 								}
 							],
-							["A", arcData(elliptics, i)]
+							["A", arcData(points, elliptics, i)]
 						].map(commandpair),
 						fill: "none",
 						stroke: elliptics[i][2] || baseColour
@@ -86,12 +82,11 @@ const ASTmap = {
 			tag: "path",
 			attrs: {
 				d: points.map((p, i) =>
-					commandpair(
-						elliptics[i]
-							? ["A", arcData(elliptics, i)]
-							: ["L", { point: xy(p) }]
-					)
-				),
+					(elliptics[i][0]
+						? [[!i ? "M" : "A", arcData(points, elliptics, i)]]
+						: [[!i ? "M" : "L", { point: xy(p) }]]
+					).map(commandpair)
+				).flat(),
 				fill: colour(points, elliptics, params)
 			}
 		}

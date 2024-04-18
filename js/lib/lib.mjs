@@ -21,7 +21,7 @@ export const drawReplaceBackground =
 	(command) => (background) => (points, arrows, elliptics) =>
 		draw(replaceBackground(command)(background)(points, arrows, elliptics))
 
-export const currpair = (i) => [0, 1].map((k) => points[(i + k) % points.length])
+export const currpair = (points, i) => [0, 1].map((k) => points[(i + k) % points.length])
 
 export const Primitive = (points, connections) => ({ points, connections })
 

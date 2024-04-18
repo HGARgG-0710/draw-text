@@ -7,7 +7,7 @@
 // * 5. the 'uni-input' component + the 'uni-export' and other drawing-related components..;
 // ^ Effectively, REWRITE THE WEBSITE ENTIRELY USING THE Web Components API;
 
-import { append, appendpar, create, text, attribute } from "./lib.mjs"
+import { append, appendpar, create, text, attribute } from "../lib/components.mjs"
 
 export class header extends HTMLElement {
 	constructor() {

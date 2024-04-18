@@ -40,22 +40,21 @@
 			Allow ALL the places that use colours (including the 'background' and others), 
 			to have a transparency argument. will allofr for some powerful effects
 
-		9. miterLimit ('limit' property)
-		10. lineDashOffset ('dash-offset' property)
-		11. gradients - conic, linear and radial (those that Canvas supports); 
-		12. fill-rule (single-value property for setting fill rules - 'evenodd' or 'nonzero');
-		13. shadow (command for shadows; takes arguments' shape of '(offsetx, offsety) blur? color?')
-		14. font (property; for doing text-stroking/fillling); 
+		9. lineDashOffset ('dash-offset' property)
+		10. gradients - conic, linear and radial (those that Canvas supports); 
+		11. fill-rule (single-value property for setting fill rules - 'evenodd' or 'nonzero');
+		12. shadow (command for shadows; takes arguments' shape of '(offsetx, offsety) blur? color?')
+		13. font (property; for doing text-stroking/fillling); 
 
-		15. filter; 
-		16. clip; 
-		17. transform - useful for skewing something; 
+		14. filter; 
+		15. clip; 
+		16. transform - useful for skewing something; 
 			This one - as a pure 'points-only' operator with the sintax: 
 				'T(a,b,c,d,e,f)(x, y)'
 			Value - new point. 
 
 		Whole separate, under question: 
-		18. Animations? [more complex, doing will require finding a finite set of elementary operations equivalent in power to multi-layer structures such as 'for-loops' in the sense of determining the algorithms...];
+		17. Animations? [more complex, doing will require finding a finite set of elementary operations equivalent in power to multi-layer structures such as 'for-loops' in the sense of determining the algorithms...];
 
 			IDEA: add eleven instructions: 
 

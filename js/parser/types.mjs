@@ -1,4 +1,5 @@
 import { regexps } from "./syntax.mjs"
+import { vars } from "../process/state/vars.mjs"
 
 // ! Integrate this with 'regexps' more closely [namely, with regexps.types (in future - 'types', 'structures', 'tokens')...];
 // ^ Add the types SPECIFICALLY... - namely, generalize for the finite-set types... [such as r/b/s]
