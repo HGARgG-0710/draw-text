@@ -16,6 +16,7 @@ function Parameter(name, _default, typedef, processor) {
 const params = new Map(
 	[
 		// ? Perhaps, return (partially) the previous 'deBackground' functionality? [require the re-drawing every time that the background is changed, + add a 0-or-1-arguments 'clean [colour]' command that would do what background currently does?]
+		// ^ YES! The background should only do that - CHANGE THE BACKGROUND! (so, it's needed to [somehow] redraw the entire thing prior to it (save the state of parsed things, instead of dynamic variable-putting, like it currently does? [cache the previous things, then clear/redraw? Think about it some more...]))
 		[
 			"background",
 			white,
@@ -67,13 +68,16 @@ const params = new Map(
 export function setParam(paramName, value, context) {
 	if (params.has(paramName)) {
 		const param = params.get(paramName)
-		const newParamValue = parseSingle(value)
-		if (param[1](newParamValue)) {
-			param[0] = newParamValue
+		if (param[1](value)) {
+			param[0] = value
 			if (typeof param[2] === "function" && context)
-				param[2].call(context, newParamValue)
+				param[2].call(context, value)
 		}
 	}
 }
 
-export { params as default }
+export function getParam(name) {
+	return params.get(name)[0]
+}
+
+export const paramsList = Array.from(params.keys())

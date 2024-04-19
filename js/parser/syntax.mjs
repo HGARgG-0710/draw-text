@@ -3,7 +3,7 @@
 // ? Add a 'regex' module to it?
 
 import { and, or, occurences, global, begin, end, nlookbehind } from "../lib/regex.mjs"
-import params from "../process/state/params.mjs"
+import { paramsList } from "../process/state/params.mjs"
 
 // ! Fix that somehow... [a proper typesystem is in order, less chaotic];
 export const validityMap = {
@@ -135,7 +135,7 @@ export const [connectionCommands, singleCommands, pairCommands] = [
 	["variable", "set-param"]
 ].map((x) => new Set(x))
 
-Array.from(params.keys()).forEach((x) => singleCommands.add(x))
+paramsList.forEach((x) => singleCommands.add(x))
 
 export const commandList = [connectionCommands, singleCommands, pairCommands]
 	.map((x) => Array.from(x))

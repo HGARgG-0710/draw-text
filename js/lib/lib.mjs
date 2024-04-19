@@ -1,5 +1,7 @@
 // * general refactoring file;
 
+import { getParam } from "../process/state/params.mjs"
+
 export const setallbackground = (i) => (background) => (x) => {
 	x[i] = background
 	return x
@@ -25,8 +27,8 @@ export const currpair = (points, i) => [0, 1].map((k) => points[(i + k) % points
 
 export const Primitive = (points, connections) => ({ points, connections })
 
-export const colour = (points, elliptics, params) =>
+export const colour = (points, elliptics) =>
 	points
 		.map((x, i) => (x[2] ? x[2] : elliptics[i][2]))
 		.reduce((acc, curr) => (acc ? acc : curr ? curr : null), null) ||
-	params.get("base-color")[0]
+	getParam("base-color")

@@ -1,7 +1,7 @@
 // ! PROBLEM: does not yet support multiple files...; fix.fix.fix.
 
 import { substitute } from "../state/vars.mjs"
-import params from "../state/params.mjs"
+import { getParam } from "../state/params.mjs"
 import svg from "../../lib/svg.mjs"
 import { replaceBackground, colour, currpair } from "../../lib/lib.mjs"
 import { arcData, xy } from "./lib.mjs"
@@ -16,10 +16,10 @@ const commandpair = ([command, params]) => ({
 const tag = (tagName, attrs, children) => ({ tag: tagName, attrs, children })
 
 function svgPoint(x, y, colour) {
-	if (params.get("draw-points")[0]) {
-		const size = params.get("point-size")[0]
+	if (getParam("draw-points")) {
+		const size = getParam("point-size")
 		return tag(
-			...(params.get("point-shape")[0] === "rect"
+			...(getParam("point-shape") === "rect"
 				? [
 						"rect",
 						{
@@ -42,7 +42,7 @@ function svgPoint(x, y, colour) {
 const ASTmap = {
 	contour: function (points, arrows, elliptics) {
 		const subShapes = []
-		const baseColour = params.get("base-color")[0]
+		const baseColour = getParam("base-color")
 		// ! REFACTOR;
 		const isPresent = (x) => x && x[0]
 		for (let i = 0; i < points.length; ++i) {
@@ -81,13 +81,15 @@ const ASTmap = {
 		return {
 			tag: "path",
 			attrs: {
-				d: points.map((p, i) =>
-					(elliptics[i][0]
-						? [[!i ? "M" : "A", arcData(points, elliptics, i)]]
-						: [[!i ? "M" : "L", { point: xy(p) }]]
-					).map(commandpair)
-				).flat(),
-				fill: colour(points, elliptics, params)
+				d: points
+					.map((p, i) =>
+						(elliptics[i][0]
+							? [[!i ? "M" : "A", arcData(points, elliptics, i)]]
+							: [[!i ? "M" : "L", { point: xy(p) }]]
+						).map(commandpair)
+					)
+					.flat(),
+				fill: colour(points, elliptics)
 			}
 		}
 	},
@@ -114,7 +116,7 @@ export function svgAST(expression) {
 	if (!(argline instanceof Array)) {
 		const { points, connections } = argline
 		const { arrows, elliptics } = connections
-		const background = params.get("background")[0]
+		const background = getParam("background")
 		return command in ASTmap
 			? ASTmap[command](points, arrows, elliptics, background)
 			: []

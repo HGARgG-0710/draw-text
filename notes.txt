@@ -1,20 +1,6 @@
 1. IDEA: create means to program curves ... (?using functions/Infinite series? some recursive name-giving mini-language?); 
-	Consider how to factor them into the syntax... (?use '-' instead of '->' for them?);
+	Consider how to factor them into the syntax...;
 
-	ABOUT CIRCLES: 
-
-		More general - replace them with ellipses. 
-		Input shape: 
-
-			(startX, startY)-(angle, ?startAngle, ?endAngle, ?rotation)(endX, endY)
-		
-		1. 'angle' - angle between the point that is to be the center of the future ellipse and '(startX, startY)'. 
-			Together with the end coordinate, sufficient to find the required data to draw the ellipse on the path using 'ellipse'; 
-		2.-4. (rotation, startAngle, endAngle) are the same as in 'ellipse' documentation of Canvas
-
-		By default, first argument is 'startAngle', 'rotation' is 0 and 'endAngle' is 2*pi ('startAngle' is 0 too so as to make a full ellipse...);
-
-		
 	ALSO - additional functionality: 
 
 		1. Bezier curve; 	
@@ -83,6 +69,8 @@
 
 				1. json{...} - an expression, result of which is a JSON-string of whatever is passed to 'json'
 				2. from-json filepath - reads a filepath 
+			
+		18. clear - good for animation, resets the Canvas...; 
 
 2. IDEA: add an .svg of some draw-text example to the README...;
 3. IDEA: add more details to the page's HTML and CSS; 
@@ -221,3 +209,34 @@
 	Current list of new features (tags/attributes) to add: 
 
 		1. <textPath>
+	
+23. THE MINIMUM SIZE OF POINTS IS SLIGHTLY LIMITED... 
+
+	Just another reminder - due to the fact that there are no floats in the typesystem (yet), 
+	there's a VERY large number of beautiful ellipse-sizes not available (in the angle argument); 
+	
+	That is particularly visible when ellipses are large enough - those sub-degrees could make a very real (and, ofttimes, essential) difference. 
+	The floats have just grown in importance...; 
+
+24. IDEA: add functionalities (for 2d): 
+
+	1. WebGL; 
+	2. WebGPU; 
+
+	Similarly, for 3D;
+
+	This will permit the more "serious" implementation of a mini-web-game-engine idea
+		(for it to become 'not so mini' anymore...); 
+	
+	IDEA: also - create not only the API layers for them, but ways for representation AS WELL! 
+
+		So, say, there'd be a separate screens for: 
+
+			1. SVG (animation, scripts AND images); 
+			2. WebGL; 
+			3. WebGPU; 
+			4. Canvas (already present); 
+
+		Would look (CSS) the same, but behave in accordance with given APIs; 
+		All can be exported as desired; 
+		[SVG is perfect, because it's ALREADY a format that is scriptable...]; 

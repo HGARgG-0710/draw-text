@@ -2,7 +2,7 @@
 // ^ redo as a function-map...;
 // * Many of the features of SVG are excessive, and are thus not present in Draw-Text (as it's intended to be as minimalistic and compact as possible...);
 
-import params from "../process/state/params.mjs"
+import { getParam } from "../process/state/params.mjs"
 
 // ! THERE IS A FORMATTING PROBLEM ! Unneeded spaces. Delete them - make it look perfect...;
 export default function svg(tagNode) {
@@ -10,18 +10,16 @@ export default function svg(tagNode) {
 	const { tag, attrs, children } = tagNode
 	const { stroke, fill } = attrs
 	// ! refactor these kinds of ternaries pray... [appear all the time...];
-	const lineJoin = params.get("line-join")[0]
+	const lineJoin = getParam("line-join")
 	const lineJoinSVG = lineJoin === "r" ? "round" : lineJoin === "b" ? "bevel" : "mitter"
-	const lineCap = params.get("line-cap")[0]
+	const lineCap = getParam("line-cap")
 	const lineCapSVG = lineCap === "r" ? "round" : lineCap === "b" ? "butt" : "square"
 	// ! NOTE: this actually includes all the temp params that have at least 2 different commands assigned (they ought to be changed...);
 	const omni = `${stroke ? ` stroke='${stroke}'` : ""} ${
 		fill ? ` fill='${fill}'` : ""
-	} stroke-linecap='${lineCapSVG}' stroke-width='${
-		params.get("line-width")[0]
-	}' stroke-linejoin='${lineJoinSVG}' stroke-miterlimit='${
-		params.get("miter-limit")[0]
-	}'`
+	} stroke-linecap='${lineCapSVG}' stroke-width='${getParam(
+		"line-width"
+	)}' stroke-linejoin='${lineJoinSVG}' stroke-miterlimit='${getParam("miter-limit")}'`
 	switch (tag) {
 		case "circle":
 			const { center, radius } = attrs

@@ -1,5 +1,6 @@
 import { regexps } from "./syntax.mjs"
 import { vars } from "../process/state/vars.mjs"
+import { getParam } from "../process/state/params.mjs"
 
 // ! Integrate this with 'regexps' more closely [namely, with regexps.types (in future - 'types', 'structures', 'tokens')...];
 // ^ Add the types SPECIFICALLY... - namely, generalize for the finite-set types... [such as r/b/s]
@@ -16,4 +17,4 @@ export const parseSingle = (x) =>
 		? (x) => x
 		: !isNaN(x)
 		? Number
-		: (text) => text.match(regexps.colorarg)[0] || params.get("base-color")[0])(x)
+		: (text) => text.match(regexps.colorarg)[0] || getParam("base-color"))(x)

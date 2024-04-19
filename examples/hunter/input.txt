@@ -1,0 +1,2 @@
+background #1f1282
+fill (20, 150)-(25, #fffff2)(150, 20)
