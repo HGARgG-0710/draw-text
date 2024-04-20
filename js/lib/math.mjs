@@ -147,130 +147,138 @@ export function ellipseData(points, angle, startAngle, endAngle) {
 	const center = getCenter(points, angle)
 
 	// ! looks like this is still quite unfinished...;
-	const sinval = (center[1] - first(points)[1]) / radius(points, angle)
-	const rotationBase = Math.asin(Math.abs(sinval))
+	const sinval = (points, angle) =>
+		(getCenter(points, angle)[1] - first(points)[1]) / radius(points, angle)
+	const rotationBase = (points, angle) => Math.asin(Math.abs(sinval(points, angle)))
 	const rotationTransform = [(x) => x, (x) => toRadians(360) - x]
 
-	// ! STRANGE SHIT STARTS TO HAPPEN AT BORDERS - 'dx=0' and 'dy=0'; CHECK FOR THOSE AS WELL!
-	// ! PROOOOOOOBBBBLLLLEEEEEMMMM... - EACH AND EVERY SINGLE FUCKING ONE ___HAS___ ITS OWN 'SPECIAL POINT' AFTER WHICH THE FIRST (currently <= 45) __STOPS__ WORKING PERFECTLY! AND THEY'RE BLOODY DIFFERENT... [some are above 45, others - under...] NEED TO FIND THEM ALL...;
-	// * they have to be figured out individually and STORED IN AN ARRAY... [try to find out the deviation (see if it scales - if not, then stick with '45')];
-	// ? find a precise solution for it sometime later? [YES IT DOES! Seems like, it's looking for the 'high/low' point of 'rotationBase' - everything after it goes into the second set, while all before - in the first ONE JUST HAS TO FIND THEM OUT!];
+	// TODO: CACHING!
+	// TODO: REFACTORING!
 
+	// ! STRANGE SHIT STARTS TO HAPPEN AT BORDERS - 'dx=0' and 'dy=0'; CHECK FOR THOSE AS WELL!
+
+	// ! note: the check with looking at the 'next one' is also (not entirely) correct. In cases when it overflows through '90deg', there's a (very) small chance that the value in question will actually get into the wrong branch, because the larger portion of the 'added' value will go into that initial [89; 90], rather than the reversed [90; 89] (it won't be visible, but still - a tiny thing to fix...)
+	// ! NOTE: this '+ 0.1' thing WON'T WORK with the non-integer values! (once self adds the floats)
 	// % Curr todo list:
 	// 		1. Find all the bounds at which the things 'break' into the other set of values (start with 45, then elminate 1-by-1 each of the 16 different cases, then - change values see if scales);
 	// 		2. Check the values at 'dx=0' and 'dy=0', how each one of 16 ellipses behaves... (they ought to either be all the same, or different... refactor accordingly);
-	const rotationAngle =
-		rotationTransform[
-			// ^ CONCLUSION: for testing, one must first express all the constants in code via functions...;
-			centerAngle(angle) <= 45
-				? /* (
-				isCenterAbove
-					? isFirstLeft && isFirstAbove
-						? 0
-						: isFirstAbove
-						? 0
-						: isFirstLeft
-						? 0
-						: 0
-					: isCenterBelow
-					? isFirstLeft && isFirstAbove
-						? 0
-						: isFirstAbove
-						? 0
-						: isFirstLeft
-						? 0
-						: 0
-					: isCenterRight
-					? isFirstLeft && isFirstAbove
-						? 0
-						: isFirstAbove
-						? 0
-						: isFirstLeft
-						? 0
-						: 0
-					: isFirstLeft && isFirstAbove
-					? 0
-					: isFirstAbove
-					? 0
-					: isFirstLeft
-					? 0
-					: 0
-			) */
-				  /* isFirstLeft ^ isFirstAbove */
-				  // * check (incomplete... ALL 176)
-				  isCenterAbove(points, angle)
-					? isFirstLeft(points) && isFirstAbove(points)
-						? 0
-						: isFirstLeft(points)
-						? 1
-						: isFirstAbove(points)
-						? 1
-						: 0
-					: // * check (incomplete... ALL 176)
-					isCenterBelow(points, angle)
-					? isFirstLeft(points) && isFirstAbove(points)
-						? 0
-						: isFirstLeft(points)
-						? 1
-						: isFirstAbove(points)
-						? 1
-						: 0
-					: // * check (incomplete, ALL 176)
-					isCenterRight(points, angle)
-					? isFirstAbove(points) && isFirstLeft(points)
-						? 0
-						: isFirstLeft(points)
-						? 1
-						: isFirstAbove(points)
-						? 1
-						: 0
-					: // * check (incomplete, ALL 176)
-					isFirstAbove(points) && isFirstLeft(points)
-					? 0
-					: isFirstLeft(points)
-					? 1
+	// ? Try to replace the 'sinval(...) < 0' with 'rotationBase(...) >/< rotationBase(...)'? [Think about it...];
+	const rotationAngle = rotationTransform[
+		// ^ CONCLUSION: for testing, one must first express all the constants in code via functions...;
+		// centerAngle(angle) <= 45
+		(
+			isCenterAbove(points, angle)
+				? // * correct! (incomplete)
+				  isFirstLeft(points, angle) && isFirstAbove(points, angle)
+					? rotationBase(points, angle) > rotationBase(points, angle + 0.1)
 					: isFirstAbove(points)
-					? 1
-					: 0
-				: // * check (incomplete, ALL 176, do for dx, dy...)
-				isCenterAbove(points, angle)
+					? rotationBase(points, angle) > rotationBase(points, angle + 0.1)
+					: isFirstLeft(points)
+					? rotationBase(points, angle) < rotationBase(points, angle + 0.1)
+					: rotationBase(points, angle) < rotationBase(points, angle + 0.1)
+				: // * correct! (incomplete)
+				isCenterBelow(points, angle)
 				? isFirstLeft(points) && isFirstAbove(points)
-					? 1
-					: isFirstLeft(points)
-					? 0
+					? rotationBase(points, angle) < rotationBase(points, angle + 0.1)
 					: isFirstAbove(points)
+					? rotationBase(points, angle) < rotationBase(points, angle + 0.1)
+					: isFirstLeft(points)
+					? sinval(points, angle) < 0
+					: sinval(points, angle) < 0
+				: //* correct! (incomplete...)
+				isCenterRight(points, angle)
+				? isFirstLeft(points) && isFirstAbove(points)
+					? sinval(points, angle) > 0
+					: isFirstAbove(points)
+					? rotationBase(points, angle) < rotationBase(points, angle + 0.1)
+					: isFirstLeft(points)
+					? sinval(points, angle) < 0
+					: rotationBase(points, angle) < rotationBase(points, angle + 0.1)
+				: // * correct! (incomplete...)
+				isFirstLeft(points) && isFirstAbove(points)
+				? rotationBase(points, angle) < rotationBase(points, angle + 0.1)
+				: isFirstAbove(points)
+				? sinval(points, angle) > 0
+				: isFirstLeft(points)
+				? rotationBase(points, angle) < rotationBase(points, angle + 0.1)
+				: sinval(points, angle) < 0
+		)
+			? // * correct! (incomplete...)
+			  /* isFirstLeft ^ isFirstAbove */
+			  // * check (incomplete... ALL 176)
+			  isCenterAbove(points, angle)
+				? isFirstLeft(points) && isFirstAbove(points)
 					? 0
-					: 1
+					: isFirstLeft(points)
+					? 1
+					: isFirstAbove(points)
+					? 1
+					: 0
 				: // * check (incomplete... ALL 176)
 				isCenterBelow(points, angle)
 				? isFirstLeft(points) && isFirstAbove(points)
-					? 1
+					? 0
 					: isFirstLeft(points)
-					? 0
+					? 1
 					: isFirstAbove(points)
-					? 0
-					: 1
-				: // * check (incomplete.. all 176)
+					? 1
+					: 0
+				: // * check (incomplete, ALL 176)
 				isCenterRight(points, angle)
 				? isFirstAbove(points) && isFirstLeft(points)
-					? 1
+					? 0
 					: isFirstLeft(points)
-					? 0
+					? 1
 					: isFirstAbove(points)
-					? 0
-					: 1
-				: // * check (incomplete.. all 176)
+					? 1
+					: 0
+				: // * check (incomplete, ALL 176)
 				isFirstAbove(points) && isFirstLeft(points)
+				? 0
+				: isFirstLeft(points)
+				? 1
+				: isFirstAbove(points)
+				? 1
+				: 0
+			: // * check (incomplete, ALL 176, do for dx, dy...)
+			isCenterAbove(points, angle)
+			? isFirstLeft(points) && isFirstAbove(points)
 				? 1
 				: isFirstLeft(points)
 				? 0
 				: isFirstAbove(points)
 				? 0
 				: 1
-		](rotationBase)
+			: // * check (incomplete... ALL 176)
+			isCenterBelow(points, angle)
+			? isFirstLeft(points) && isFirstAbove(points)
+				? 1
+				: isFirstLeft(points)
+				? 0
+				: isFirstAbove(points)
+				? 0
+				: 1
+			: // * check (incomplete.. all 176)
+			isCenterRight(points, angle)
+			? isFirstAbove(points) && isFirstLeft(points)
+				? 1
+				: isFirstLeft(points)
+				? 0
+				: isFirstAbove(points)
+				? 0
+				: 1
+			: // * check (incomplete.. all 176)
+			isFirstAbove(points) && isFirstLeft(points)
+			? 1
+			: isFirstLeft(points)
+			? 0
+			: isFirstAbove(points)
+			? 0
+			: 1
+	](rotationBase(points, angle))
 
-	console.log(toDegrees(sinval))
-	console.log(toDegrees(rotationBase))
+	console.log(toDegrees(sinval(points, angle)))
+	console.log(toDegrees(rotationBase(points, angle)))
 
 	// ! finish it... [not rotated, assumes wrong coordinate system, add the appropriate transformations...];
 	// * For rotation - use the rotation matrix...;
