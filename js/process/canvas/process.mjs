@@ -1,6 +1,6 @@
 import draw from "./draw.mjs"
 import { context as drawcontext } from "./draw.mjs"
-import { parseSingle } from "../../parser/types.mjs"
+import { parseSingle } from "../types.mjs"
 import { paramsList, setParam } from "../state/params.mjs"
 import { vars, substitute } from "../state/vars.mjs"
 

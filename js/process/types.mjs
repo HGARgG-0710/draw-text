@@ -1,8 +1,8 @@
-import { regexps } from "./syntax.mjs"
-import { vars } from "../process/state/vars.mjs"
-import { getParam } from "../process/state/params.mjs"
+import { regexps } from "../parser/syntax.mjs"
+import { vars } from "./state/vars.mjs"
+import { getParam } from "./state/params.mjs"
 
-// ! Integrate this with 'regexps' more closely [namely, with regexps.types (in future - 'types', 'structures', 'tokens')...];
+// ! Integrate this with 'tokenizer' more closely [namely, with regexps.types (in future - 'types', 'structures', 'tokens')...];
 // ^ Add the types SPECIFICALLY... - namely, generalize for the finite-set types... [such as r/b/s]
 export const parseSingle = (x) =>
 	(x instanceof Array
@@ -17,4 +17,6 @@ export const parseSingle = (x) =>
 		? (x) => x
 		: !isNaN(x)
 		? Number
-		: (text) => text.match(regexps.colorarg)[0] || getParam("base-color"))(x)
+		: (text) =>
+				text.match(regexps.colorarg)[0] ||
+				getParam("base-color"))(x)

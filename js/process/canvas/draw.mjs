@@ -1,54 +1,47 @@
 import { colour, currpair, drawReplaceBackground } from "../../lib/lib.mjs"
-import { ellipseData, rectData } from "../../lib/math.mjs"
-import { setParam, getParam } from "../state/params.mjs"
+import { ellipseData, rectData, toRadians } from "../../lib/math.mjs"
+import { getParam } from "../state/params.mjs"
 
 export const canvas = document.querySelector("canvas")
 export const context = canvas.getContext("2d")
 context.globalCompositeOperation = "source-over"
 
-// ! added the point-drawing parameter definition; All that is left is to test them out...;
+// ^ IDEA: create a new parameter - 'point-cover' with values 'true/false' (default: false); If set to true, then the points shall be drawn before the connections;
 const drawMap = {
 	contour: function (points, arrows, elliptics) {
+		const baseColour = getParam("base-color")
+		let fillStyle = null
+		let strokeStyle = null
+		// * drawing the connections
 		for (const key of Array.from(points.keys())) {
-			context.fillStyle = points[key][2] || getParam("base-color")
-			drawPoint(...points[key])
-
 			context.beginPath()
-			// * For contour...
-			context.strokeStyle = arrows[key][1] || elliptics[key][2] || context.fillStyle
+			strokeStyle = context.strokeStyle =
+				arrows[key][1] || elliptics[key][2] || strokeStyle || baseColour
 			if (arrows[key][0]) {
 				context.moveTo(...points[key])
 				line(points, key)
 			} else if (elliptics[key][0]) ellipse(points, elliptics, key)
 
-			// * For point...
 			context.stroke()
+		}
+		// * drawing the points;
+		for (const key of Array.from(points.keys())) {
+			fillStyle = context.fillStyle = points[key][2] || fillStyle || baseColour
+			drawPoint(...points[key])
 		}
 	},
 	fill: function (points, _arrows, elliptics) {
-		// ! DEBUG CODE!
-		let center
 		context.fillStyle = colour(points, elliptics)
 		context.beginPath()
 		for (const key of Array.from(points.keys())) {
 			if (elliptics[key][0]) {
-				center = ellipse(points, elliptics, key)
+				ellipse(points, elliptics, key)
 				continue
 			}
 			line(points, key)
 		}
 		context.closePath()
 		context.fill()
-
-		// ! DEBUG CODE! DELETE LATER!
-		console.log("ET???")
-		setParam("draw-points", true, context)
-		setParam("point-size", 4, context)
-		const prevStyle = context.fillStyle
-		context.fillStyle = "red"
-		currpair(points, 0).forEach((p) => drawPoint(...p))
-		drawPoint(...center)
-		context.fillStyle = prevStyle
 	},
 	clear: (points, arrows, elliptics, background) =>
 		drawReplaceBackground("contour")(background)(points, arrows, elliptics),
@@ -70,8 +63,6 @@ function ellipse(points, elliptics, key) {
 		...elliptics[key].slice(3, 5)
 	)
 	context.ellipse(...center, ...radius, rotationAngle, startAngle, endAngle)
-	// ! DEBUG CODE !
-	return center
 }
 
 export function drawPoint(x, y) {
@@ -82,7 +73,7 @@ export function drawPoint(x, y) {
 		switch (shape) {
 			case "circ":
 				const path = new Path2D()
-				path.arc(x, y, size)
+				path.arc(x, y, size, toRadians(0), toRadians(360))
 				context.fill(path)
 				break
 			case "rect":

@@ -1,88 +1,64 @@
 import { Primitive } from "../lib/lib.mjs"
-import {
-	regexps,
-	validityMap,
-	commandList,
-	pairCommands,
-	connectionCommands
-} from "./syntax.mjs"
+import { regexps, validityMap, commandList, connectionCommands } from "./syntax.mjs"
+import { Parser, parserTable, Tokenizer, tokens, DeSymbol } from "./tokenizer.mjs"
 
-function extractFirst(string, from, to, regex) {
-	return string.slice(from, to).match(new RegExp(regex, "g"))[0]
+// TODO: later, generalize the 'parseTable' to not have 'parseLine', instead donig everything in 'parse' - when adding the 'function' expressions;
+function parseLine(line) {
+	return Parser(parserTable)(Tokenizer(tokens)(DeSymbol([" ", "\t"])(line)))[1]
 }
-// ! this one's somewhat ugly. Rewrite - first of all, create a special function which would parse the 'between' values, then - check for them, insert the missing defaults/parse-depending-on-the-type. The thing ends up being separated into a sequence of functions instead of getting written only just here...;
-function parseConnections(string) {
-	const pairsinds = triplesInds(string)
-	function retrieveType(type, parsingFunc) {
-		const [presentConnections, colouredConnections] = type.map((x) =>
-			findSegments(string, regexps[x])
-		)
-		const colouredBeginnings = colouredConnections.map((x) => x[0])
-		return pairsinds.map((_x, i) => {
-			// ! This condition is broken. Better just change the values for 'presentConnection' based off the second part of the '||'-expression... (include the missing ones, then shoren the 'fel' to !!presentConnections[i]);
-			const fel =
-				!!presentConnections[i] &&
-				(i > (i + 1) % pairsinds.length ||
-					presentConnections[i][0] < pairsinds[(i + 1) % pairsinds.length][0])
-			return [fel].concat(
-				fel
-					? colouredBeginnings.includes(presentConnections[i][0])
-						? ((x) =>
-								parsingFunc(
-									extractFirst(
-										string,
-										colouredBeginnings[x],
-										colouredBeginnings[x] + colouredConnections[x][1],
-										regexps[type[1]]
-									)
-								))(colouredBeginnings.indexOf(presentConnections[i][0]))
-						: [false]
-					: []
-			)
-		})
-	}
-	return {
-		arrows: retrieveType(["arrow", "colorarrowStrict"], (x) =>
-			x.slice(3, x.length - 1)
-		),
-		elliptics: retrieveType(Array(2).fill("elliptic"), (x) =>
-			((x) => x.slice(2, x.length - 1).split(","))(
-				x.split(" ").join("\t").split("\t").join("")
-			)
+
+// ^ idea: another good addition to the parsing library...;
+function getInds(parsed) {
+	return function (type) {
+		return parsed.reduce(
+			(acc, curr, i) => (curr.type === type ? acc.concat([i]) : acc),
+			[]
 		)
 	}
 }
 
-function findSegments(string, regex) {
-	regex = new RegExp(regex, "g")
-	const segments = []
-	let arr = []
-	while ((arr = regex.exec(string)) !== null)
-		segments.push([arr.index, arr.index + arr[0].length])
-	return segments
+function getType(parsed) {
+	return (type) => parsed.filter((x) => x.type === type)
 }
 
-function triplesInds(string) {
-	return findSegments(string, regexps.triple)
-}
-
-function parseSemiTriples(string) {
-	// ? Extend to hexidecimal/different numeric notations supported by native JS number-conversion? Add own implementation, if that is too narrow?
-	return triplesInds(string)
-		.map((x) => string.slice(...x))
-		.map((pair) =>
-			pair
-				.slice(1, pair.length - 1)
-				.split(" ")
-				.join("")
-				.split("\t")
-				.join("")
-				.split(",")
+// ! change method signatures! [this needs to re-parse everything all over again!];
+function connections(parsed) {
+	const [pointPos, ellipticPos, arrowPos] = [
+		"point",
+		"elliptic-connection",
+		"arrow-connection"
+	].map(getInds(parsed))
+	const connectionPos = [arrowPos, ellipticPos]
+	let counters = Array(2).fill(0)
+	const [arrows, elliptics] = Array(2)
+		.fill(0)
+		.map((_x, i) =>
+			pointPos.reduce(
+				(acc, curr) =>
+					((isConnection) =>
+						acc.concat([
+							[
+								isConnection,
+								...(isConnection
+									? ((x) => (x ? x.map((x) => x.value) : []))(
+											parsed[connectionPos[i][counters[i]++]].value
+									  )
+									: [])
+							]
+						]))(connectionPos[i][counters[i]] === curr + 1),
+				[]
+			)
 		)
+	return { arrows, elliptics }
+}
+
+// ? Extend numbers to hexidecimal/different base- notations supported by native JS number-conversion? Add own implementation, if that is too narrow?
+function points(parsed) {
+	return getType(parsed)("point").map((x) => x.value.map((x) => x.value))
 }
 
 function isValid(text) {
-	return getlines(text).every((line, i) => {
+	return getlines(text).every((line) => {
 		const r = commandList.map((command) => countOccurrencesStr(line, command))
 		const command = commandList[r.indexOf(1)]
 		return (
@@ -105,9 +81,7 @@ export function validate(text, callback, validityCheck = isValid) {
 function countOccurrencesStr(string, sub) {
 	let counted = 0
 	out: for (let i = 0; i < string.length; i++) {
-		for (let j = 0; j < sub.length; j++) {
-			if (string[i + j] !== sub[j]) continue out
-		}
+		for (let j = 0; j < sub.length; j++) if (string[i + j] !== sub[j]) continue out
 		counted++
 	}
 	return counted
@@ -122,7 +96,14 @@ function getlines(text) {
 		.split(";")
 		.join("\n")
 		.split("\n")
-		.filter((x) => x.length)
+		.filter(
+			(x) =>
+				x
+					.split(" ")
+					.join("\t")
+					.split("\t")
+					.filter((x) => x.length).length
+		)
 }
 
 // ^ IDEA: create a formatter for the thing (code format)?
@@ -140,14 +121,7 @@ export default function parse(text) {
 	return lines.map((x, i) => ({
 		command: commands[i],
 		argline: (connectionCommands.has(commands[i])
-			? (y) => Primitive(parseSemiTriples(y), parseConnections(x))
-			: pairCommands.has(commands[i])
-			? (x) =>
-					x
-						.split("\t")
-						.join(" ")
-						.split(" ")
-						.filter((x) => x.length)
-			: (x) => [x])(x.split(commands[i])[1].trim())
+			? (x) => Primitive(...[points, connections].map((f) => f(x)))
+			: (x) => x.map((x) => x.value))(parseLine(x.split(commands[i])[1].trim()))
 	}))
 }

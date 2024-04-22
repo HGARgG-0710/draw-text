@@ -1,8 +1,8 @@
-import { parseSingle } from "../../parser/types.mjs"
+import { parseSingle } from "../types.mjs"
 
 export const vars = new Map()
 
-export function substitute(expression) {
+export function substitute(expression) {	
 	if (expression instanceof Array) return expression.map(parseSingle)
 	const { argline, connections, points, arrows, elliptics } = expression
 	if (elliptics)

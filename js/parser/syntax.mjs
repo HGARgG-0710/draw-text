@@ -2,7 +2,7 @@
 // ? This 'findSegments' is a good addition to the library in question...; Also - consider index-passing-based parsing (one, where one of inputs is an index, and so is one of outputs...);
 // ? Add a 'regex' module to it?
 
-import { and, or, occurences, global, begin, end, nlookbehind } from "../lib/regex.mjs"
+import { and, or, occurences, begin, end, nlookbehind } from "../lib/regex.mjs"
 import { paramsList } from "../process/state/params.mjs"
 
 // ! Fix that somehow... [a proper typesystem is in order, less chaotic];
@@ -12,6 +12,7 @@ export const validityMap = {
 	"line-width": "vardecimal",
 	// ? make those into a variable too? [define arithmetic on those finite sets too? Isomorphic to the additive group of Z_n, where 'n' is their size?]
 	"line-cap": "caparg",
+	"line-join": "caparg",
 	contour: "argseq",
 	fill: "argseq",
 	erase: "argseq",
@@ -66,21 +67,19 @@ export const regexps = {
 	),
 	decimal: end(begin(reg.decimal)),
 	// TODO: refactor these... [a 'finiteArrayRegExp']
-	caparg: end(begin(or(/b/, /r/, /s/))),
-	boolarg: end(begin(or(/true/, /false/))),
-	pointshapearg: end(begin(or(/rect/, /circ/)))
+	caparg: or(/b/, /r/, /s/),
+	boolarg: or(/true/, /false/),
+	pointshapearg: or(/rect/, /circ/)
 }
 
-regexps.triple = global(
-	and(
-		nlookbehind(and(...r("hyphen", "space"))),
-		regfun.brackets(
-			reg.space,
-			regexps.vardecimal,
-			...r("space", "comma", "space"),
-			regexps.vardecimal,
-			occurences(0, 1)(and(...r("comma", "space"), regexps.varcolor))
-		)
+regexps.triple = and(
+	nlookbehind(reg.hyphen),
+	regfun.brackets(
+		reg.space,
+		regexps.vardecimal,
+		...r("space", "comma", "space"),
+		regexps.vardecimal,
+		occurences(0, 1)(and(...r("comma", "space"), regexps.varcolor))
 	)
 )
 

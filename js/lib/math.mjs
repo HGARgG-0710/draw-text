@@ -11,6 +11,14 @@ export function toDegrees(rads) {
 	return (rads * 180) / Math.PI
 }
 
+// ^ IDEA: write a proper linear algebra submodule, then use here elegantly...;
+export function rotateClockwise(point, angle) {
+	return [
+		Math.cos(angle) * point[0] - Math.sin(angle) * point[1],
+		Math.sin(angle) * point[0] + Math.cos(angle) * point[1]
+	]
+}
+
 // ^ idea: add all the functions from here to the future planned modules/packages related to geometry...;
 // ! complete...
 export function ellipseData(points, angle, startAngle, endAngle) {
@@ -48,13 +56,6 @@ export function ellipseData(points, angle, startAngle, endAngle) {
 			.map((f) => diagLen(points) * f(toRadians(centerAngle(angle))))
 	const radius = (points, angle) => first(_radius(points, angle))
 
-	// const term = [
-	// 	(d) => Math.acos(Math.abs(d) / diagLen) - toRadians(centerAngle),
-	// 	(d) => toRadians(90) - (toRadians(centerAngle) - Math.acos(Math.abs(d) / diagLen))
-	// ]
-	// 	.map((f) => [dx, dy].map((d) => f(d)))
-	// 	.flat()
-
 	const term = (points, angle) => [
 		Math.acos(Math.abs(dx(points)) / diagLen(points)) - toRadians(centerAngle(angle)),
 		Math.acos(Math.abs(dy(points)) / diagLen(points)) - toRadians(centerAngle(angle)),
@@ -68,26 +69,6 @@ export function ellipseData(points, angle, startAngle, endAngle) {
 			(toRadians(centerAngle(angle)) +
 				Math.acos(Math.abs(dx(points)) / diagLen(points)))
 	]
-
-	console.log("first above?")
-	console.log(isFirstAbove(points))
-	console.log("first left?")
-	console.log(isFirstLeft(points))
-
-	console.log("above?")
-	console.log(isCenterAbove(points, angle))
-	console.log("below?")
-	console.log(isCenterBelow(points, angle))
-	console.log("right?")
-	console.log(isCenterRight(points, angle))
-
-	console.log("is dx?")
-	console.log(!!dx(points))
-	console.log("is dy?")
-	console.log(!!dy(points))
-
-	console.log("\n\n")
-	console.log(dx(points))
 
 	const getCenter = (points, angle) =>
 		first(points).map(
@@ -150,140 +131,45 @@ export function ellipseData(points, angle, startAngle, endAngle) {
 	const sinval = (points, angle) =>
 		(getCenter(points, angle)[1] - first(points)[1]) / radius(points, angle)
 	const rotationBase = (points, angle) => Math.asin(Math.abs(sinval(points, angle)))
-	const rotationTransform = [(x) => x, (x) => toRadians(360) - x]
-
-	// TODO: CACHING!
-	// TODO: REFACTORING!
-
-	// ! STRANGE SHIT STARTS TO HAPPEN AT BORDERS - 'dx=0' and 'dy=0'; CHECK FOR THOSE AS WELL!
 
 	// ! note: the check with looking at the 'next one' is also (not entirely) correct. In cases when it overflows through '90deg', there's a (very) small chance that the value in question will actually get into the wrong branch, because the larger portion of the 'added' value will go into that initial [89; 90], rather than the reversed [90; 89] (it won't be visible, but still - a tiny thing to fix...)
-	// ! NOTE: this '+ 0.1' thing WON'T WORK with the non-integer values! (once self adds the floats)
-	// % Curr todo list:
-	// 		1. Find all the bounds at which the things 'break' into the other set of values (start with 45, then elminate 1-by-1 each of the 16 different cases, then - change values see if scales);
-	// 		2. Check the values at 'dx=0' and 'dy=0', how each one of 16 ellipses behaves... (they ought to either be all the same, or different... refactor accordingly);
+	// ! NOTE: this '+ 0.1' thing WON'T GENERALLY WORK with the non-integer values! (once self adds the floats, also add the corresponding 'size check' - to either revert the condition of checking in this case, or (less general) - decrease the power of 10 below -1 here...)
+	const rotationConditional = [
+		(points, angle) =>
+			rotationBase(points, angle) < rotationBase(points, angle + 0.1),
+		(points, angle) => sinval(points, angle) < 0,
+		(points, angle) =>
+			rotationBase(points, angle) > rotationBase(points, angle + 0.1),
+		(points, angle) => sinval(points, angle) > 0
+	].map((f) => f(points, angle))
+	const rotationTransform = [(x) => x, (x) => toRadians(360) - x]
+	const la = [(x, y) => x ^ y, (x, y) => +(x === y)]
+
+	// TODO: CACHING!
+	// TODO: REFACTORING -- make those (rotationAngle) into separate functions - properties of the 'ellipse' submodule...; Then use elegantly here...
+
 	// ? Try to replace the 'sinval(...) < 0' with 'rotationBase(...) >/< rotationBase(...)'? [Think about it...];
 	const rotationAngle = rotationTransform[
-		// ^ CONCLUSION: for testing, one must first express all the constants in code via functions...;
-		// centerAngle(angle) <= 45
-		(
-			isCenterAbove(points, angle)
-				? // * correct! (incomplete)
-				  isFirstLeft(points, angle) && isFirstAbove(points, angle)
-					? rotationBase(points, angle) > rotationBase(points, angle + 0.1)
-					: isFirstAbove(points)
-					? rotationBase(points, angle) > rotationBase(points, angle + 0.1)
-					: isFirstLeft(points)
-					? rotationBase(points, angle) < rotationBase(points, angle + 0.1)
-					: rotationBase(points, angle) < rotationBase(points, angle + 0.1)
-				: // * correct! (incomplete)
-				isCenterBelow(points, angle)
-				? isFirstLeft(points) && isFirstAbove(points)
-					? rotationBase(points, angle) < rotationBase(points, angle + 0.1)
-					: isFirstAbove(points)
-					? rotationBase(points, angle) < rotationBase(points, angle + 0.1)
-					: isFirstLeft(points)
-					? sinval(points, angle) < 0
-					: sinval(points, angle) < 0
-				: //* correct! (incomplete...)
-				isCenterRight(points, angle)
-				? isFirstLeft(points) && isFirstAbove(points)
-					? sinval(points, angle) > 0
-					: isFirstAbove(points)
-					? rotationBase(points, angle) < rotationBase(points, angle + 0.1)
-					: isFirstLeft(points)
-					? sinval(points, angle) < 0
-					: rotationBase(points, angle) < rotationBase(points, angle + 0.1)
-				: // * correct! (incomplete...)
-				isFirstLeft(points) && isFirstAbove(points)
-				? rotationBase(points, angle) < rotationBase(points, angle + 0.1)
-				: isFirstAbove(points)
-				? sinval(points, angle) > 0
-				: isFirstLeft(points)
-				? rotationBase(points, angle) < rotationBase(points, angle + 0.1)
-				: sinval(points, angle) < 0
-		)
-			? // * correct! (incomplete...)
-			  /* isFirstLeft ^ isFirstAbove */
-			  // * check (incomplete... ALL 176)
-			  isCenterAbove(points, angle)
-				? isFirstLeft(points) && isFirstAbove(points)
-					? 0
-					: isFirstLeft(points)
-					? 1
-					: isFirstAbove(points)
-					? 1
-					: 0
-				: // * check (incomplete... ALL 176)
-				isCenterBelow(points, angle)
-				? isFirstLeft(points) && isFirstAbove(points)
-					? 0
-					: isFirstLeft(points)
-					? 1
-					: isFirstAbove(points)
-					? 1
-					: 0
-				: // * check (incomplete, ALL 176)
-				isCenterRight(points, angle)
-				? isFirstAbove(points) && isFirstLeft(points)
-					? 0
-					: isFirstLeft(points)
-					? 1
-					: isFirstAbove(points)
-					? 1
-					: 0
-				: // * check (incomplete, ALL 176)
-				isFirstAbove(points) && isFirstLeft(points)
-				? 0
-				: isFirstLeft(points)
-				? 1
-				: isFirstAbove(points)
-				? 1
-				: 0
-			: // * check (incomplete, ALL 176, do for dx, dy...)
-			isCenterAbove(points, angle)
-			? isFirstLeft(points) && isFirstAbove(points)
-				? 1
-				: isFirstLeft(points)
-				? 0
-				: isFirstAbove(points)
-				? 0
-				: 1
-			: // * check (incomplete... ALL 176)
-			isCenterBelow(points, angle)
-			? isFirstLeft(points) && isFirstAbove(points)
-				? 1
-				: isFirstLeft(points)
-				? 0
-				: isFirstAbove(points)
-				? 0
-				: 1
-			: // * check (incomplete.. all 176)
-			isCenterRight(points, angle)
-			? isFirstAbove(points) && isFirstLeft(points)
-				? 1
-				: isFirstLeft(points)
-				? 0
-				: isFirstAbove(points)
-				? 0
-				: 1
-			: // * check (incomplete.. all 176)
-			isFirstAbove(points) && isFirstLeft(points)
-			? 1
-			: isFirstLeft(points)
-			? 0
-			: isFirstAbove(points)
-			? 0
-			: 1
+		la[
+			+!rotationConditional[
+				isCenterAbove(points, angle)
+					? 2 * isFirstAbove(points)
+					: isCenterBelow(points, angle)
+					? +!isFirstAbove(points)
+					: isCenterRight(points, angle)
+					? isFirstLeft(points) * (1 + 2 * isFirstAbove(points))
+					: +!isFirstLeft(points) * (1 + 2 * isFirstAbove(points))
+			]
+		](...[isFirstLeft, isFirstAbove].map((f) => f(points)))
 	](rotationBase(points, angle))
 
-	console.log(toDegrees(sinval(points, angle)))
-	console.log(toDegrees(rotationBase(points, angle)))
-
-	// ! finish it... [not rotated, assumes wrong coordinate system, add the appropriate transformations...];
-	// * For rotation - use the rotation matrix...;
-	const nextPoint = _radius(points, angle).map(
-		(r, i) => r * Math[fs[r[0] >= r[1] ? i : +!i]](radAngs[1])
+	// TODO: this here is (supposed to be) correct - the parametrization of a point on an ellipse through an angle; (define a function inside this module as well...)
+	// ! test...
+	const nextPoint = rotateClockwise(
+		_radius(points, angle).map(
+			(r, i) => r * Math[fs[r[0] >= r[1] ? i : +!i]](radAngs[1])
+		),
+		rotationAngle
 	)
 
 	return {
