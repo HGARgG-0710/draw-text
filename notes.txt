@@ -235,3 +235,16 @@
 		Would look (CSS) the same, but behave in accordance with given APIs; 
 		All can be exported as desired; 
 		[SVG is perfect, because it's ALREADY a format that is scriptable...]; 
+	
+25. IDEA: Create a JS module for custom carets (surprisingly, browser's CSS implementations doesn't seem to support it yet); Use it in Draw-Text?
+	Can be done via a combination of: 
+
+		1. styling (changing a particular element); 
+		2. dom/text manipulation; 
+		3. handling of keyboard input; 
+	
+	Only (possible) problem is the performance. Consider that before using. 
+
+26. IDEA: create a browser-Vim module and use in Draw-text; 
+
+	Same as with 25 - dom-manipulation performance is the only potential difficulty.

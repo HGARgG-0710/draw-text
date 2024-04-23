@@ -16,7 +16,6 @@
 <body>
 	<uni-header></uni-header>
 	<main>
-		<!-- TODO: make a separate page with documentation [this is no longer covering it...] -->
 		<div class="space-rect"></div>
 		<div class="main-rect">
 			<div class="text">
@@ -25,7 +24,7 @@
 				<p>
 					Draw-Text is a simple webpage that allows one to draw pictures using lines, points, polygons
 					and ellipses together with a mini programming language,
-					then export the results to png/jpg or any other desired image format.
+					then export the results to one of the available image formats (see the docs).
 				</p>
 
 				<h2>
@@ -50,15 +49,21 @@
 				</div>
 				<div id="files_area">
 					<div id="files">
-						<div class="file-list">
-							<label for="pre-file" class="file-input">Files (before Input):</label>
-							<input type="file" id="pre-file" hidden multiple />
-							<ul></ul>
+						<div class="files-container">
+							<button class="clear-button">Clear</button>
+							<div class="file-list">
+								<label for="pre-file" class="file-input">Files (before Input):</label>
+								<input type="file" id="pre-file" hidden multiple />
+								<ul></ul>
+							</div>
 						</div>
-						<div class="file-list">
-							<label for="post-file" class="file-input">Files (after Input):</label>
-							<input type="file" id="post-file" hidden multiple />
-							<ul></ul>
+						<div class="files-container">
+							<button class="clear-button">Clear</button>
+							<div class="file-list">
+								<label for="post-file" class="file-input">Files (after Input):</label>
+								<input type="file" id="post-file" hidden multiple />
+								<ul></ul>
+							</div>
 						</div>
 					</div>
 				</div>

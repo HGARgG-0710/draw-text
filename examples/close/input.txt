@@ -1,0 +1,5 @@
+fill (125, 0)-(45, #ff3867)(0, 125)
+line-width 22
+line-cap r 
+contour (50, 50)->( #ffffff)(200, 200)
+contour (50, 200)->( #ffffff)(200, 50)

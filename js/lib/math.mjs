@@ -14,7 +14,7 @@ export function toDegrees(rads) {
 // ^ IDEA: write a proper linear algebra submodule, then use here elegantly...;
 export function rotateClockwise(point, angle) {
 	return [
-		Math.cos(angle) * point[0] - Math.sin(angle) * point[1],
+		Math.cos(angle) * point[0] + Math.sin(angle) * point[1],
 		Math.sin(angle) * point[0] + Math.cos(angle) * point[1]
 	]
 }
@@ -145,7 +145,6 @@ export function ellipseData(points, angle, startAngle, endAngle) {
 	const rotationTransform = [(x) => x, (x) => toRadians(360) - x]
 	const la = [(x, y) => x ^ y, (x, y) => +(x === y)]
 
-	// TODO: CACHING!
 	// TODO: REFACTORING -- make those (rotationAngle) into separate functions - properties of the 'ellipse' submodule...; Then use elegantly here...
 
 	// ? Try to replace the 'sinval(...) < 0' with 'rotationBase(...) >/< rotationBase(...)'? [Think about it...];

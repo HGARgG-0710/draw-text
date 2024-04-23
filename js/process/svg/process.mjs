@@ -4,7 +4,7 @@ import { tosvg } from "./svg.mjs"
 
 export function svgProcess(expression) {
 	const { command, argline } = expression
-	if (["set-param", "variable"].includes(command) || paramsList.has(command)) {
+	if (["set-param", "variable"].includes(command) || paramsList.includes(command)) {
 		// ? Replace this? [do the 'setParam' again... Separately...]
 		process(expression)
 		if (command === "variable") return ""

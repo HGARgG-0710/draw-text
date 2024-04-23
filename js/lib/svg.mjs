@@ -44,6 +44,7 @@ export default function svg(tagNode) {
 			return `<polyline ${
 				points ? ` points='${points.join(",")}'` : ""
 			}${omni}>\n${(children || []).map(svg).join("\n")}\n</polyline>`
+		// ! PROBLEM - the 'ellipse' functionality DOES NOT work with SVG properly - FIX THAT! Need much more testing (do later - this release has already taken a lot of time and effort...); 
 		case "path":
 			const { d, pathLength } = attrs
 			// TODO: later, GENERALIZE THIS - create a general interface for the attributes, so as not to have to create repetitious ternaries like these every single time... (generalize to a function, then define the desired SVG specs in terms of it...);
@@ -65,9 +66,11 @@ export default function svg(tagNode) {
 										} = params
 										return `A ${radius.join(
 											" "
-										)} ${angle} ${+largeArc} ${+sweep} ${next.join(
-											","
-										)}`
+										)} ${angle} ${+largeArc} ${+sweep} ${next
+											.map((x) =>
+												Math.abs(x) < 1 / 100 ? 0 : x - 1 / 2
+											)
+											.join(",")}`
 									case "M":
 									case "L":
 										const { point } = params

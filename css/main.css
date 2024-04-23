@@ -137,7 +137,7 @@ textarea#code {
 	background-color: aliceblue;
 	border-style: none;
 	border-radius: 6px;
-	font-size: 13.75px; 
+	font-size: 13.75px;
 }
 
 #files {
@@ -282,5 +282,28 @@ ol ol {
 }
 
 .text:first-child {
-	padding-top: 2vh; 
+	padding-top: 2vh;
+}
+
+.notice {
+	color: tomato;
+}
+
+.files-container {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5vh;
+}
+
+.clear-button {
+	border-style: none;
+	border-radius: 2px;
+	font-size: 18px;
+	font-family: "Nunito", sans-serif;
+	color: white;
+	background-color: burlywood;
+}
+
+.clear-button:active {
+	background-color: antiquewhite;
 }

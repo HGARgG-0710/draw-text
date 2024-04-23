@@ -1,6 +1,12 @@
 import { black, white } from "../../lib/colors.mjs"
 import { canvas, context } from "../canvas/draw.mjs"
 
+// ! CREATE A NEW MAP WITH DEFAULT PARAMETERS - use the 'resetParams' to fix the bug with pictures remaining...;
+const defaults = new Map()
+export function resetParams(context) {
+	defaults.forEach((v, k) => setParam(k, v, context))
+}
+
 export function drawBackground(colour) {
 	const prevFill = context.fillStyle
 	this.fillStyle = colour
@@ -12,7 +18,7 @@ function Parameter(name, _default, typedef, processor) {
 	return [name, [_default, typedef, processor]]
 }
 
-// ! BUG!!! The 'context.reset()' fixes the behaviour of the canvas BUT NOT THE VALUES OF 'params'!!! This is prone to cause issues. Fix. 
+// ! BUG!!! The 'context.reset()' fixes the behaviour of the canvas BUT NOT THE VALUES OF 'params'!!! This is prone to cause issues. Fix.
 const params = new Map(
 	[
 		// ? Perhaps, return (partially) the previous 'deBackground' functionality? [require the re-drawing every time that the background is changed, + add a 0-or-1-arguments 'clean [colour]' command that would do what background currently does?]
@@ -70,8 +76,7 @@ export function setParam(paramName, value, context) {
 		const param = params.get(paramName)
 		if (param[1](value)) {
 			param[0] = value
-			if (typeof param[2] === "function" && context)
-				param[2].call(context, value)
+			if (typeof param[2] === "function" && context) param[2].call(context, value)
 		}
 	}
 }

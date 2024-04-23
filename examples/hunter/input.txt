@@ -1,26 +1,42 @@
 background #1f1282
 
-variable hatRightX 220
-variable hatRightY 102
+variable hatRightX 235
+variable hatRightY 124
 
-variable hatLeftX 65
-variable hatLeftY 115
+variable hatLeftX 60
+variable hatLeftY 120
 
-variable hatTopX 102
-variable hatTopY 63
+variable hatTopX 110
+variable hatTopY 75
 
-variable hatRightTopX 160
-variable hatRightTopY 70
+variable hatRightTopX 180
+variable hatRightTopY 60
+
+variable hatMidRightX 190
+variable hatMidRightY 85
+
+variable hatMidLeftX 118
+variable hatMidLeftY 88
+
+variable hatRightLowX 185
+variable hatRightLowY 107
+
+variable hatLeftLowX 105
+variable hatLeftLowY 108
 
 fill (20, 150)-(45, #fffff2)(150, 20)
 base-color #0d4a2f
+
 fill (85, 140)->(112, 230)->(124, 235)->(124, 260)->(55, 270)->(70, 300)->(220, 300)->(235, 268)->(164, 261)->(165, 238)->(180, 217)->(192,170)->
 base-color #08301e
-fill (hatLeftX, hatLeftY)(hatTopX, hatTopY)(hatRightTopX, hatRightTopY)(hatRightX, hatRightY)(160, 85)(120, 82)
+
+fill (hatLeftX, hatLeftY)(hatTopX, hatTopY)(hatRightTopX, hatRightTopY)(hatRightX, hatRightY)(hatMidRightX, hatMidRightY)(hatMidLeftX, hatMidLeftY)
 base-color #063c45
-fill (hatLeftX, hatLeftY)(120, 82)(160, 85)(hatRightX, hatRightY)(155, 101)(107, 106)
+
+fill (hatLeftX, hatLeftY)(hatMidLeftX, hatMidLeftY)(hatMidRightX, hatMidRightY)(hatRightX, hatRightY)(hatRightLowX, hatRightLowY)(hatLeftLowX, hatLeftLowY)
 base-color #8c640f
+
 line-width 2
 line-cap r
-contour (hatLeftX, hatLeftY)->(120, 82)->(160, 85)->(hatRightX, hatRightY)->(155, 101)->(107, 106)->
+contour (hatLeftX, hatLeftY)->(hatMidLeftX, hatMidLeftY)->(hatMidRightX, hatMidRightY)->(hatRightX, hatRightY)->(hatRightLowX, hatRightLowY)->(hatLeftLowX, hatLeftLowY)->
 contour (hatLeftX, hatLeftY)->(hatTopX, hatTopY)->(hatRightTopX, hatRightTopY)->(hatRightX, hatRightY)

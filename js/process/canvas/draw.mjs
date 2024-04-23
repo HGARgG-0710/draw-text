@@ -30,15 +30,18 @@ const drawMap = {
 			drawPoint(...points[key])
 		}
 	},
-	fill: function (points, _arrows, elliptics) {
+	fill: function (points, arrows, elliptics) {
+		let lastElliptic = false
+
 		context.fillStyle = colour(points, elliptics)
 		context.beginPath()
 		for (const key of Array.from(points.keys())) {
 			if (elliptics[key][0]) {
 				ellipse(points, elliptics, key)
+				lastElliptic = true
 				continue
 			}
-			line(points, key)
+			if (!lastElliptic || arrows[key][0]) line(points, key)
 		}
 		context.closePath()
 		context.fill()

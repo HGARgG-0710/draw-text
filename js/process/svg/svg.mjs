@@ -81,14 +81,19 @@ const ASTmap = {
 		return {
 			tag: "path",
 			attrs: {
-				d: points
-					.map((p, i) =>
-						(elliptics[i][0]
-							? [[!i ? "M" : "A", arcData(points, elliptics, i)]]
-							: [[!i ? "M" : "L", { point: xy(p) }]]
-						).map(commandpair)
-					)
-					.flat(),
+				d: (points.length
+					? [commandpair(["M", { point: xy(points[0]) }])]
+					: []
+				).concat(
+					points
+						.map((_p, i) =>
+							(elliptics[i][0]
+								? [["A", arcData(points, elliptics, i)]]
+								: [["L", { point: xy(points[(i + 1) % points.length]) }]]
+							).map(commandpair)
+						)
+						.flat()
+				),
 				fill: colour(points, elliptics)
 			}
 		}
@@ -113,15 +118,13 @@ const ASTmap = {
 
 export function svgAST(expression) {
 	const { command, argline } = substitute(expression)
-	if (!(argline instanceof Array)) {
-		const { points, connections } = argline
-		const { arrows, elliptics } = connections
-		const background = getParam("background")
-		return command in ASTmap
-			? ASTmap[command](points, arrows, elliptics, background)
-			: []
-	}
-	return ASTmap[command](...argline)
+	if (!(command in ASTmap)) return []
+	// TODO: create a separate class for special signatures (the direct '...argline')
+	if (command === "background") return ASTmap[command](...argline)
+	const { points, connections } = argline
+	const { arrows, elliptics } = connections
+	const background = getParam("background")
+	return ASTmap[command](points, arrows, elliptics, background)
 }
 
 export function tosvg(expression) {

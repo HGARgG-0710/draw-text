@@ -3,8 +3,19 @@ import { regexps, validityMap, commandList, connectionCommands } from "./syntax.
 import { Parser, parserTable, Tokenizer, tokens, DeSymbol } from "./tokenizer.mjs"
 
 // TODO: later, generalize the 'parseTable' to not have 'parseLine', instead donig everything in 'parse' - when adding the 'function' expressions;
-function parseLine(line) {
-	return Parser(parserTable)(Tokenizer(tokens)(DeSymbol([" ", "\t"])(line)))[1]
+function parseLine(line, splitSpace = false) {
+	return Parser(parserTable)(
+		Tokenizer(tokens)(
+			(splitSpace
+				? (x) =>
+						x
+							.split(" ")
+							.join("\t")
+							.split("\t")
+							.filter((x) => x.length)
+				: (x) => DeSymbol([" ", "\t"])(x))(line)
+		)
+	)[1]
 }
 
 // ^ idea: another good addition to the parsing library...;
@@ -118,10 +129,14 @@ export default function parse(text) {
 		commandList.map((command) => countOccurrencesStr(l, command)).indexOf(1)
 	)
 	const commands = lines.map((_x, i) => commandList[commandInds[i]])
-	return lines.map((x, i) => ({
-		command: commands[i],
-		argline: (connectionCommands.has(commands[i])
-			? (x) => Primitive(...[points, connections].map((f) => f(x)))
-			: (x) => x.map((x) => x.value))(parseLine(x.split(commands[i])[1].trim()))
-	}))
+	return lines.map((x, i) =>
+		((isConnection) => ({
+			command: commands[i],
+			argline: (isConnection
+				? (x) => Primitive(...[points, connections].map((f) => f(x)))
+				: (x) => x.map((x) => x.value))(
+				parseLine(x.split(commands[i])[1].trim(), !isConnection)
+			)
+		}))(connectionCommands.has(commands[i]))
+	)
 }

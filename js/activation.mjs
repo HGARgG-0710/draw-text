@@ -1,3 +1,5 @@
+// TODO: refactor all of the functions amongst this stuff - should go to a 'lib' directory instead... (separate usage and definition by location);
+
 import {
 	clear as childClear,
 	create,
@@ -7,7 +9,8 @@ import {
 	query,
 	cquery,
 	attribute,
-	mquery
+	mquery,
+	prop
 } from "./lib/components.mjs"
 import parse, { validate, validateNumber } from "./parser/main.mjs"
 import process from "./process/canvas/process.mjs"
@@ -18,7 +21,7 @@ import { download } from "./lib/components.mjs"
 const [imgExt, codeElem, downloadButton] = ["img-format", "code", "download-button"]
 	.map((x) => `#${x}`)
 	.map(query())
-const filelists = mquery()(".file-list")
+const [filelists, fileContainers] = [".file-list", ".files-container"].map(mquery())
 
 // ? Make a separate files with all the constants?
 const maxFilenameLength = 25
@@ -41,9 +44,7 @@ const outList = (list) => {
 	list.forEach(outSingle)
 }
 const readFiles = async (files) => {
-	return await Promise.all(
-		Array.from(files).map(async (file) => (await file.arrayBuffer()).text())
-	)
+	return await Promise.all(Array.from(files).map(async (file) => file.text()))
 }
 
 const outOnChange = function (_kevent) {
@@ -100,8 +101,6 @@ const mimeMap = {
 	webp: "image/webp"
 }
 
-// TODO: write a documentation on the precise list of available MIME-types;
-// ! refactor that thing with the 'download'-a element...; Then, use the output from
 downloadButton.addEventListener("click", async (_event) => {
 	const ext = imgExt.value
 	// ? [later] make ternary conditional into a function-map? [possibly, add the '.avif' support later...];
@@ -121,12 +120,10 @@ downloadButton.addEventListener("click", async (_event) => {
 	)
 })
 
-// TODO: implement running from file; [create more examples - then implement and test...];
-// ! take the '...'-bit out somewhere (useful for 'common patterns' on a webpage/somewhere else, where UX is concerned...);
-filelists.forEach((fileList) =>
-	query(fileList)("input[type='file']").addEventListener("change", function (event) {
+// ! take the '...'-string bit out somewhere (useful for 'common patterns' on a webpage/somewhere else, where UX is concerned...);
+const filesOut = (fileList) =>
+	function (target) {
 		const list = childClear(query(fileList)("ul"))
-		const { target } = event
 		const { files } = target
 		Array.from(files)
 			.map((f) => f.name)
@@ -142,5 +139,20 @@ filelists.forEach((fileList) =>
 				)
 			)
 		imgout(lastText)
+	}
+
+filelists.forEach((fileList) => {
+	const input = query(fileList)("input[type='file']")
+	filesOut(fileList)(input)
+	input.addEventListener("change", function (event) {
+		return filesOut(fileList)(event.target)
 	})
-)
+})
+
+fileContainers.forEach((container) => {
+	query(container)("button.clear-button").addEventListener("click", function (_event) {
+		const input = query(container)("input[type='file']")
+		prop(input)("value", "")
+		filesOut(query(container)(".file-list"))(input)
+	})
+})

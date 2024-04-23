@@ -100,8 +100,11 @@
 								<code>contour (x1, y1, c1)->(cc1)...->(ccn-1)(xn, yn, cn)->(ccn)-></code>
 								<p>
 									To add colour to the straight-line connections between points, add colour to them as
-									a
-									first argument.
+									the first argument.
+								</p>
+								<p class="notice">
+									The ellipses (currently) have questionable support for SVG - bugs are
+									possible.
 								</p>
 							</div>
 
@@ -283,17 +286,18 @@
 											<code>point-shape v</code>
 											<p>
 												Set the shapes that should be drawn instead of points. Possible values
-												for
-												mandatory argument <code>v</code>:
+												for mandatory argument <code>v</code>:
 											</p>
 											<ol>
 												<li>
-													rect (default) - rectangular; draws a square with the half diagonal
+													<code>rect</code> (default) - rectangular; draws a square with the
+													half diagonal
 													of
 													<code>point-size</code>
 												</li>
 												<li>
-													circ - circular, draw circles with a center in a point in question;
+													<code>circ</code> - circular, draw circles with a center in a point
+													in question;
 													the
 													radius is given by <code>point-size</code>
 												</li>
@@ -310,7 +314,50 @@
 											</p>
 										</div>
 									</li>
-									<!-- TODO: add -- line-join, miter-limit -->
+									<li>
+										<div class="description">
+											<code>line-join v</code>
+											<p>
+												An SVG-export-only parameter that is (image-wise) an exact equivalent of
+												<code>line-cap</code> for Canvas (png/jpg/webp export).
+												In the Canvas version, <code>line-cap</code> serves the function of both
+												itself and <code>line-join</code>, while in SVG they are separated.
+											</p>
+											<p>
+												In SVG, <code>line-join</code> defines the choice of connections between
+												the lines, while <code>line-cap</code> - only the choice of
+												line-endings.
+											</p>
+											<p>
+												The only mandatory argument <code>v</code> can have values:
+											</p>
+											<ol>
+												<li>
+													<code>m</code> (default) - connected segments are joined by
+													extending their outside edges to connect at a single point, with the
+													effect of filling an additional lozenge-shaped area.
+													The final effect of this choice of parameter is
+													affected by the <code>miter-limit</code> paramter.
+												</li>
+												<li>
+													<code>r</code> - rounded connections
+												</li>
+												<li>
+													<code>b</code> - triangular connections
+												</li>
+											</ol>
+										</div>
+									</li>
+									<li>
+										<div class="description">
+											<code>miter-limit n</code>
+											<p>
+												SVG-only.
+												Affects the effect of choice of <code>set-param line-join m</code>.
+												The only mandatory argument <code>n</code> is a number.
+											</p>
+										</div>
+									</li>
 								</ol>
 							</div>
 						</div>
@@ -341,7 +388,7 @@
 
 				<p>Currently, the website allows the code to be converted to the following media types:</p>
 				<ol>
-					<li>SVG (<code>svg</code>)</li>
+					<li>SVG (<code>svg</code>) - experimental</li>
 					<li>PNG (<code>png</code>)</li>
 					<li>JPEG (<code>jpeg</code> or <code>jpg</code>)</li>
 					<li>WEBP (<code>webp</code>)</li>
@@ -349,6 +396,13 @@
 
 				<p>In the future, new formats may appear.</p>
 
+				<h2>Files-loading</h2>
+
+				<p>
+					Besides the 'Input' field, it's also possible to prepend or append the input code to be run by
+					'draw-text' via files (which is useful for modularizing a given image's code).
+					The files' lists can be cleared entirely, or renewed.
+				</p>
 			</div>
 		</div>
 		<div class="space-rect"></div>
