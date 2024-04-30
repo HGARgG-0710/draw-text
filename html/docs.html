@@ -11,6 +11,7 @@
 	<link
 		href="https://fonts.googleapis.com/css2?family=Josefin+Sans:ital,wght@0,100..700;1,100..700&family=Madimi+One&family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap"
 		rel="stylesheet">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 
 <body>
@@ -103,8 +104,8 @@
 									the first argument.
 								</p>
 								<p class="notice">
-									The ellipses (currently) have questionable support for SVG - bugs are
-									possible.
+									The ellipses (currently) have very questionable support for SVG - no rotation
+									available yet, also - insufficient testing.
 								</p>
 							</div>
 
@@ -402,6 +403,10 @@
 					Besides the 'Input' field, it's also possible to prepend or append the input code to be run by
 					'draw-text' via files (which is useful for modularizing a given image's code).
 					The files' lists can be cleared entirely, or renewed.
+				</p>
+				<p class="notice">
+					Currently, the SVG output does not support loading multiple files
+					(will be fixed in the future).
 				</p>
 			</div>
 		</div>

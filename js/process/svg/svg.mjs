@@ -1,5 +1,6 @@
 // ! PROBLEM: does not yet support multiple files...; fix.fix.fix.
 
+import { canvas } from "../canvas/draw.mjs"
 import { substitute } from "../state/vars.mjs"
 import { getParam } from "../state/params.mjs"
 import svg from "../../lib/svg.mjs"
@@ -39,12 +40,12 @@ function svgPoint(x, y, colour) {
 	}
 }
 
+const isPresent = (x) => x && x[0]
+
 const ASTmap = {
 	contour: function (points, arrows, elliptics) {
 		const subShapes = []
 		const baseColour = getParam("base-color")
-		// ! REFACTOR;
-		const isPresent = (x) => x && x[0]
 		for (let i = 0; i < points.length; ++i) {
 			while (isPresent(arrows[i])) {
 				subShapes.push(
@@ -77,7 +78,7 @@ const ASTmap = {
 		}
 		return subShapes
 	},
-	fill: function (points, _arrows, elliptics) {
+	fill: function (points, arrows, elliptics) {
 		return {
 			tag: "path",
 			attrs: {
@@ -89,8 +90,10 @@ const ASTmap = {
 						.map((_p, i) =>
 							(elliptics[i][0]
 								? [["A", arcData(points, elliptics, i)]]
-								: [["L", { point: xy(points[(i + 1) % points.length]) }]]
-							).map(commandpair)
+								: !isPresent(elliptics[i - 1]) || arrows[i][0]
+								? [["L", { point: xy(points[(i + 1) % points.length]) }]]
+								: []
+							).map((x) => (x.length ? commandpair(x) : x))
 						)
 						.flat()
 				),
@@ -131,5 +134,5 @@ export function tosvg(expression) {
 	return svg(svgAST(expression))
 }
 
-export const svgTag = (text, canvas) =>
+export const svgTag = (text) =>
 	`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${canvas.width} ${canvas.height}">\n${text}\n</svg>`

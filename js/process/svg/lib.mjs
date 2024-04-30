@@ -7,7 +7,13 @@ export const arcData = (points, elliptics, i) => ({
 			radius,
 			rotationAngle: angle,
 			nextPoint
-		} = ellipseData(currpair(points, i), elliptics[i][1], ...elliptics[i].slice(3, 5))
+		} = ellipseData(
+			currpair(points, i),
+			elliptics[i][1],
+			elliptics[i][3],
+			elliptics[i][4],
+			true
+		)
 		return {
 			radius,
 			angle: toDegrees(angle),

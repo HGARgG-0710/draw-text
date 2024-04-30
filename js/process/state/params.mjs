@@ -1,12 +1,6 @@
 import { black, white } from "../../lib/colors.mjs"
 import { canvas, context } from "../canvas/draw.mjs"
 
-// ! CREATE A NEW MAP WITH DEFAULT PARAMETERS - use the 'resetParams' to fix the bug with pictures remaining...;
-const defaults = new Map()
-export function resetParams(context) {
-	defaults.forEach((v, k) => setParam(k, v, context))
-}
-
 export function drawBackground(colour) {
 	const prevFill = context.fillStyle
 	this.fillStyle = colour
@@ -86,3 +80,8 @@ export function getParam(name) {
 }
 
 export const paramsList = Array.from(params.keys())
+
+const defaults = new Map(paramsList.map((paramName) => [paramName, getParam(paramName)]))
+export function resetParams(context) {
+	defaults.forEach((v, k) => setParam(k, v, context))
+}

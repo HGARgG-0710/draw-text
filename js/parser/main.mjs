@@ -102,8 +102,11 @@ function countOccurencesArr(arr, elem) {
 	return arr.reduce((acc, curr) => acc + (curr === elem), 0)
 }
 
+// ! later, refactor using 'math-expressions.js';
 function getlines(text) {
 	return text
+		.split("\r")
+		.join("")
 		.split(";")
 		.join("\n")
 		.split("\n")
@@ -117,12 +120,11 @@ function getlines(text) {
 		)
 }
 
-// ^ IDEA: create a formatter for the thing (code format)?
+// ^ IDEA: create a formatter for the thing (draw-text input format)?
 
 // ! Support more color-schemes (CMYK, RGBA, grayscale and others...);
-// ! PROBLEM: for now, only the HEX colour notation is supported (RGB used...) - expand syntax;
+// ! PROBLEM: for now, only the HEX colour notation is supported (RGB used...) - expand numeric systems syntax;
 
-// ^ IDEA: add ability to specify the default colours [as a parameter];
 export default function parse(text) {
 	const lines = getlines(text)
 	const commandInds = lines.map((l) =>

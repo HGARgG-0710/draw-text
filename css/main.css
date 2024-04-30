@@ -3,11 +3,6 @@ body {
 	background-color: rgb(142, 227, 255);
 }
 
-uni-header {
-	margin: 0;
-	padding: 0;
-}
-
 #pagetop {
 	display: flex;
 	background-color: rgb(255, 149, 137);
@@ -25,10 +20,11 @@ uni-header {
 
 #pagename {
 	background-color: rgb(208, 255, 231);
-	text-align: center;
 	height: 7.5vh;
 	display: flex;
-	flex-direction: column;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
 }
 
 #pagename h1 {
@@ -97,10 +93,6 @@ p {
 	margin-bottom: 0.25vh;
 	margin-top: 0.5vh;
 	margin-left: 5vw;
-}
-
-.main-rect h2:first-child {
-	margin-top: 1vh;
 }
 
 ol {
@@ -225,7 +217,7 @@ a {
 #second-align {
 	display: flex;
 	flex-direction: column;
-	justify-content: flex-start;
+	align-items: flex-start;
 	gap: 2.5vh;
 }
 
@@ -281,10 +273,6 @@ ol ol {
 	gap: 4vh;
 }
 
-.text:first-child {
-	padding-top: 2vh;
-}
-
 .notice {
 	color: tomato;
 }
@@ -306,4 +294,42 @@ ol ol {
 
 .clear-button:active {
 	background-color: antiquewhite;
+}
+
+@media screen and (max-width: 1079px) {
+	.space-rect {
+		width: 0;
+	}
+	.main-rect {
+		width: 100vw;
+		margin-bottom: 0;
+		border-radius: 0;
+	}
+	#sizes input[type="text"] {
+		width: 11.75vw;
+	}
+	#code {
+		width: 80vw;
+	}
+	#input_area {
+		flex-direction: column;
+	}
+	#pagetop-end p {
+		--lr: 5vw;
+		padding: 0;
+		padding-left: var(--lr);
+		padding-right: var(--lr);
+	}
+	#second-align {
+		align-items: center;
+	}
+}
+
+@media screen and (max-width: 450px) {
+	#pagetop {
+		--tb: 2vh;
+		padding-top: var(--tb);
+		padding-bottom: var(--tb);
+		gap: 10px;
+	}
 }

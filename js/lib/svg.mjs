@@ -36,7 +36,7 @@ export default function svg(tagNode) {
 			const { x, y, height, width } = attrs
 			return `<rect ${x ? ` x='${x}'` : ""} ${y ? ` y='${y}'` : ""} ${
 				height ? ` height='${height}'` : ""
-			} ${width ? ` width=${width}` : ""} ${omni}>\n${(children || [])
+			} ${width ? ` width='${width}'` : ""} ${omni}>\n${(children || [])
 				.map(svg)
 				.join("\n")}\n</rect>`
 		case "polyline":
@@ -44,7 +44,7 @@ export default function svg(tagNode) {
 			return `<polyline ${
 				points ? ` points='${points.join(",")}'` : ""
 			}${omni}>\n${(children || []).map(svg).join("\n")}\n</polyline>`
-		// ! PROBLEM - the 'ellipse' functionality DOES NOT work with SVG properly - FIX THAT! Need much more testing (do later - this release has already taken a lot of time and effort...); 
+		// ! PROBLEM - the 'ellipse' functionality DOES NOT work with SVG properly - FIX THAT! Need much more testing (do later - this release has already taken a lot of time and effort...);
 		case "path":
 			const { d, pathLength } = attrs
 			// TODO: later, GENERALIZE THIS - create a general interface for the attributes, so as not to have to create repetitious ternaries like these every single time... (generalize to a function, then define the desired SVG specs in terms of it...);
@@ -67,8 +67,10 @@ export default function svg(tagNode) {
 										return `A ${radius.join(
 											" "
 										)} ${angle} ${+largeArc} ${+sweep} ${next
-											.map((x) =>
-												Math.abs(x) < 1 / 100 ? 0 : x - 1 / 2
+											.map((x, i) =>
+												Math.abs(x) < 1 / 10000
+													? 0
+													: x - 1 / 10 ** (4 * i)
 											)
 											.join(",")}`
 									case "M":

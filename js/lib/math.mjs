@@ -11,17 +11,29 @@ export function toDegrees(rads) {
 	return (rads * 180) / Math.PI
 }
 
-// ^ IDEA: write a proper linear algebra submodule, then use here elegantly...;
+export function ellipseCenterAnglePoint(radius, angle, center) {
+	const coeff = (-1) ** (Math.PI / 2 < angle < (3 / 2) * Math.PI)
+	const pyth = Math.sqrt(
+		(Math.sin(angle) * radius[0]) ** 2 + (Math.cos(angle) * radius[1]) ** 2
+	)
+	return ["sin", "cos"].map(
+		(fname, i) =>
+			(coeff * radius[0] * radius[1] * Math[fname](angle)) / pyth + center[i]
+	)
+}
+
+// ! PROBLEM [1] - THIS IS NOT THE CORRECT ROTATION! ONE MUST INSTEAD ROTATE THE "AXIS"! SAME AS WITH THE CANVAS ROTATION!
+// ! PROBLEM [2] - DOES SVG SUPPORT THAT KIND OF ROTATION IN PRINCIPLE EVEN? IF NOT, ONE'LL HAVE TO ALTER CODE FOR IT VERY SERIOUSLY...;
 export function rotateClockwise(point, angle) {
 	return [
-		Math.cos(angle) * point[0] + Math.sin(angle) * point[1],
+		Math.cos(angle) * point[0] - Math.sin(angle) * point[1],
 		Math.sin(angle) * point[0] + Math.cos(angle) * point[1]
 	]
 }
 
 // ^ idea: add all the functions from here to the future planned modules/packages related to geometry...;
-// ! complete...
-export function ellipseData(points, angle, startAngle, endAngle) {
+// ! PROBLEM - THE isSVG parameter! It's only a temp, to allow at least SOME ellipses to work with SVG currently...; 
+export function ellipseData(points, angle, startAngle, endAngle, isSVG = false) {
 	const radAngs = [startAngle, endAngle].map((x, i) =>
 		toRadians(x != null ? x : 360 ** i - !i)
 	)
@@ -162,19 +174,15 @@ export function ellipseData(points, angle, startAngle, endAngle) {
 		](...[isFirstLeft, isFirstAbove].map((f) => f(points)))
 	](rotationBase(points, angle))
 
-	// TODO: this here is (supposed to be) correct - the parametrization of a point on an ellipse through an angle; (define a function inside this module as well...)
-	// ! test...
-	const nextPoint = rotateClockwise(
-		_radius(points, angle).map(
-			(r, i) => r * Math[fs[r[0] >= r[1] ? i : +!i]](radAngs[1])
-		),
-		rotationAngle
-	)
+	// ! WRONG! fix later...; 
+	const nextPoint = ellipseCenterAnglePoint(_radius(points, angle), radAngs[1], center)
 
+	console.log(rotationAngle * !isSVG)
+	console.trace()
 	return {
 		center,
 		radius: _radius(points, angle),
-		rotationAngle,
+		rotationAngle: rotationAngle * !isSVG,
 		nextPoint,
 		startAngle: radAngs[0],
 		endAngle: radAngs[1]
