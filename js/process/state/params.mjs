@@ -12,6 +12,17 @@ function Parameter(name, _default, typedef, processor) {
 	return [name, [_default, typedef, processor]]
 }
 
+const toDefault = [
+	"line-width",
+	"line-cap",
+	"draw-points",
+	"point-size",
+	"point-shape",
+	"base-color",
+	"line-join",
+	"miter-limit"
+]
+
 // ! BUG!!! The 'context.reset()' fixes the behaviour of the canvas BUT NOT THE VALUES OF 'params'!!! This is prone to cause issues. Fix.
 const params = new Map(
 	[
@@ -81,7 +92,7 @@ export function getParam(name) {
 
 export const paramsList = Array.from(params.keys())
 
-const defaults = new Map(paramsList.map((paramName) => [paramName, getParam(paramName)]))
+const defaults = new Map(toDefault.map((paramName) => [paramName, getParam(paramName)]))
 export function resetParams(context) {
 	defaults.forEach((v, k) => setParam(k, v, context))
 }
