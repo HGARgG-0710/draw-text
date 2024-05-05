@@ -1,0 +1,9 @@
+variable lightblue #6484f5
+fill (150, 0)-(45, lightblue)(0, 150)
+
+line-cap r
+line-width 16
+base-color #fff
+
+contour (85, 240)->(130, 180)
+contour (125, 75)-(45)(225, 75)
