@@ -4,9 +4,13 @@ import { currpair } from "../../lib/lib.mjs"
 export const arcData = (points, elliptics, i) => ({
 	...(() => {
 		const {
+			center,
 			radius,
-			rotationAngle: angle,
-			nextPoint
+			rotationAngle,
+			startPoint,
+			nextPoint,
+			rotatedStart,
+			rotatedEnd
 		} = ellipseData(
 			currpair(points, i),
 			elliptics[i][1],
@@ -15,9 +19,14 @@ export const arcData = (points, elliptics, i) => ({
 			true
 		)
 		return {
+			center,
 			radius,
-			angle: toDegrees(angle),
-			nextPoint
+			rotationAngle: toDegrees(rotationAngle),
+			startPoint,
+			nextPoint,
+			rotatedStart,
+			rotatedEnd,
+			angle: 0
 		}
 	})(),
 	// ! THESE TWO ARE SUPPOSED TO BE THE SUBSTITUTES FOR 'isCenterAbove/isCenterBelow/isCenterLeft/isCenterRight' + 'isAbove/isBelow'!!!

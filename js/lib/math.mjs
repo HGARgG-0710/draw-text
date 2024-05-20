@@ -22,18 +22,19 @@ export function ellipseCenterAnglePoint(radius, angle, center) {
 	)
 }
 
-// ! PROBLEM [1] - THIS IS NOT THE CORRECT ROTATION! ONE MUST INSTEAD ROTATE THE "AXIS"! SAME AS WITH THE CANVAS ROTATION!
-// ! PROBLEM [2] - DOES SVG SUPPORT THAT KIND OF ROTATION IN PRINCIPLE EVEN? IF NOT, ONE'LL HAVE TO ALTER CODE FOR IT VERY SERIOUSLY...;
-export function rotateClockwise(point, angle) {
+// ! refactor later...;
+export function pointRotateClockwise(center, point, angle) {
+	const diff = [0, 1].map((x) => point[x] - center[x])
 	return [
-		Math.cos(angle) * point[0] - Math.sin(angle) * point[1],
-		Math.sin(angle) * point[0] + Math.cos(angle) * point[1]
+		Math.cos(angle) * diff[0] - Math.sin(angle) * diff[1] + center[0],
+		Math.sin(angle) * diff[0] + Math.cos(angle) * diff[1] + center[1]
 	]
 }
 
+// ! DIRTY CODE - lots of stuff un-refactored, possibly obsolete... [re-test thoroughly again, check notes, GET RID OF NESTED LOGICAL TERNARIES - REPLACE WITH SHORT-FORM];
+// TODO: REFACTORING -- make those (rotationAngle) into separate functions - properties of the 'ellipse' submodule...; Then use elegantly here...
 // ^ idea: add all the functions from here to the future planned modules/packages related to geometry...;
-// ! PROBLEM - THE isSVG parameter! It's only a temp, to allow at least SOME ellipses to work with SVG currently...; 
-export function ellipseData(points, angle, startAngle, endAngle, isSVG = false) {
+export function ellipseData(points, angle, startAngle, endAngle) {
 	const radAngs = [startAngle, endAngle].map((x, i) =>
 		toRadians(x != null ? x : 360 ** i - !i)
 	)
@@ -139,7 +140,6 @@ export function ellipseData(points, angle, startAngle, endAngle, isSVG = false) 
 
 	const center = getCenter(points, angle)
 
-	// ! looks like this is still quite unfinished...;
 	const sinval = (points, angle) =>
 		(getCenter(points, angle)[1] - first(points)[1]) / radius(points, angle)
 	const rotationBase = (points, angle) => Math.asin(Math.abs(sinval(points, angle)))
@@ -157,8 +157,6 @@ export function ellipseData(points, angle, startAngle, endAngle, isSVG = false) 
 	const rotationTransform = [(x) => x, (x) => toRadians(360) - x]
 	const la = [(x, y) => x ^ y, (x, y) => +(x === y)]
 
-	// TODO: REFACTORING -- make those (rotationAngle) into separate functions - properties of the 'ellipse' submodule...; Then use elegantly here...
-
 	// ? Try to replace the 'sinval(...) < 0' with 'rotationBase(...) >/< rotationBase(...)'? [Think about it...];
 	const rotationAngle = rotationTransform[
 		la[
@@ -174,16 +172,22 @@ export function ellipseData(points, angle, startAngle, endAngle, isSVG = false) 
 		](...[isFirstLeft, isFirstAbove].map((f) => f(points)))
 	](rotationBase(points, angle))
 
-	// ! WRONG! fix later...; 
-	const nextPoint = ellipseCenterAnglePoint(_radius(points, angle), radAngs[1], center)
+	const [startPoint, nextPoint] = radAngs.map((ang) =>
+		ellipseCenterAnglePoint(_radius(points, angle), ang, center)
+	)
 
-	console.log(rotationAngle * !isSVG)
-	console.trace()
+	const [rotatedStart, rotatedEnd] = [startPoint, nextPoint].map((x) =>
+		pointRotateClockwise(center, x, rotationAngle)
+	)
+
 	return {
 		center,
 		radius: _radius(points, angle),
-		rotationAngle: rotationAngle * !isSVG,
+		rotationAngle,
+		startPoint,
 		nextPoint,
+		rotatedStart,
+		rotatedEnd,
 		startAngle: radAngs[0],
 		endAngle: radAngs[1]
 	}

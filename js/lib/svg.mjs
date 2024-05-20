@@ -4,7 +4,7 @@
 
 import { getParam } from "../process/state/params.mjs"
 
-// ! THERE IS A FORMATTING PROBLEM ! Unneeded spaces. Delete them - make it look perfect...;
+// ! TAKE OUT ALL THE 'value-correction' stuff into separate a module (how much one hates the API aspect of SVG - absolutely unworkable with...);
 export default function svg(tagNode) {
 	if (tagNode instanceof Array) return tagNode.map(svg).join("\n")
 	const { tag, attrs, children } = tagNode
@@ -46,10 +46,10 @@ export default function svg(tagNode) {
 			}${omni}>\n${(children || []).map(svg).join("\n")}\n</polyline>`
 		// ! PROBLEM - the 'ellipse' functionality DOES NOT work with SVG properly - FIX THAT! Need much more testing (do later - this release has already taken a lot of time and effort...);
 		case "path":
-			const { d, pathLength } = attrs
+			const { d, pathLength, transform } = attrs
 			// TODO: later, GENERALIZE THIS - create a general interface for the attributes, so as not to have to create repetitious ternaries like these every single time... (generalize to a function, then define the desired SVG specs in terms of it...);
 			// TODO: generalize the switch for 'd'-parsing to an external function-map later...
-			// TODO: add more commands for 'd'...;
+			// TODO: add more commands implementations for 'd'...;
 			return `<path${
 				d
 					? ` d='${d
@@ -66,13 +66,9 @@ export default function svg(tagNode) {
 										} = params
 										return `A ${radius.join(
 											" "
-										)} ${angle} ${+largeArc} ${+sweep} ${next
-											.map((x, i) =>
-												Math.abs(x) < 1 / 10000
-													? 0
-													: x - 1 / 10 ** (4 * i)
-											)
-											.join(",")}`
+										)} ${angle} ${+largeArc} ${+sweep} ${next.join(
+											","
+										)}`
 									case "M":
 									case "L":
 										const { point } = params
@@ -81,10 +77,10 @@ export default function svg(tagNode) {
 							})
 							.join("\n")}'`
 					: ""
-			}${pathLength ? ` pathLength='${pathLength}'` : ""}${omni}>\n${(
-				children || []
-			)
-				.map(svg)
-				.join("\n")}\n</path>`
+			}${pathLength ? ` pathLength='${pathLength}'` : ""}${
+				transform && transform.length
+					? ` transform='${transform.map((x) => `${x[0]}(${x[1].join(" ")})`)}'`
+					: ""
+			}${omni}>\n${(children || []).map(svg).join("\n")}\n</path>`
 	}
 }

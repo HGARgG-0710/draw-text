@@ -248,3 +248,10 @@
 26. IDEA: create a browser-Vim module and use in Draw-text; 
 
 	Same as with 25 - dom-manipulation performance is the only potential difficulty.
+
+27. FEATURE TO ADD: 
+
+	param inside-round [true/false]: 
+
+		A boolean parameter determining whether the insides of corners are to be round (by default in both Canvas and SVG, they're not);
+		This (effectively), draw an 'inside-shadow' of the given thing with round corners; 

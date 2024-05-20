@@ -23,7 +23,6 @@ const toDefault = [
 	"miter-limit"
 ]
 
-// ! BUG!!! The 'context.reset()' fixes the behaviour of the canvas BUT NOT THE VALUES OF 'params'!!! This is prone to cause issues. Fix.
 const params = new Map(
 	[
 		// ? Perhaps, return (partially) the previous 'deBackground' functionality? [require the re-drawing every time that the background is changed, + add a 0-or-1-arguments 'clean [colour]' command that would do what background currently does?]
