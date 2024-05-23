@@ -4,6 +4,7 @@
 <head>
 	<title>Draw-Text!</title>
 	<link rel="stylesheet" href="./css/main.css">
+	<script src="./js/components/files-container.mjs" type="module"></script>
 	<script src="./js/components/header.mjs" type="module"></script>
 	<script src="./js/activation.mjs" type="module"></script>
 	<link rel="preconnect" href="https://fonts.googleapis.com">
@@ -50,22 +51,9 @@
 				</div>
 				<div id="files_area">
 					<div id="files">
-						<div class="files-container">
-							<button class="clear-button">Clear</button>
-							<div class="file-list">
-								<label for="pre-file" class="file-input">Files (before Input):</label>
-								<input type="file" id="pre-file" hidden multiple />
-								<ul></ul>
-							</div>
-						</div>
-						<div class="files-container">
-							<button class="clear-button">Clear</button>
-							<div class="file-list">
-								<label for="post-file" class="file-input">Files (after Input):</label>
-								<input type="file" id="post-file" hidden multiple />
-								<ul></ul>
-							</div>
-						</div>
+						<files-container label-name="fonts" label="Font Files"></files-container>
+						<files-container label-name="pre-file" label="Files (before)"></files-container>
+						<files-container label-name="post-file" label="Files (after)"></files-container>
 					</div>
 				</div>
 				<div id="output_area">

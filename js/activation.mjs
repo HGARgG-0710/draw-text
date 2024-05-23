@@ -7,7 +7,6 @@ import {
 	appendpar,
 	text,
 	query,
-	cquery,
 	attribute,
 	mquery,
 	prop
@@ -17,12 +16,14 @@ import process from "./process/canvas/process.mjs"
 import { clear, canvas, context } from "./process/canvas/draw.mjs"
 import { svgURI } from "./process/svg/uri.mjs"
 import { download } from "./lib/components.mjs"
-import { resetParams } from "./process/state/params.mjs"
+import { canvasParams } from "./process/state/params.mjs"
 
 const [imgExt, codeElem, downloadButton] = ["img-format", "code", "download-button"]
 	.map((x) => `#${x}`)
 	.map(query())
 const [filelists, fileContainers] = [".file-list", ".files-container"].map(mquery())
+
+export const [fontFiles, preFiles, postFiles] = Array.from(filelists)
 
 // ? Make a separate files with all the constants?
 const maxFilenameLength = 25
@@ -42,9 +43,8 @@ const outSingle = (text) => {
 	validate(text, (text) => parse(text).forEach(process))
 }
 const outList = (list) => list.forEach(outSingle)
-const readFiles = async (files) => {
-	return await Promise.all(Array.from(files).map(async (file) => file.text()))
-}
+const readFiles = async (files) =>
+	await Promise.all(Array.from(files).map(async (file) => file.text()))
 
 const outOnChange = function (_kevent) {
 	const v = this.value.trim()
@@ -56,13 +56,10 @@ const outOnChange = function (_kevent) {
 
 const imgout = async (text) => {
 	clear()
-	resetParams(context)
-	const [filesPre, filesAfter] = Array.from(filelists)
-		.map(cquery("input[type='file']"))
-		.map((x) => x.files)
-	outList(await readFiles(filesPre))
+	canvasParams.reset(context)
+	outList(await readFiles(files(preFiles)))
 	outSingle(text)
-	outList(await readFiles(filesAfter))
+	outList(await readFiles(files(postFiles)))
 }
 
 // ? This doesn't work for changing of the viewport values - make reactive?
@@ -105,24 +102,27 @@ const mimeMap = {
 	webp: "image/webp"
 }
 
-// TODO: BUG - for whatever reason, pressing the 'download' button for 'svg' causes the image on the canvas to vanish...; 
+export const files = (x) => Array.from(query(x)("input[type='file']").files)
+
+// TODO: BUG - for whatever reason, pressing the 'download' button for 'svg' causes the image on the canvas to vanish...;
 downloadButton.addEventListener("click", async (_event) => {
 	const ext = imgExt.value
+	const isSVG = ext === "svg"
 	// ? [later] make ternary conditional into a function-map? [possibly, add the '.avif' support later...];
 	download(
 		ext,
-		ext === "svg"
+		isSVG
 			? svgURI(
 					validate(
-						(await readFiles(filelists[0]))
+						(await readFiles(files(preFiles)))
 							.concat([codeElem.value])
-							.concat(await readFiles(filelists[1]))
+							.concat(await readFiles(files(postFiles)))
 							.join("\n"),
 						parse
 					)
 			  )
 			: canvas.toDataURL(ext in mimeMap ? mimeMap[ext] : "image/png"),
-		ext === "SVG"
+		isSVG
 	)
 })
 
@@ -147,7 +147,7 @@ const filesOut = (fileList) =>
 		imgout(lastText)
 	}
 
-filelists.forEach((fileList) => {
+;[preFiles, postFiles].forEach((fileList) => {
 	const input = query(fileList)("input[type='file']")
 	filesOut(fileList)(input)
 	input.addEventListener("change", function (event) {

@@ -15,27 +15,25 @@
 
 			To set a given point '(...)' to 'round' do "r(...)", for other values - corresponding modifiers. 
 
-		3. strokeText [add text to draw-text...]; 
-		4. setLineDash (for dotted lines)
-		5. fillText;
-		6. drawImage (images!!! - implement together with the paths, arguments variables and file-running instead of necessarily getting the text from 'textarea' field);
-		7. createPattern (return type - a 'colour');
+		3. setLineDash (for dotted lines)
+		4. drawImage (images!!! - implement together with the paths, arguments variables and file-running instead of necessarily getting the text from 'textarea' field);
+		5. createPattern (return type - a 'colour');
 
-		8. lineDashOffset ('dash-offset' property)
-		9. gradients - conic, linear and radial (those that Canvas supports); 
-		10. fill-rule (single-value property for setting fill rules - 'evenodd' or 'nonzero');
-		11. shadow (command for shadows; takes arguments' shape of '(offsetx, offsety) blur? color?')
-		13. font (property; for doing text-stroking/fillling); 
+		6. lineDashOffset ('dash-offset' property)
+		7. gradients - conic, linear and radial (those that Canvas supports); 
+		8. fill-rule (single-value property for setting fill rules - 'evenodd' or 'nonzero');
+		9. shadow (command for shadows; takes arguments' shape of '(offsetx, offsety) blur? color?')
+		10. font (property; for doing text-stroking/fillling); 
 
-		13. filter; 
-		14. clip; 
-		15. transform - useful for skewing something; 
+		11. filter; 
+		12. clip; 
+		13. transform - useful for skewing something; 
 			This one - as a pure 'points-only' operator with the sintax: 
 				'T(a,b,c,d,e,f)(x, y)'
 			Value - new point. 
 
 		Whole separate, under question: 
-		16. Animations? [more complex, doing will require finding a finite set of elementary operations equivalent in power to multi-layer structures such as 'for-loops' in the sense of determining the algorithms...];
+		14. Animations? [more complex, doing will require finding a finite set of elementary operations equivalent in power to multi-layer structures such as 'for-loops' in the sense of determining the algorithms...];
 
 			IDEA: add eleven instructions: 
 
@@ -65,7 +63,7 @@
 				1. json{...} - an expression, result of which is a JSON-string of whatever is passed to 'json'
 				2. from-json filepath - reads a filepath 
 			
-		17. clear - good for animation, resets the Canvas...; 
+		15. clear - good for animation, resets the Canvas...; 
 
 2. IDEA: add an .svg of some draw-text example to the README...;
 3. IDEA: add more details to the page's HTML and CSS; 
@@ -84,17 +82,13 @@
 	
 	NOTE UPDATE: now, it comes down to changing the background - the task became more chanllenging, but also far more fun! 
 	Think about it...; 
-	
-7. Idea: add support for a 'point'-datatype to the parser; 
 
-	Allows one to store (in variables) individual points instead of simply x/y/color coordinates of a point...;
-
-8. A website Favicon - add it; 
+7. A website Favicon - add it; 
 
 	Think of something pretty. Draw it with 'draw-text'; 
 	Then, use as a favicon (an .svg...); 
 
-9. Arithmetic! 
+8. Arithmetic! 
 
 	Add arithmetic for those expressions (simple addition, multiplication, division, subtraction and modulo ought to do it by now...); 
 	Add simple case static/strong typezation typezation 
@@ -104,21 +98,17 @@
 
 	Also - the booleans and trigonometric functions (sin, cos, tan); 
 
-10. Add arguments; 
+9. Add arguments; 
 
 	Syntax: [! or % or $ or @]n, where 'n' is the number of the argument...; 'n' can be an expression (so is, for instance, calculated); 
 
 	[useful with images, paths and filereading];
 
-11. Add filereading: 
+10. Add filereading: 
 
 	For text files only (getting stroke-Text strings, colours, numbers and points); 
 
-12. Add "string" type: 
-
-	Easier to parse this way. Would be used for textual information; 
-
-13. Add a simple 'compiler' program for draw-this code: 
+11. Add a simple 'compiler' program for draw-this code: 
 
 	Would, in truth, simply substitute the argument-variables for static values, provided by the user; 
 	Eliminates the need for further user input;
@@ -126,18 +116,18 @@
 	Also - eliminates inner calls from other files 
 		(if they are available - puts the code inside with appropriate name collisions in vars fixed (when required), otherwise - a compiler error); 
 	
-14. Add file-running commands: 
+12. Add file-running commands: 
 
 	Two directives: 
 
 		1. run filepath [...arguments] - runs a given file within the context of the present canvas (without merging variable spaces); 
 		2. paste filepath [...arguments] - pastes the code of the given file into the present one (note: IT DOES NOT HAVE TO BE CORRECT AS OF SELF, variables can be undefined, for instance);
 
-15. Add a way to access the command-properties (such as 'radius'): 
+13. Add a way to access the command-properties (such as 'radius'): 
 
 	For instance, add a special symbol (like % or $, or @, or !) to get their values [those will be ignored by the 'validate' function]; 
 
-16. Add more complex data structures: 
+14. Add more complex data structures: 
 
 	For instance - arrays: 
 
@@ -153,8 +143,9 @@
 				3. other, more complex cases;
 	
 		6?. Some functions for arrays (like, 'slice' or 'map'? Would make development far easier, however, would increase the number of operators...):
+		7?. Make the triple 'point' (x, y, c) just a case of 'array' (add alternative syntax - '(x1, ..., xn)'); 
 	
-17. Idea [possibly, not good]: functions!
+15. Idea [possibly, not good]: functions!
 
 	They would be evaluated as a set of compilation-structures, 
 		namely - for them there'd exist a separate process for putting those out as a script in an alternative file (so as to replace 'function's with 'run's);
@@ -167,11 +158,11 @@
 	
 	The i'th argument of n-level function is accessed via "$[repeat n]$i", whereas "$i" is used for script argument [0-level function];
 
-18. Add code highlighting for the on-the-website editor? 
+16. Add code highlighting for the on-the-website editor? 
 
 	Keywords-colouring, at least, and underline matching brackets when near them...;
 
-19. Extend the module for svg support!
+17. Extend the module for svg support!
 
 	The 'js/svg.mjs' is a module needed to ensure the svg support on the website; 
 
@@ -180,7 +171,7 @@
 		one is going to write a library of one's own 
 			(first as a submodule of Draw-Text, then - as a separate thing...)
 		
-20. IDEA: separate the website code and the code of the PL: 	
+18. IDEA: separate the website code and the code of the PL: 	
 
 	Create a separate repo of DTPL (draw-text programming language), 
 	specifically for everything related to the language; 
@@ -189,13 +180,13 @@
 
 	Note: code structure is starting to get too messy and unwieldy. 
 
-21. IDEA [possibly, a bad one]: Add 3d! 
+19. IDEA [possibly, a bad one]: Add 3d! 
 
 	After having completed the game engine, animation and all the other functionalities, 
 		add the third dimension.
 	[?webgl for this cause, mayhaps?]
 
-22. IDEA [SVG-extension]: 
+20. IDEA [SVG-extension]: 
 
 	Previously (in 1.), features from Canvas were decided to be added to the website as wrappers (namely, the extension of the power of draw-text); 
 	Now, as one started implementing the SVG compatibility of the format, it is time to consider doing the same with it; 
@@ -205,7 +196,7 @@
 
 		1. <textPath>
 	
-23. THE MINIMUM SIZE OF POINTS IS SLIGHTLY LIMITED... 
+21. THE MINIMUM SIZE OF POINTS IS SLIGHTLY LIMITED... 
 
 	Just another reminder - due to the fact that there are no floats in the typesystem (yet), 
 	there's a VERY large number of beautiful ellipse-sizes not available (in the angle argument); 
@@ -213,7 +204,7 @@
 	That is particularly visible when ellipses are large enough - those sub-degrees could make a very real (and, ofttimes, essential) difference. 
 	The floats have just grown in importance...; 
 
-24. IDEA: add functionalities (for 2d): 
+22. IDEA: add functionalities (for 2d): 
 
 	1. WebGL; 
 	2. WebGPU; 
@@ -236,7 +227,7 @@
 		All can be exported as desired; 
 		[SVG is perfect, because it's ALREADY a format that is scriptable...]; 
 	
-25. IDEA: Create a JS module for custom carets (surprisingly, browser's CSS implementations doesn't seem to support it yet); Use it in Draw-Text?
+23. IDEA: Create a JS module for custom carets (surprisingly, browser's CSS implementations doesn't seem to support it yet); Use it in Draw-Text?
 	Can be done via a combination of: 
 
 		1. styling (changing a particular element); 
@@ -245,11 +236,11 @@
 	
 	Only (possible) problem is the performance. Consider that before using. 
 
-26. IDEA: create a browser-Vim module and use in Draw-text; 
+24. IDEA: create a browser-Vim module and use in Draw-text; 
 
-	Same as with 25 - dom-manipulation performance is the only potential difficulty.
+	Same as with 23 - dom-manipulation performance is the only potential difficulty.
 
-27. FEATURE TO ADD: 
+25. FEATURE TO ADD: 
 
 	param inside-round [true/false]: 
 

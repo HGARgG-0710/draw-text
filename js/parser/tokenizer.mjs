@@ -1,3 +1,6 @@
+// TODO: later, refactor this parser using the parser library of one's own...;
+// ? Add a regex-module to it?
+
 import { global } from "../lib/regex.mjs"
 
 export const tokens = {
@@ -8,21 +11,23 @@ export const tokens = {
 	varname: /[a-zA-Z\d_]+/,
 	comma: /,/,
 	opbrack: /\(/,
-	clbrack: /\)/
+	clbrack: /\)/,
+	quote: /"/,
+	symbol: /./
 }
 
-// ! LATER, rewrite in terms of the 'InputHandler' interface from the library (MUCH better than this for handling the 'isEnd' predicate);
+// ! LATER, rewrite in terms of the 'InputHandler' interface from the 'parser' library (MUCH better than this for handling the 'isEnd' predicate);
 export const parserTable = {
 	// ! SPECIAL CASE OF 'delim' from the parsing library...;
 	opbrack: function (tokens, i, parser) {
 		const isEnd = tokens.length <= i
 		let vals = []
-		i++
+		++i
 		let lastComma = true
 		while (tokens[i] && tokens[i].type !== "clbrack") {
 			if (!lastComma) {
 				lastComma = true
-				i++
+				++i
 				continue
 			}
 			const pair = parser(tokens, i, i + 1)
@@ -57,6 +62,19 @@ export const parserTable = {
 					{ type: "arrow-connection", value: pair[1][0].value }
 			  ])(next)
 			: [next[0], [{ type: "arrow-connection" }, ...next[1]]]
+	},
+	quote: function (tokens, i) {
+		let finstr = ""
+		let isPrevBacked = false
+		while (tokens[++i].type !== "quote" || isPrevBacked) {
+			if (!isPrevBacked && tokens[i].value === "\\") {
+				isPrevBacked = true
+				continue
+			}
+			isPrevBacked = false
+			finstr += tokens[i].value
+		}
+		return [i + 1, { type: "string", value: finstr }]
 	}
 }
 

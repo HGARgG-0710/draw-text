@@ -91,9 +91,9 @@ export function validate(text, callback, validityCheck = isValid) {
 // * (can be easily achieved via '.indexesOf(...).length' - same algorithm, but more general, for unlimited types...);
 function countOccurrencesStr(string, sub) {
 	let counted = 0
-	out: for (let i = 0; i < string.length; i++) {
-		for (let j = 0; j < sub.length; j++) if (string[i + j] !== sub[j]) continue out
-		counted++
+	out: for (let i = 0; i < string.length; ++i) {
+		for (let j = 0; j < sub.length; ++j) if (string[i + j] !== sub[j]) continue out
+		++counted
 	}
 	return counted
 }

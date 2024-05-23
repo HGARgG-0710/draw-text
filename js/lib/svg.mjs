@@ -1,58 +1,28 @@
 // TODO: later, make this into a full-blown SVG-AST API, then publish as an NPM package...; [also, write a parser and a way to construct SVG from the AST]; [And the 'formatter' - done by means of parsing, then using the obtained AST to get the 'normalized' SVG];
-// ^ redo as a function-map...;
-// * Many of the features of SVG are excessive, and are thus not present in Draw-Text (as it's intended to be as minimalistic and compact as possible...);
+// * NOTE: Many of the features of SVG are excessive, and are thus not present in Draw-Text (as it's intended to be as minimalistic and compact as possible...); Thus, this is only an early sketch/prototype of whatever the SVG module would end up being...;
 
-import { getParam } from "../process/state/params.mjs"
+export function svgCode(tagName, signature) {
+	const attrsFunc = SvgAttributesString(signature)
+	return (attrs, children = []) =>
+		`<${tagName} ${attrsFunc(attrs)}>\n${svg(children)}\n</${tagName}>`
+}
 
-// ! TAKE OUT ALL THE 'value-correction' stuff into separate a module (how much one hates the API aspect of SVG - absolutely unworkable with...);
-export default function svg(tagNode) {
-	if (tagNode instanceof Array) return tagNode.map(svg).join("\n")
-	const { tag, attrs, children } = tagNode
-	const { stroke, fill } = attrs
-	// ! refactor these kinds of ternaries pray... [appear all the time...];
-	const lineJoin = getParam("line-join")
-	const lineJoinSVG = lineJoin === "r" ? "round" : lineJoin === "b" ? "bevel" : "mitter"
-	const lineCap = getParam("line-cap")
-	const lineCapSVG = lineCap === "r" ? "round" : lineCap === "b" ? "butt" : "square"
-	// ! NOTE: this actually includes all the temp params that have at least 2 different commands assigned (they ought to be changed...);
-	const omni = `${stroke ? ` stroke='${stroke}'` : ""} ${
-		fill ? ` fill='${fill}'` : ""
-	} stroke-linecap='${lineCapSVG}' stroke-width='${getParam(
-		"line-width"
-	)}' stroke-linejoin='${lineJoinSVG}' stroke-miterlimit='${getParam("miter-limit")}'`
-	switch (tag) {
-		case "circle":
-			const { center, radius } = attrs
-			return `<circle ${
-				center
-					? `${["x", "y"]
-							.map((t, i) => (center[i] ? ` c${t}='${center[i]}'` : ""))
-							.join(" ")}`
-					: ``
-			} ${radius ? ` r='${radius}'` : ""} ${omni}>\n${(children || [])
-				.map(svg)
-				.join("\n")}\n</circle>`
-		case "rect":
-			const { x, y, height, width } = attrs
-			return `<rect ${x ? ` x='${x}'` : ""} ${y ? ` y='${y}'` : ""} ${
-				height ? ` height='${height}'` : ""
-			} ${width ? ` width='${width}'` : ""} ${omni}>\n${(children || [])
-				.map(svg)
-				.join("\n")}\n</rect>`
-		case "polyline":
-			const { points } = attrs
-			return `<polyline ${
-				points ? ` points='${points.join(",")}'` : ""
-			}${omni}>\n${(children || []).map(svg).join("\n")}\n</polyline>`
-		// ! PROBLEM - the 'ellipse' functionality DOES NOT work with SVG properly - FIX THAT! Need much more testing (do later - this release has already taken a lot of time and effort...);
-		case "path":
-			const { d, pathLength, transform } = attrs
-			// TODO: later, GENERALIZE THIS - create a general interface for the attributes, so as not to have to create repetitious ternaries like these every single time... (generalize to a function, then define the desired SVG specs in terms of it...);
-			// TODO: generalize the switch for 'd'-parsing to an external function-map later...
-			// TODO: add more commands implementations for 'd'...;
-			return `<path${
-				d
-					? ` d='${d
+export const pairFill = (x) => Array(2).fill(x)
+
+export const svgMap = ((x) =>
+	[
+		[
+			"circle",
+			[["center", (t, i) => `c${i ? "y" : "x"}="${t}"`], ["radius", "r"], ...x]
+		],
+		["rect", [...["x", "y", "height", "width"].map(pairFill), ...x]],
+		["polyline", [pairFill("points").concat([(points) => points.join(",")]), ...x]],
+		[
+			"path",
+			[
+				pairFill("d").concat([
+					(d) =>
+						d
 							.map((c) => {
 								const { command, params } = c
 								switch (command) {
@@ -75,12 +45,59 @@ export default function svg(tagNode) {
 										return `${command} ${point.join(",")}`
 								}
 							})
-							.join("\n")}'`
+							.join("\n")
+				]),
+				pairFill("transform").concat([
+					(transform) =>
+						transform
+							.map((x) => `${x.transform}(${x.args.join(" ")})`)
+							.join(" ")
+				]),
+				...x
+			]
+		],
+		["text", [...["x", "y", "paint-order"].map(pairFill), ...x]],
+		["style", []]
+	].reduce(
+		(prev, curr) => ({ ...prev, ...((x, y) => ({ [x]: svgCode(x, y) }))(...curr) }),
+		{}
+	))(
+	[
+		"stroke",
+		"fill",
+		"stroke-linecap",
+		"stroke-width",
+		"stroke-linejoin",
+		"stroke-miterlimit",
+		"style"
+	].map(pairFill)
+)
+
+// ! CREATE ANOTHER LAYER FOR PASSING THE 'svgParams' VALUES AS ARGUMENTS TO 'svg'!
+// * TO ADD:
+// 1. line-join -> stroke-linejoin (r->round, b->bevel, m->mitter)
+// 2. line-cap -> stroke-linecap (r->round, b->butt, s->square)
+// 3. miter-limit -> stroke-miterlimit
+// 4. line-width -> stroke-width
+export default function svg(tagNode) {
+	if (!tagNode) return ""
+	if (!(tagNode instanceof Object)) return tagNode
+	if (tagNode instanceof Array) return tagNode.map(svg).join("\n")
+	const { tag, attrs, children } = tagNode
+	return svgMap[tag](attrs, children)
+}
+
+export function SvgAttributesString(signature) {
+	return (attrs) =>
+		signature
+			.map((x) =>
+				attrs[x[0]] != undefined
+					? typeof x[1] === "function"
+						? attrs[x[0]].map(x[1] || ((x) => x))
+						: `${x[1]}="${(x[2] || ((x) => x))(attrs[x[0]])}"`
 					: ""
-			}${pathLength ? ` pathLength='${pathLength}'` : ""}${
-				transform && transform.length
-					? ` transform='${transform.map((x) => `${x[0]}(${x[1].join(" ")})`)}'`
-					: ""
-			}${omni}>\n${(children || []).map(svg).join("\n")}\n</path>`
-	}
+			)
+			.flat()
+			.filter((x) => x && x.length)
+			.join(" ")
 }

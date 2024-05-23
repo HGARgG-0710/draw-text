@@ -1,11 +1,9 @@
-// TODO: later, refactor this parser using the parser library of one's own...;
-// ? This 'findSegments' is a good addition to the library in question...; Also - consider index-passing-based parsing (one, where one of inputs is an index, and so is one of outputs...);
-// ? Add a 'regex' module to it?
+// TODO: this division of 'syntax-parser' is very messy - the SYNTAX CHECKS and PARSING should be conducted using THE SAME API, not separate ones...;
+// ? Think of how to solve the problem generally interface-wise...;
 
 import { and, or, occurences, begin, end, nlookbehind } from "../lib/regex.mjs"
-import { paramsList } from "../process/state/params.mjs"
+import { canvasParams } from "../process/state/params.mjs"
 
-// ! Fix that somehow... [a proper typesystem is in order, less chaotic];
 export const validityMap = {
 	background: "colorarg",
 	variable: "vararg",
@@ -20,11 +18,13 @@ export const validityMap = {
 	"draw-points": "boolarg",
 	"point-size": "vardecimal",
 	"point-shape": "pointshapearg",
-	"base-color": "varcolor"
+	"base-color": "varcolor",
+	"fill-text": "fontarg",
+	"stroke-text": "fontarg",
+	"font-load": "duostring"
 }
 
 // ^ IDEA: create a module for working with regexp tables [note: they could be used to construct the 'parser-type-recognition-tables' for parsers created by one of self's currently developed libraries...];
-// TODO: refactor these... [lots of repetition...];
 
 const reg = {
 	arrow: /->/,
@@ -37,7 +37,9 @@ const reg = {
 	tab: /\t/,
 	spacebar: / /,
 	comma: /,/,
-	hyphen: /-/
+	hyphen: /-/,
+	quote: /"/,
+	wild: /.*/
 }
 
 // ! later, use some properly defined alias space instead of something particular like this (math-expressions.js);
@@ -47,10 +49,14 @@ function r(...args) {
 
 const regfun = {
 	variable: (...x) => or(...r(...x, "varname")),
-	brackets: (...x) => and(reg.opbrack, ...x, reg.clbrack)
+	brackets: (...x) => and(reg.opbrack, ...x, reg.clbrack),
+	quotes: (...x) => and(reg.quote, ...x, reg.quote)
 }
 
-// ? More semantic subdivisions? Some of these things are types/command-arguments, while some are mere tokens. There should be separation...;
+export function finarrre(array) {
+	return or(...array.map((x) => new RegExp(x)))
+}
+
 export const regexps = {
 	arrow: reg.arrow,
 	vardecimal: regfun.variable("decimal"),
@@ -66,10 +72,11 @@ export const regexps = {
 		)
 	),
 	decimal: end(begin(reg.decimal)),
-	// TODO: refactor these... [a 'finiteArrayRegExp']
-	caparg: or(/b/, /r/, /s/),
-	boolarg: or(/true/, /false/),
-	pointshapearg: or(/rect/, /circ/)
+	// TODO: TAKE THESE FIN-ARRAYS OUT OF HERE [connect with the 'params' typesystem...];
+	caparg: finarrre(["b", "r", "s"]),
+	boolarg: finarrre(["true", "false"]),
+	pointshapearg: finarrre(["rect", "circ"]),
+	string: regfun.quotes(reg.wild)
 }
 
 regexps.triple = and(
@@ -82,6 +89,9 @@ regexps.triple = and(
 		occurences(0, 1)(and(...r("comma", "space"), regexps.varcolor))
 	)
 )
+
+regexps.vartriple = or(reg.varname, regexps.triple)
+regexps.varstring = or(reg.varname, regexps.string)
 
 regexps.colorarg = and(reg.space, regexps.varcolor, reg.space)
 regexps.colorarrowStrict = and(...r("arrow", "space"), regfun.brackets(regexps.varcolor))
@@ -121,21 +131,37 @@ regexps.argseq = occurences(
 )(
 	and(
 		reg.space,
-		regexps.triple,
+		regexps.vartriple,
 		reg.space,
 		occurences(0, 1)(or(...["elliptic", "colorarrow"].map((x) => regexps[x])))
 	)
 )
 
+regexps.fontarg = and(
+	regexps.varstring,
+	reg.space,
+	regexps.varstring,
+	reg.space,
+	regexps.vartriple
+)
+
+regexps.duostring = and(regexps.varstring, reg.space, regexps.varstring)
+
 // ^ IDEA: add a special category of commands - 'set'-commands; They'd be defined DIRECTLY by the 'params', and each have a given signature; This would free one from having to add them manually into the parser...;
-export const [connectionCommands, singleCommands, pairCommands] = [
+export const [connectionCommands, singleCommands, pairCommands, fontCommands] = [
 	["contour", "fill", "clear", "erase"],
 	[],
-	["variable", "set-param"]
+	["variable", "set-param"],
+	["stroke-text", "fill-text", "font-load"]
 ].map((x) => new Set(x))
 
-paramsList.forEach((x) => singleCommands.add(x))
+canvasParams.list().forEach((x) => singleCommands.add(x))
 
-export const commandList = [connectionCommands, singleCommands, pairCommands]
+export const commandList = [
+	connectionCommands,
+	singleCommands,
+	pairCommands,
+	fontCommands
+]
 	.map((x) => Array.from(x))
-	.flat()
+	.reduce((prev, curr) => prev.concat(curr), [])

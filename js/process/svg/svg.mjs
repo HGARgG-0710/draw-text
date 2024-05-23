@@ -1,11 +1,9 @@
-// ! PROBLEM: does not yet support multiple files...; fix.fix.fix.
-
 import { arcNextPoint } from "../../lib/svg-values.mjs"
 import { canvas } from "../canvas/draw.mjs"
 import { substitute } from "../state/vars.mjs"
-import { getParam } from "../state/params.mjs"
+import { svgParams } from "../state/params.mjs"
 import svg from "../../lib/svg.mjs"
-import { replaceBackground, colour } from "../../lib/lib.mjs"
+import { replaceColourBackground, colour } from "../../lib/lib.mjs"
 import { arcData, xy } from "./lib.mjs"
 import { rectData } from "../../lib/math.mjs"
 import { svgColour } from "../../lib/colors.mjs"
@@ -18,10 +16,10 @@ const commandpair = ([command, params]) => ({
 const tag = (tagName, attrs, children) => ({ tag: tagName, attrs, children })
 
 function svgPoint(x, y, colour) {
-	if (getParam("draw-points")) {
-		const size = getParam("point-size")
+	if (svgParams.get("draw-points")) {
+		const size = svgParams.get("point-size")
 		return tag(
-			...(getParam("point-shape") === "rect"
+			...(svgParams.get("point-shape") === "rect"
 				? [
 						"rect",
 						{
@@ -43,10 +41,33 @@ function svgPoint(x, y, colour) {
 
 const isPresent = (x) => x && x[0]
 
+const frequentParams = () => ({
+	"stroke-linejoin": ((x) => (x === "r" ? "round" : x === "b" ? "bevel" : "mitter"))(
+		svgParams.get("line-join")
+	),
+	"stroke-linecap": ((x) => (x === "r" ? "round" : x === "b" ? "butt" : "square"))(
+		svgParams.get("line-cap")
+	),
+	"stroke-miterlimit": svgParams.get("miter-limit"),
+	"stroke-width": svgParams.get("line-width")
+})
+
+const colourReplacement = (name) =>
+	function (argline) {
+		const { points, connections } = argline
+		const { arrows, elliptics } = connections
+		return svgAST(
+			replaceColourBackground(name)(svgParams.get("background"))(
+				points,
+				arrows,
+				elliptics
+			)
+		)
+	}
+
 const ASTmap = {
-	// ? Refactor? ['contour' and 'fill' look VEEE-E-E-ERY similar...];
 	contour: function (points, arrows, elliptics) {
-		const baseColour = getParam("base-color")
+		const baseColour = svgParams.get("base-color")
 		const svgPoints = points.map((point, i) =>
 			elliptics[i][0]
 				? arcData(points, elliptics, i).startPoint
@@ -54,6 +75,8 @@ const ASTmap = {
 				? arcData(points, elliptics, i).nextPoint
 				: point
 		)
+		const { points, connections } = argline
+		const { arrows, elliptics } = connections
 		return svgPoints
 			.reduce((prev, curr, i) => {
 				const elPres = isPresent(elliptics[i])
@@ -88,7 +111,8 @@ const ASTmap = {
 								? [["rotation", [ad.rotationAngle, ...ad.center]]]
 								: [],
 							fill: "none",
-							stroke
+							stroke,
+							...frequentParams()
 						}),
 					svgPoint(...points[i])
 				])
@@ -103,6 +127,8 @@ const ASTmap = {
 				? arcData(points, elliptics, i - 1).rotatedEnd
 				: point
 		)
+		const { points, connections } = argline
+		const { arrows, elliptics } = connections
 		return {
 			tag: "path",
 			attrs: {
@@ -134,38 +160,56 @@ const ASTmap = {
 						? [commandpair(["M", { point: xy(svgPoints[0]) }])]
 						: []
 				),
-				fill: colour(points, elliptics)
+				fill: colour(points, elliptics),
+				...frequentParams()
 			}
 		}
 	},
-	// ? refactor further? [exactly same];
-	clear: function (points, arrows, elliptics, background) {
-		return svgAST(replaceBackground("contour")(background)(points, arrows, elliptics))
+	clear: colourReplacement("contour"),
+	erase: colourReplacement("fill"),
+	"stroke-text": function (argline) {
+		const [text, font, point] = argline
+		return tag(
+			"text",
+			{
+				style: `font: "${font}"`,
+				stroke: point[2],
+				fill: "none",
+				"paint-order": "stroke",
+				x: point[0] || 0,
+				y: point[1] || 0,
+				...frequentParams()
+			},
+			[text]
+		)
 	},
-	erase: function (points, arrows, elliptics, background) {
-		return svgAST(replaceBackground("fill")(background)(points, arrows, elliptics))
+	"fill-text": function (argline) {
+		const [text, font, point] = argline
+		return tag(
+			"text",
+			{
+				style: `font: "${font}"`,
+				stroke: "none",
+				fill: point[2],
+				x: point[0] || 0,
+				y: point[1] || 0,
+				...frequentParams()
+			},
+			[text]
+		)
 	},
-	background: function (fill) {
-		const { width, height } = canvas
-		return tag("rect", {
-			x: 0,
-			y: 0,
-			width,
-			height,
-			fill
-		})
+	// ! NOTE: important -- the thing in question REQUIRES for the font-files to later be exported with the thing [SO: when one downloads the file, one must ALSO download the font-files];
+	"font-load": function (argline) {
+		const [fontName, fontUrl] = argline
+		return tag("style", {}, [
+			`@font-face {\n\tfont-family: "${fontName}";\n\tsrc: url(${fontUrl});\n}`
+		])
 	}
 }
 
 export function svgAST(expression) {
 	const { command, argline } = substitute(expression)
-	if (!(command in ASTmap)) return []
-	// TODO: create a separate class for special signatures (the direct '...argline')
-	if (command === "background") return ASTmap[command](...argline)
-	const { points, connections } = argline
-	const { arrows, elliptics } = connections
-	const background = getParam("background")
-	return ASTmap[command](points, arrows, elliptics, background)
+	return command in ASTmap ? ASTmap[command](argline) : []
 }
 
 export function tosvg(expression) {

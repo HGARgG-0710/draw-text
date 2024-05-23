@@ -1,20 +1,19 @@
-import { paramsList } from "../state/params.mjs"
-import process from "../canvas/process.mjs"
+import { vars } from "../state/vars.mjs"
+import { svgParams } from "../state/params.mjs"
 import { tosvg } from "./svg.mjs"
 
-// ! PROBLEM - the 'vars' and 'params' for 'SVG' and 'Canvas' ought to be different - the SVG's "background", for instance, causes the Canvas' background to change as well...;
+// ? [potential] PROBLEM - the 'vars' for 'SVG' and 'Canvas' ought to be different - the SVG's "background", for instance, causes the Canvas' background to change as well...;
 export function svgProcess(expression) {
 	const { command, argline } = expression
-	if (["set-param", "variable"].includes(command) || paramsList.includes(command)) {
-		// ! THIS CHECK IS BAD! [one should create a general mechanism for creating separate 'params' systems - not this unity...];
-		if (
-			!(command === "set-param" && argline[0] === "background") &&
-			command != "background"
+	const isParam = svgParams.list().includes(command)
+	if (["set-param", "variable"].includes(command) || isParam) {
+		const [name, value] = argline
+		if (isParam)
+			return svgProcess({ command: "set-param", argline: [command, ...argline] })
+		return (command === "set-param" ? svgParams.set : vars.set.bind(vars))(
+			name,
+			parseSingle(svgParams)(value)
 		)
-			process(expression)
-		if (command === "variable") return ""
-		if (command === "set-param")
-			return svgProcess({ command: argline[0], argline: argline.slice(1) })
 	}
 	return tosvg(expression)
 }

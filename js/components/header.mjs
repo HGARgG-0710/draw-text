@@ -14,10 +14,9 @@ export class header extends HTMLElement {
 		super()
 	}
 	connectedCallback() {
-		const _append = append(this)
-
-		const pagetop = _append(attribute(create("div"))("id", "pagetop"))
-		const pagename = _append(attribute(create("div"))("id", "pagename"))
+		const [pagetop, pagename] = ["top", "name"].map((x) =>
+			append(this)(attribute(create("div"))("id", `page${x}`))
+		)
 
 		// * the GitHub repo area-clickable;
 		append(pagetop)(
@@ -48,7 +47,7 @@ export class header extends HTMLElement {
 		)
 
 		// * The reference to my page
-		// TODO: once personal website complete, CHANGE!
+		// TODO: once personal website complete, CHANGE REFERENCE!
 		append(pagetop)(
 			appendpar(
 				attribute(
@@ -70,9 +69,7 @@ export class header extends HTMLElement {
 		// * The copyright
 		append(pagetop)(
 			appendpar(attribute(create("div"))("id", "pagetop-end"))(
-				appendpar(create("p"))(
-					document.createTextNode("\u00A9 Igor Kuznetsov, 2024")
-				)
+				appendpar(create("p"))(text("\u00A9 Igor Kuznetsov, 2024"))
 			)
 		)
 

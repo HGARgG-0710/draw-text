@@ -1,6 +1,8 @@
+import { fontFiles } from "../../activation.mjs"
 import { colour, currpair, drawReplaceBackground } from "../../lib/lib.mjs"
 import { ellipseData, rectData, toRadians } from "../../lib/math.mjs"
-import { getParam } from "../state/params.mjs"
+import { loadFont } from "../state/fonts.mjs"
+import { canvasParams } from "../state/params.mjs"
 
 export const canvas = document.querySelector("canvas")
 export const context = canvas.getContext("2d")
@@ -8,8 +10,11 @@ context.globalCompositeOperation = "source-over"
 
 // ^ IDEA: create a new parameter - 'point-cover' with values 'true/false' (default: false); If set to true, then the points shall be drawn before the connections;
 const drawMap = {
-	contour: function (points, arrows, elliptics) {
-		const baseColour = getParam("base-color")
+	contour: function (argline) {
+		const { points, connections } = argline
+		const { arrows, elliptics } = connections ? connections : {}
+
+		const baseColour = canvasParams.get("base-color")
 		let fillStyle = null
 		let strokeStyle = null
 		// * drawing the connections
@@ -30,7 +35,10 @@ const drawMap = {
 			drawPoint(...points[key])
 		}
 	},
-	fill: function (points, arrows, elliptics) {
+	fill: function (argline) {
+		const { points, connections } = argline
+		const { arrows, elliptics } = connections ? connections : {}
+
 		let lastElliptic = false
 
 		context.fillStyle = colour(points, elliptics)
@@ -46,10 +54,42 @@ const drawMap = {
 		context.closePath()
 		context.fill()
 	},
-	clear: (points, arrows, elliptics, background) =>
-		drawReplaceBackground("contour")(background)(points, arrows, elliptics),
-	erase: (points, arrows, elliptics, background) =>
-		drawReplaceBackground("fill")(background)(points, arrows, elliptics)
+	clear: (argline) => {
+		const background = canvasParams.get("background")
+		const { points, connections } = argline
+		const { arrows, elliptics } = connections ? connections : {}
+		return drawReplaceBackground("contour")(background)(points, arrows, elliptics)
+	},
+	erase: (argline) => {
+		const background = canvasParams.get("background")
+		const { points, connections } = argline
+		const { arrows, elliptics } = connections ? connections : {}
+		return drawReplaceBackground("fill")(background)(points, arrows, elliptics)
+	},
+	"stroke-text": function (argline) {
+		const [text, font, point] = argline
+		const lastColour = context.strokeStyle
+		context.strokeStyle = point[2] || canvasParams.get("base-color")
+		// ! defaults...
+		context.font = font
+		// ? create a 'default-point' parameter (one that is used when the required 'point' parameter is ommited?); A default of the parameter is [0, 0];
+		context.strokeText(text, ...(point || [0, 0]).slice(0, 2))
+		context.strokeStyle = lastColour
+	},
+	"fill-text": function (argline) {
+		const [text, font, point] = argline
+		const lastColour = context.strokeStyle
+		context.strokeStyle = point[2] || canvasParams.get("base-color")
+		// todo: add the defaults:
+		context.font = font
+		// ? create a 'default-point' parameter (one that is used when the required 'point' parameter is ommited?); A default of the parameter is [0, 0];
+		context.fillText(text, ...(point || [0, 0]).slice(0, 2))
+		context.strokeStyle = lastColour
+	},
+	"font-load": function (argline) {
+		const [fontName, fontUrl] = argline
+		loadFont(fontName, fontUrl, files(fontFiles))
+	}
 }
 
 context.imageSmoothingEnabled = false
@@ -69,10 +109,8 @@ function ellipse(points, elliptics, key) {
 }
 
 export function drawPoint(x, y) {
-	if (getParam("draw-points")) {
-		const [size, shape] = ["point-size", "point-shape"].map((param) =>
-			getParam(param)
-		)
+	if (canvasParams.get("draw-points")) {
+		const [size, shape] = ["point-size", "point-shape"].map(canvasParams.get)
 		switch (shape) {
 			case "circ":
 				const path = new Path2D()
@@ -87,15 +125,10 @@ export function drawPoint(x, y) {
 }
 
 export default function draw(primitive) {
-	const background = getParam("background")
 	if (primitive) {
 		const { command } = primitive
-
 		const { argline } = primitive
-		const { points, connections } = argline
-		const { arrows, elliptics } = connections ? connections : {}
-
-		if (points.length) drawMap[command](points, arrows, elliptics, background)
+		if (points.length) drawMap[command](argline)
 	}
 }
 export function clear() {
