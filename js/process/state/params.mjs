@@ -1,5 +1,7 @@
 import { black, white } from "../../lib/colors.mjs"
+import svg from "../../lib/svg.mjs"
 import { canvas, context } from "../canvas/draw.mjs"
+import { tag } from "../svg/svg.mjs"
 
 export function Parameters(initial, toDefault, absence = () => {}) {
 	function Parameter(name, _default, typedef, processor) {
@@ -12,8 +14,7 @@ export function Parameters(initial, toDefault, absence = () => {}) {
 			const param = params.get(paramName)
 			if (param[1](value)) {
 				param[0] = value
-				if (typeof param[2] === "function" && context)
-					return param[2].call(context, value)
+				if (typeof param[2] === "function") return param[2].call(context, value)
 				return absence.call(context, value)
 			}
 		}
@@ -110,13 +111,15 @@ export const svgParams = Parameters(
 			() => true,
 			function (fill) {
 				const { width, height } = canvas
-				return tag("rect", {
-					x: 0,
-					y: 0,
-					width,
-					height,
-					fill
-				})
+				return svg(
+					tag("rect", {
+						x: 0,
+						y: 0,
+						width,
+						height,
+						fill
+					})
+				)
 			}
 		],
 		["line-width", 1, (x) => typeof x === "number"],

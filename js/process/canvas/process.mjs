@@ -11,7 +11,7 @@ export default function canvasProcess(expression, context = drawcontext) {
 			const [name, value] = argline
 			return (command === "set-param" ? canvasParams.set : vars.set.bind(vars))(
 				name,
-				parseSingle(canvasParams)(value),
+				parseSingle(value),
 				context
 			)
 		default:

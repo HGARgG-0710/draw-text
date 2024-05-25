@@ -13,6 +13,7 @@ export const tokens = {
 	opbrack: /\(/,
 	clbrack: /\)/,
 	quote: /"/,
+	whitespace: /\t| /,
 	symbol: /./
 }
 
@@ -23,17 +24,14 @@ export const parserTable = {
 		const isEnd = tokens.length <= i
 		let vals = []
 		++i
-		let lastComma = true
 		while (tokens[i] && tokens[i].type !== "clbrack") {
-			if (!lastComma) {
-				lastComma = true
+			if (tokens[i].type === "comma") {
 				++i
 				continue
 			}
 			const pair = parser(tokens, i, i + 1)
 			i = pair[0]
-			vals = vals.concat(pair[1])
-			lastComma = false
+			vals = vals.concat(pair[1].map((x) => x.value))
 		}
 		return [i + 1, isEnd ? [] : [{ type: "point", value: vals }]]
 	},
@@ -75,6 +73,9 @@ export const parserTable = {
 			finstr += tokens[i].value
 		}
 		return [i + 1, { type: "string", value: finstr }]
+	},
+	whitespace: function (tokens, i) {
+		return [i + 1, []]
 	}
 }
 

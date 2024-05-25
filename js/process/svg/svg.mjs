@@ -13,7 +13,7 @@ const commandpair = ([command, params]) => ({
 	params
 })
 
-const tag = (tagName, attrs, children) => ({ tag: tagName, attrs, children })
+export const tag = (tagName, attrs, children) => ({ tag: tagName, attrs, children })
 
 function svgPoint(x, y, colour) {
 	if (svgParams.get("draw-points")) {
@@ -66,7 +66,9 @@ const colourReplacement = (name) =>
 	}
 
 const ASTmap = {
-	contour: function (points, arrows, elliptics) {
+	contour: function (argline) {
+		const { points, connections } = argline
+		const { arrows, elliptics } = connections
 		const baseColour = svgParams.get("base-color")
 		const svgPoints = points.map((point, i) =>
 			elliptics[i][0]
@@ -75,8 +77,6 @@ const ASTmap = {
 				? arcData(points, elliptics, i).nextPoint
 				: point
 		)
-		const { points, connections } = argline
-		const { arrows, elliptics } = connections
 		return svgPoints
 			.reduce((prev, curr, i) => {
 				const elPres = isPresent(elliptics[i])
@@ -119,7 +119,9 @@ const ASTmap = {
 			}, [])
 			.filter((x) => x)
 	},
-	fill: function (points, arrows, elliptics) {
+	fill: function (argline) {
+		const { points, connections } = argline
+		const { arrows, elliptics } = connections
 		const svgPoints = points.map((point, i) =>
 			elliptics[i][0]
 				? arcData(points, elliptics, i).rotatedStart
@@ -127,8 +129,6 @@ const ASTmap = {
 				? arcData(points, elliptics, i - 1).rotatedEnd
 				: point
 		)
-		const { points, connections } = argline
-		const { arrows, elliptics } = connections
 		return {
 			tag: "path",
 			attrs: {
@@ -160,7 +160,7 @@ const ASTmap = {
 						? [commandpair(["M", { point: xy(svgPoints[0]) }])]
 						: []
 				),
-				fill: colour(points, elliptics),
+				fill: colour(svgParams)(points, elliptics),
 				...frequentParams()
 			}
 		}
@@ -172,7 +172,7 @@ const ASTmap = {
 		return tag(
 			"text",
 			{
-				style: `font: "${font}"`,
+				style: `font: ${font}`,
 				stroke: point[2],
 				fill: "none",
 				"paint-order": "stroke",
@@ -188,7 +188,7 @@ const ASTmap = {
 		return tag(
 			"text",
 			{
-				style: `font: "${font}"`,
+				style: `font: ${font}`,
 				stroke: "none",
 				fill: point[2],
 				x: point[0] || 0,
@@ -198,11 +198,10 @@ const ASTmap = {
 			[text]
 		)
 	},
-	// ! NOTE: important -- the thing in question REQUIRES for the font-files to later be exported with the thing [SO: when one downloads the file, one must ALSO download the font-files];
 	"font-load": function (argline) {
 		const [fontName, fontUrl] = argline
 		return tag("style", {}, [
-			`@font-face {\n\tfont-family: "${fontName}";\n\tsrc: url(${fontUrl});\n}`
+			`@font-face {\n\tfont-family: "${fontName}";\n\tsrc: url("${fontUrl}");\n}`
 		])
 	}
 }

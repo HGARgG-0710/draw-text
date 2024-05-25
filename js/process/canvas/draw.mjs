@@ -1,4 +1,4 @@
-import { fontFiles } from "../../activation.mjs"
+import { fontFiles, files } from "../../activation.mjs"
 import { colour, currpair, drawReplaceBackground } from "../../lib/lib.mjs"
 import { ellipseData, rectData, toRadians } from "../../lib/math.mjs"
 import { loadFont } from "../state/fonts.mjs"
@@ -13,82 +13,90 @@ const drawMap = {
 	contour: function (argline) {
 		const { points, connections } = argline
 		const { arrows, elliptics } = connections ? connections : {}
+		if (points.length) {
+			const baseColour = canvasParams.get("base-color")
+			let fillStyle = null
+			let strokeStyle = null
+			// * drawing the connections
+			for (const key of Array.from(points.keys())) {
+				context.beginPath()
+				strokeStyle = context.strokeStyle =
+					arrows[key][1] || elliptics[key][2] || strokeStyle || baseColour
+				if (arrows[key][0]) {
+					context.moveTo(...points[key])
+					line(points, key)
+				} else if (elliptics[key][0]) ellipse(points, elliptics, key)
 
-		const baseColour = canvasParams.get("base-color")
-		let fillStyle = null
-		let strokeStyle = null
-		// * drawing the connections
-		for (const key of Array.from(points.keys())) {
-			context.beginPath()
-			strokeStyle = context.strokeStyle =
-				arrows[key][1] || elliptics[key][2] || strokeStyle || baseColour
-			if (arrows[key][0]) {
-				context.moveTo(...points[key])
-				line(points, key)
-			} else if (elliptics[key][0]) ellipse(points, elliptics, key)
-
-			context.stroke()
-		}
-		// * drawing the points;
-		for (const key of Array.from(points.keys())) {
-			fillStyle = context.fillStyle = points[key][2] || fillStyle || baseColour
-			drawPoint(...points[key])
+				context.stroke()
+			}
+			// * drawing the points;
+			for (const key of Array.from(points.keys())) {
+				fillStyle = context.fillStyle = points[key][2] || fillStyle || baseColour
+				drawPoint(...points[key])
+			}
 		}
 	},
 	fill: function (argline) {
 		const { points, connections } = argline
 		const { arrows, elliptics } = connections ? connections : {}
+		if (points.length) {
+			let lastElliptic = false
 
-		let lastElliptic = false
-
-		context.fillStyle = colour(points, elliptics)
-		context.beginPath()
-		for (const key of Array.from(points.keys())) {
-			if (elliptics[key][0]) {
-				ellipse(points, elliptics, key)
-				lastElliptic = true
-				continue
+			context.fillStyle = colour(canvasParams)(points, elliptics)
+			context.beginPath()
+			for (const key of Array.from(points.keys())) {
+				if (elliptics[key][0]) {
+					ellipse(points, elliptics, key)
+					lastElliptic = true
+					continue
+				}
+				if (!lastElliptic || arrows[key][0]) line(points, key)
 			}
-			if (!lastElliptic || arrows[key][0]) line(points, key)
+			context.closePath()
+			context.fill()
 		}
-		context.closePath()
-		context.fill()
 	},
 	clear: (argline) => {
 		const background = canvasParams.get("background")
 		const { points, connections } = argline
 		const { arrows, elliptics } = connections ? connections : {}
-		return drawReplaceBackground("contour")(background)(points, arrows, elliptics)
+		if (points.length)
+			return drawReplaceBackground("contour")(background)(points, arrows, elliptics)
 	},
 	erase: (argline) => {
 		const background = canvasParams.get("background")
 		const { points, connections } = argline
 		const { arrows, elliptics } = connections ? connections : {}
-		return drawReplaceBackground("fill")(background)(points, arrows, elliptics)
+		if (points.length)
+			return drawReplaceBackground("fill")(background)(points, arrows, elliptics)
 	},
 	"stroke-text": function (argline) {
-		const [text, font, point] = argline
-		const lastColour = context.strokeStyle
-		context.strokeStyle = point[2] || canvasParams.get("base-color")
-		// ! defaults...
-		context.font = font
-		// ? create a 'default-point' parameter (one that is used when the required 'point' parameter is ommited?); A default of the parameter is [0, 0];
-		context.strokeText(text, ...(point || [0, 0]).slice(0, 2))
-		context.strokeStyle = lastColour
+		document.fonts.ready.then(() => {
+			const [text, font, point] = argline
+			const lastColour = context.strokeStyle
+			context.strokeStyle = (point && point[2]) || canvasParams.get("base-color")
+			// ! defaults ['default-font', same as 'fill-text'];
+			context.font = font
+			// ? create a 'default-point' parameter (one that is used when the required 'point' parameter is ommited?); A default of the parameter is [0, 0];
+			context.strokeText(text, ...(point || [0, 0]).slice(0, 2))
+			context.strokeStyle = lastColour
+		})
 	},
 	"fill-text": function (argline) {
-		const [text, font, point] = argline
-		const lastColour = context.strokeStyle
-		context.strokeStyle = point[2] || canvasParams.get("base-color")
-		// todo: add the defaults:
-		context.font = font
-		// ? create a 'default-point' parameter (one that is used when the required 'point' parameter is ommited?); A default of the parameter is [0, 0];
-		context.fillText(text, ...(point || [0, 0]).slice(0, 2))
-		context.strokeStyle = lastColour
+		document.fonts.ready.then(() => {
+			const [text, font, point] = argline
+			const lastColour = context.strokeStyle
+			context.fillStyle = (point && point[2]) || canvasParams.get("base-color")
+			// todo: add the defaults [as a parameter];
+			context.font = font
+			// ? create a 'default-point' parameter (one that is used when the required 'point' parameter is ommited?); A default of the parameter is [0, 0];
+			context.fillText(text, ...(point || [0, 0]).slice(0, 2))
+			context.fillStyle = lastColour
+		})
 	},
-	"font-load": function (argline) {
+	"font-load": async function (argline) {
 		const [fontName, fontUrl] = argline
-		loadFont(fontName, fontUrl, files(fontFiles))
+		await loadFont(fontName, fontUrl, files(fontFiles))
 	}
 }
 
@@ -126,9 +134,8 @@ export function drawPoint(x, y) {
 
 export default function draw(primitive) {
 	if (primitive) {
-		const { command } = primitive
-		const { argline } = primitive
-		if (points.length) drawMap[command](argline)
+		const { command, argline } = primitive
+		drawMap[command](argline)
 	}
 }
 export function clear() {

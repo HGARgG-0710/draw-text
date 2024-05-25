@@ -27,8 +27,8 @@ export const currpair = (points, i) => [0, 1].map((k) => points[(i + k) % points
 
 export const Primitive = (points, connections) => ({ points, connections })
 
-export const colour = (points, elliptics) =>
+export const colour = (params) => (points, elliptics) =>
 	points
 		.map((x, i) => (x[2] ? x[2] : elliptics[i][2]))
 		.reduce((acc, curr) => (acc ? acc : curr ? curr : null), null) ||
-	svgParams.get("base-color")
+	params.get("base-color")

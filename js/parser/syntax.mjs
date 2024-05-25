@@ -65,12 +65,6 @@ export const regexps = {
 		...r("arrow", "space"),
 		occurences(0, 1)(regfun.brackets(regfun.variable("color")))
 	),
-	vararg: occurences(1)(
-		and(
-			...r("varname", "space", "spacebar", "space"),
-			regfun.variable("color", "decimal")
-		)
-	),
 	decimal: end(begin(reg.decimal)),
 	// TODO: TAKE THESE FIN-ARRAYS OUT OF HERE [connect with the 'params' typesystem...];
 	caparg: finarrre(["b", "r", "s"]),
@@ -87,6 +81,13 @@ regexps.triple = and(
 		...r("space", "comma", "space"),
 		regexps.vardecimal,
 		occurences(0, 1)(and(...r("comma", "space"), regexps.varcolor))
+	)
+)
+
+regexps.vararg = occurences(1)(
+	and(
+		...r("spacebar", "varname", "space", "spacebar"),
+		or(regfun.variable("color", "decimal"), regexps.triple)
 	)
 )
 

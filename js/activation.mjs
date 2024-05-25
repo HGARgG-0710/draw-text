@@ -9,7 +9,8 @@ import {
 	query,
 	attribute,
 	mquery,
-	prop
+	prop,
+	downloadGeneral
 } from "./lib/components.mjs"
 import parse, { validate, validateNumber } from "./parser/main.mjs"
 import process from "./process/canvas/process.mjs"
@@ -17,6 +18,8 @@ import { clear, canvas, context } from "./process/canvas/draw.mjs"
 import { svgURI } from "./process/svg/uri.mjs"
 import { download } from "./lib/components.mjs"
 import { canvasParams } from "./process/state/params.mjs"
+
+export const files = (x) => Array.from(query(x)("input[type='file']").files)
 
 const [imgExt, codeElem, downloadButton] = ["img-format", "code", "download-button"]
 	.map((x) => `#${x}`)
@@ -102,15 +105,24 @@ const mimeMap = {
 	webp: "image/webp"
 }
 
-export const files = (x) => Array.from(query(x)("input[type='file']").files)
-
-// TODO: BUG - for whatever reason, pressing the 'download' button for 'svg' causes the image on the canvas to vanish...;
 downloadButton.addEventListener("click", async (_event) => {
 	const ext = imgExt.value
 	const isSVG = ext === "svg"
-	// ? [later] make ternary conditional into a function-map? [possibly, add the '.avif' support later...];
+	if (isSVG) {
+		let i = 0
+		const reader = new FileReader()
+		const readFonts = []
+		reader.onload = function (event) {
+			readFonts.push(reader.result)
+			++i
+			if (i === fonts.length)
+				fonts.forEach((x, i) => downloadGeneral(() => x.name)(readFonts[i]))
+		}
+		const fonts = files(fontFiles)
+		fonts.forEach((x) => reader.readAsDataURL(x))
+	}
+	// ? possibly, add the '.avif' support later
 	download(
-		ext,
 		isSVG
 			? svgURI(
 					validate(
@@ -122,6 +134,7 @@ downloadButton.addEventListener("click", async (_event) => {
 					)
 			  )
 			: canvas.toDataURL(ext in mimeMap ? mimeMap[ext] : "image/png"),
+		ext,
 		isSVG
 	)
 })
@@ -147,7 +160,7 @@ const filesOut = (fileList) =>
 		imgout(lastText)
 	}
 
-;[preFiles, postFiles].forEach((fileList) => {
+filelists.forEach((fileList) => {
 	const input = query(fileList)("input[type='file']")
 	filesOut(fileList)(input)
 	input.addEventListener("change", function (event) {

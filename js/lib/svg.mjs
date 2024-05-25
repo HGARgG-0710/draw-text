@@ -73,12 +73,6 @@ export const svgMap = ((x) =>
 	].map(pairFill)
 )
 
-// ! CREATE ANOTHER LAYER FOR PASSING THE 'svgParams' VALUES AS ARGUMENTS TO 'svg'!
-// * TO ADD:
-// 1. line-join -> stroke-linejoin (r->round, b->bevel, m->mitter)
-// 2. line-cap -> stroke-linecap (r->round, b->butt, s->square)
-// 3. miter-limit -> stroke-miterlimit
-// 4. line-width -> stroke-width
 export default function svg(tagNode) {
 	if (!tagNode) return ""
 	if (!(tagNode instanceof Object)) return tagNode

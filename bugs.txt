@@ -1,0 +1,16 @@
+KNOWN BUGS LIST [fixes to be implemented sometime later]: 
+
+1. Impossible to use more than one weight for a given font.
+
+	The fix would be: 
+
+		1.1. Change the 'font-load' interface (add the optional 'weight' parameter); 
+		1.2. Change the check in loadFont for font-uniqueness: 
+
+			Currently, it only checks for the family; 
+			It also must for the value of 'weight';
+
+2. Loaded files disappear after reloading (find a way to keep them between re-loads);
+
+	Solution: use 'document.localStorage' - save the files' data in base64 format, 
+		concatenated with some Unicode symbol outside the range of symbols used for base64 strings;
