@@ -43,7 +43,7 @@ const [vh, vw] = ["Height", "Width"].map((x) =>
 )
 
 const outSingle = (text) => {
-	validate(text, (text) => parse(text).forEach(process))
+	validate(text, (text) => parse(text).forEach((x) => process(x, context)))
 }
 const outList = (list) => list.forEach(outSingle)
 const readFiles = async (files) =>

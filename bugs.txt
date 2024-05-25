@@ -14,3 +14,8 @@ KNOWN BUGS LIST [fixes to be implemented sometime later]:
 
 	Solution: use 'document.localStorage' - save the files' data in base64 format, 
 		concatenated with some Unicode symbol outside the range of symbols used for base64 strings;
+
+3. [Minor inconsistency] The parser's slightly too inacuratte in regard of when there is a NECESSITY in a "/ |\t/"; 
+
+	Fix that (add a "/( |\t)+/")...
+	Tailor all the parser's checks accordingly...;

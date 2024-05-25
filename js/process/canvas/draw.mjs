@@ -42,7 +42,7 @@ const drawMap = {
 		if (points.length) {
 			let lastElliptic = false
 
-			context.fillStyle = colour(canvasParams)(points, elliptics)
+			context.fillStyle = colour(canvasParams)(points, elliptics, arrows)
 			context.beginPath()
 			for (const key of Array.from(points.keys())) {
 				if (elliptics[key][0]) {

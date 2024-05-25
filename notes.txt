@@ -246,3 +246,7 @@
 
 		A boolean parameter determining whether the insides of corners are to be round (by default in both Canvas and SVG, they're not);
 		This (effectively), draw an 'inside-shadow' of the given thing with round corners; 
+	
+26. DARK THEME: 
+
+	The colours are IMPOSSIBLE to work with during nighttime/with-tired-eyes...; 

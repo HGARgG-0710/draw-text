@@ -156,20 +156,24 @@ textarea#code {
 .gappedol {
 	display: flex;
 	flex-direction: column;
-	gap: 0.55vh;
+	gap: 0.75vh;
 }
 
-.nogapli {
+.flexli {
 	display: flex;
 	flex-direction: column;
-	gap: 0;
 }
 
-.nogapli code {
+.description {
+	display: flex;
+	flex-direction: column;
+}
+
+.flexli code {
 	margin-bottom: -0.2vh;
 }
-.nogapli code:last-child {
-	margin-bottom: 0.05vh;
+.flexli code:last-child {
+	margin-bottom: 0.1vh;
 }
 
 label {
@@ -255,7 +259,7 @@ button#download-button {
 
 .description p {
 	margin-top: 1vh;
-	font-size: 15px;
+	font-size: 15.25px;
 	padding-left: 2vw;
 }
 

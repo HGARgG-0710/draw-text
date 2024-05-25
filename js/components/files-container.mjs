@@ -1,6 +1,6 @@
 import { append, appendpar, attribute, create, text } from "../lib/components.mjs"
 
-export class files_container extends HTMLElement {
+window.customElements.define("files-container", class extends HTMLElement {
 	constructor() {
 		super()
 	}
@@ -29,6 +29,4 @@ export class files_container extends HTMLElement {
 
 		appendpar(fileList)(create("ul"))
 	}
-}
-
-window.customElements.define("files-container", files_container)
+})

@@ -1,9 +1,9 @@
-import draw, { context as drawcontext } from "./draw.mjs"
+import draw from "./draw.mjs"
 import { parseSingle } from "../types.mjs"
 import { canvasParams } from "../state/params.mjs"
 import { vars, substitute } from "../state/vars.mjs"
 
-export default function canvasProcess(expression, context = drawcontext) {
+export default function canvasProcess(expression, context) {
 	const { command, argline } = expression
 	switch (command) {
 		case "set-param":
@@ -16,10 +16,13 @@ export default function canvasProcess(expression, context = drawcontext) {
 			)
 		default:
 			if (canvasParams.list().includes(command))
-				return canvasProcess({
-					command: "set-param",
-					argline: [command].concat(argline)
-				})
+				return canvasProcess(
+					{
+						command: "set-param",
+						argline: [command].concat(argline)
+					},
+					context
+				)
 			return draw(substitute(expression))
 	}
 }

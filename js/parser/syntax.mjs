@@ -21,7 +21,8 @@ export const validityMap = {
 	"base-color": "varcolor",
 	"fill-text": "fontarg",
 	"stroke-text": "fontarg",
-	"font-load": "duostring"
+	"font-load": "duostring",
+	"set-param": "paramarg"
 }
 
 // ^ IDEA: create a module for working with regexp tables [note: they could be used to construct the 'parser-type-recognition-tables' for parsers created by one of self's currently developed libraries...];
@@ -87,7 +88,10 @@ regexps.triple = and(
 regexps.vararg = occurences(1)(
 	and(
 		...r("spacebar", "varname", "space", "spacebar"),
-		or(regfun.variable("color", "decimal"), regexps.triple)
+		or(
+			regfun.variable("color", "decimal"),
+			...["triple", "string"].map((x) => regexps[x])
+		)
 	)
 )
 
@@ -147,6 +151,8 @@ regexps.fontarg = and(
 )
 
 regexps.duostring = and(regexps.varstring, reg.space, regexps.varstring)
+
+regexps.paramarg = and(reg.varname, reg.space, occurences(0, "")(regexps.vararg))
 
 // ^ IDEA: add a special category of commands - 'set'-commands; They'd be defined DIRECTLY by the 'params', and each have a given signature; This would free one from having to add them manually into the parser...;
 export const [connectionCommands, singleCommands, pairCommands, fontCommands] = [

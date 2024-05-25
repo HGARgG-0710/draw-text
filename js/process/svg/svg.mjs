@@ -108,7 +108,12 @@ const ASTmap = {
 								)
 							]),
 							transform: elPres
-								? [["rotation", [ad.rotationAngle, ...ad.center]]]
+								? [
+										{
+											transform: "rotation",
+											args: [ad.rotationAngle, ...ad.center]
+										}
+								  ]
 								: [],
 							fill: "none",
 							stroke,
@@ -160,7 +165,7 @@ const ASTmap = {
 						? [commandpair(["M", { point: xy(svgPoints[0]) }])]
 						: []
 				),
-				fill: colour(svgParams)(points, elliptics),
+				fill: colour(svgParams)(points, elliptics, arrows),
 				...frequentParams()
 			}
 		}

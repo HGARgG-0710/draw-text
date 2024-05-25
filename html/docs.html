@@ -4,13 +4,19 @@
 
 <head>
 	<title>Draw-Text! Docs</title>
+
+	<script src="./../js/components/flex-li.mjs" type="module"></script>
+	<script src="./../js/components/item-description.mjs" type="module"></script>
 	<script src="./../js/components/header.mjs" type="module"></script>
+
 	<link rel="stylesheet" href="./../css/main.css">
+
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link
 		href="https://fonts.googleapis.com/css2?family=Josefin+Sans:ital,wght@0,100..700;1,100..700&family=Madimi+One&family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap"
 		rel="stylesheet">
+
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 
@@ -25,11 +31,10 @@
 				</h2>
 
 				<p>
-					The language of the page contains the following elementary commands:
+					The mini-language of the page contains the following elementary commands:
 				</p>
 
 				<!-- ? Re-conceptualize 'clear' and 'erase' as commands on the level of documentation? [Call them 'aliases', define aliases separately, create a general structure, refactor the code? Pray think...] -->
-				<!-- TODO: add 'nogapli' to all the li-elements of 'ol'... -->
 				<ol>
 					<li>
 						<code>contour</code> - creates a contour from a set of points (connected or not, can be
@@ -47,20 +52,30 @@
 						<code>fill</code>)
 					</li>
 					<li>
-						<code>variable</code> - creates a variable to later reference in code (can be a colour, a number
-						or
-						another previously-defined variable)
+						<code>variable</code> - creates a variable to later reference in code (can be a colour, a
+						number, a point, a string or another previously-defined variable)
 					</li>
 					<li>
 						<code>set-param</code> - sets a value for a 'parameter', an specialized variable, which affects
-						the
-						way that the canvas and other commands behave. There is a number of avaliable parameters.
+						the way that the canvas and other commands behave. There is a number of avaliable parameters.
+					</li>
+					<li>
+						<code>stroke-text</code> - strokes an outline of a given piece of text using the chosen font
+						(has to be present on the system or loaded separately);
+					</li>
+					<li>
+						<code>fill-text</code> - fills the given piece of text using the chosen font.
+					</li>
+					<li>
+						<code>font-load</code> - loads a font file with the given name (font file itself has be provided
+						by the user). Loaded fonts can later be used by <code>stroke-text</code> or
+						<code>fill-text</code>.
 					</li>
 				</ol>
 
 				<p>
 					Commands are separated by newline symbols and are executed from top to bottom, points/arguments
-					being read from left to right.
+					being read from left to right. A command MUST be followed by at least one space/tab.
 					Additional tabs and spaces are ignored.
 				</p>
 
@@ -70,46 +85,60 @@
 				</p>
 
 				<p>
+					Available datatypes and their respective syntaxes:
+				</p>
+
+				<ol>
+					<li>Numbers: a decimal integer greater than or equal to 0</li>
+					<li>String: A sequence of symbols surrounded by <code>"</code>. Example: <code>"SOMETHING"</code>
+					</li>
+					<li>Colour: A HEX-given colour value. Example: <code>#ccca00</code></li>
+					<li>Point: A two-tuple of numbers <code>(x, y)</code> or a three-tuple of two numbers and a colour.
+						<code>(x, y, c)</code>
+					</li>
+				</ol>
+
+				<p>
 					Precise signature looks something like the following:
 				</p>
 
 				<ol class="gappedol">
 					<li>
-						<div class="nogapli">
-							<div class="description">
+						<flex-li>
+							<item-description>
 								<code>contour (x1, y1)...(xn, yn)</code>
 								<p>Where <code>(x1, y1), ..., (xn, yn)</code> are point coordinates.
 									This will draw the contour with all points unconnected.</p>
-							</div>
+							</item-description>
 
-							<div class="description">
+							<item-description>
 								<code>contour (x1, y1)->...->(xn, yn)-></code>
 								<p>
 									To connect them with a straight line, you can add a <code>-></code> between the
 									points.
 								</p>
-							</div>
-							<div class="description">
+							</item-description>
+							<item-description>
 								<code>contour (x1, y1, c1)...(xn, yn, cn)</code>
 								<p>
 									To make the points coloured, add a third argument (here, the
-									<code>c1, ..., cn</code>).
+									<code>c1, ..., cn</code>) - a colour.
 								</p>
-							</div>
+							</item-description>
 
-							<div class="description">
+							<item-description>
 								<code>contour (x1, y1, c1)->(cc1)...->(ccn-1)(xn, yn, cn)->(ccn)-></code>
 								<p>
 									To add colour to the straight-line connections between points, add colour to them as
 									the first argument.
 								</p>
 								<p class="notice">
-									The ellipses (currently) have very questionable support for SVG - no rotation
-									available yet, also - insufficient testing.
+									The ellipses (currently) have very questionable support for SVG - insufficient
+									testing.
 								</p>
-							</div>
+							</item-description>
 
-							<div class="description">
+							<item-description>
 								<code>contour (x1, y1)-(alpha1, c1, sa1, ea1)...-(alphan, cn, san, ean)(xn, yn)-(alphan, cn, san, ean)</code>
 								<p>
 									To add an elliptic connection of colour given by <code>c1, ..., cn</code>
@@ -127,20 +156,20 @@
 									but instead it is determined via the angles (<code>sa1, ..., san</code> and
 									<code>ea1, ..., ean</code>)
 								</p>
-							</div>
-						</div>
+							</item-description>
+						</flex-li>
 					</li>
 					<li>
-						<div class="nogapli">
-							<div class="description">
+						<flex-li>
+							<item-description>
 								<code>fill (x1, y1)...(xn, yn)</code>
 								<p>
 									To add a straight line to the path that will be used for filling, put one shape
 									close to
 									the next.
 								</p>
-							</div>
-							<div class="description">
+							</item-description>
+							<item-description>
 								<code>fill (x1, y1, c1)...(xn, yn, cn)</code>
 								<p>
 									Colours for filling can be given as well (third argument). However, only the first
@@ -149,43 +178,43 @@
 									colouring is monotonic. (For multiple colours, apply several <code>fill</code>s one
 									after the other for appropriate shapes and colours)
 								</p>
-							</div>
-							<div class="description">
+							</item-description>
+							<item-description>
 								<code>fill (x1, y1)-(alpha1, c1, sa1, ea1)...-(alphan, cn, san, ean)(xn, yn)</code>
 								<p>
 									Same as with <code>contour</code> - create an elliptic connection on the path that
 									is to
 									be filled.
 								</p>
-							</div>
-						</div>
+							</item-description>
+						</flex-li>
 					</li>
 					<li>
-						<div class="nogapli">
-							<div class="description">
+						<flex-li>
+							<item-description>
 								<code>clear (x1, y1)...(xn, yn)</code>
 								<p>
 									The signatures are <em>exactly</em> the same as in <code>contour</code>. The only
 									difference between the two commands is that <code>clear</code> uses the background
 									colour (and so, the user's colour input is ignored), while contour does not.
 								</p>
-							</div>
-						</div>
+							</item-description>
+						</flex-li>
 					</li>
 					<li>
-						<div class="nogapli">
-							<div class="description">
+						<flex-li>
+							<item-description>
 								<code>erase (x1, y1)...(xn, yn)</code>
 								<p>
 									Same to <code>fill</code> as what <code>clear</code> is to <code>contour</code>.
 									Signatures match exactly.
 								</p>
-							</div>
-						</div>
+							</item-description>
+						</flex-li>
 					</li>
 					<li>
-						<div class="nogapli">
-							<div class="description">
+						<flex-li>
+							<item-description>
 								<code>variable varname varvalue</code>
 								<p>
 									Creates a new variable. Variables are all user-defined and are used by their name.
@@ -202,15 +231,15 @@
 									its new value.
 									Both arguments are mandatory.
 								</p>
-							</div>
-						</div>
+							</item-description>
+						</flex-li>
 					</li>
 					<li>
-						<div class="nogapli">
-							<div class="description">
+						<flex-li>
+							<item-description>
 								<code>
-								set-param param-name paramarg1 ...							
-							</code>
+									set-param param-name paramarg1 ...							
+								</code>
 								<p>
 									Here, <code>param-name</code> is the name of the parameter being set.
 								</p>
@@ -226,37 +255,37 @@
 
 								<ol>
 									<li>
-										<div class="description">
+										<item-description>
 											<code>background c</code>
 											<p>
 												Changes background colour to the value of mandatory argument
 												<code>c</code>
 												(a colour).
 											</p>
-										</div>
+										</item-description>
 									</li>
 									<li>
-										<div class="description">
+										<item-description>
 											<code>point-size n</code>
 											<p>
 												Changes size of points to the value of mandatory paramater
 												<code>n</code>
 												(a number)
 											</p>
-										</div>
+										</item-description>
 									</li>
 									<li>
-										<div class="description">
+										<item-description>
 											<code>line-width n</code>
 											<p>
 												Changes the value of lines' width to the value of mandatory argument
 												<code>n</code>
 												(a number).
 											</p>
-										</div>
+										</item-description>
 									</li>
 									<li>
-										<div class="description">
+										<item-description>
 											<code>line-cap v</code>
 											<p>Changes the "cap" of lines in contours. Possible values of
 												<code>v</code>:
@@ -267,10 +296,10 @@
 												<li><code>s</code> - square cap at lines' ends (prolongs them slightly)
 												</li>
 											</ol>
-										</div>
+										</item-description>
 									</li>
 									<li>
-										<div class="description">
+										<item-description>
 											<code>draw-points v</code>
 											<p>
 												Affects whether or not should the points of contours be drawn. Possible
@@ -280,10 +309,10 @@
 												<li><code>false</code> (default) - do not draw the points</li>
 												<li><code>true</code> - draw the points</li>
 											</ol>
-										</div>
+										</item-description>
 									</li>
 									<li>
-										<div class="description">
+										<item-description>
 											<code>point-shape v</code>
 											<p>
 												Set the shapes that should be drawn instead of points. Possible values
@@ -303,20 +332,20 @@
 													radius is given by <code>point-size</code>
 												</li>
 											</ol>
-										</div>
+										</item-description>
 									</li>
 									<li>
-										<div class="description">
+										<item-description>
 											<code>base-color c</code>
 											<p>
 												Changes the colour which is used as the default (in absence of it).
 												By default, the <code>code-color</code> is black.
 												The only parameter <code>c</code> - the new colour - is mandatory.
 											</p>
-										</div>
+										</item-description>
 									</li>
 									<li>
-										<div class="description">
+										<item-description>
 											<code>line-join v</code>
 											<p>
 												An SVG-export-only parameter that is (image-wise) an exact equivalent of
@@ -347,21 +376,63 @@
 													<code>b</code> - triangular connections
 												</li>
 											</ol>
-										</div>
+										</item-description>
 									</li>
 									<li>
-										<div class="description">
+										<item-description>
 											<code>miter-limit n</code>
 											<p>
 												SVG-only.
 												Affects the effect of choice of <code>set-param line-join m</code>.
 												The only mandatory argument <code>n</code> is a number.
 											</p>
-										</div>
+										</item-description>
 									</li>
 								</ol>
-							</div>
-						</div>
+							</item-description>
+						</flex-li>
+					</li>
+					<li>
+						<flex-li>
+							<item-description>
+								<code>stroke-text text font-name start-point</code>
+								<p>
+									There are two mandatory parameters - <code>text</code> (a string, the text to be
+									stroked) and
+									<code>font-name</code> (a string, the name of the font to be used), as well as one
+									optional parameter
+									<code>start-point</code> which defaults to <code>(0, 0)</code>.
+								</p>
+								<p>
+									Note: the <code>font-name</code> is actually a CSS font string, and so can be left
+									empty,
+									or used for specifying the size of the font, as well as its defaulting system font.
+									For usage, see examples.
+								</p>
+							</item-description>
+						</flex-li>
+					</li>
+					<li>
+						<flex-li>
+							<item-description>
+								<code>fill-text text font-name start-point</code>
+								<p>The signature is the same as that of <code>stroke-text</code>.</p>
+							</item-description>
+						</flex-li>
+					</li>
+					<li>
+						<flex-li>
+							<item-description>
+								<code>font-load font-name font-url</code>
+								<p>
+									Has two mandatory arguments <code>font-name</code> (a string, the new name under
+									which the font should be saved after loading),
+									and <code>font-url</code> (a string, the name of the font-file passed to the page to
+									be used as the source for the font).
+								</p>
+								<p>Note: when using SVG, the font-files will be saved together with the final image.</p>
+							</item-description>
+						</flex-li>
 					</li>
 				</ol>
 
@@ -400,13 +471,14 @@
 				<h2>Files-loading</h2>
 
 				<p>
+					The successful usage of <code>font-load</code> will require the user to first provide the font files
+					via the appropriate file-list.
+				</p>
+
+				<p>
 					Besides the 'Input' field, it's also possible to prepend or append the input code to be run by
 					'draw-text' via files (which is useful for modularizing a given image's code).
 					The files' lists can be cleared entirely, or renewed.
-				</p>
-				<p class="notice">
-					Currently, the SVG output does not support loading multiple files
-					(will be fixed in the future).
 				</p>
 			</div>
 		</div>

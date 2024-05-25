@@ -1,6 +1,6 @@
 // * general refactoring file;
 
-import { svgParams } from "../process/state/params.mjs"
+import draw from "../process/canvas/draw.mjs"
 
 export const setallbackground = (i) => (background) => (x) => {
 	x[i] = background
@@ -27,8 +27,8 @@ export const currpair = (points, i) => [0, 1].map((k) => points[(i + k) % points
 
 export const Primitive = (points, connections) => ({ points, connections })
 
-export const colour = (params) => (points, elliptics) =>
+export const colour = (params) => (points, elliptics, arrows) =>
 	points
-		.map((x, i) => (x[2] ? x[2] : elliptics[i][2]))
+		.map((x, i) => (x[2] ? x[2] : arrows[i][1] ? arrows[i][1] : elliptics[i][2]))
 		.reduce((acc, curr) => (acc ? acc : curr ? curr : null), null) ||
 	params.get("base-color")

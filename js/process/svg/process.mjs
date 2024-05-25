@@ -11,8 +11,6 @@ export function svgProcess(expression) {
 		const [name, value] = argline
 		if (isParam)
 			return svgProcess({ command: "set-param", argline: [command, ...argline] })
-		console.log("HELLOOOOO???")
-		console.log(argline[0])
 		return (command === "set-param" ? svgParams.set : vars.set.bind(vars))(
 			name,
 			parseSingle(value)
