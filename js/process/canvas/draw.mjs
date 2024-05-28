@@ -26,7 +26,6 @@ const drawMap = {
 					context.moveTo(...points[key])
 					line(points, key)
 				} else if (elliptics[key][0]) ellipse(points, elliptics, key)
-
 				context.stroke()
 			}
 			// * drawing the points;
@@ -71,28 +70,24 @@ const drawMap = {
 			return drawReplaceBackground("fill")(background)(points, arrows, elliptics)
 	},
 	"stroke-text": function (argline) {
-		document.fonts.ready.then(() => {
-			const [text, font, point] = argline
-			const lastColour = context.strokeStyle
-			context.strokeStyle = (point && point[2]) || canvasParams.get("base-color")
-			// ! defaults ['default-font', same as 'fill-text'];
-			context.font = font
-			// ? create a 'default-point' parameter (one that is used when the required 'point' parameter is ommited?); A default of the parameter is [0, 0];
-			context.strokeText(text, ...(point || [0, 0]).slice(0, 2))
-			context.strokeStyle = lastColour
-		})
+		const [text, font, point] = argline
+		const lastColour = context.strokeStyle
+		context.strokeStyle = (point && point[2]) || canvasParams.get("base-color")
+		// ! defaults ['default-font', same as 'fill-text'];
+		context.font = font
+		// ? create a 'default-point' parameter (one that is used when the required 'point' parameter is ommited?); A default of the parameter is [0, 0];
+		context.strokeText(text, ...(point || [0, 0]).slice(0, 2))
+		context.strokeStyle = lastColour
 	},
 	"fill-text": function (argline) {
-		document.fonts.ready.then(() => {
-			const [text, font, point] = argline
-			const lastColour = context.strokeStyle
-			context.fillStyle = (point && point[2]) || canvasParams.get("base-color")
-			// todo: add the defaults [as a parameter];
-			context.font = font
-			// ? create a 'default-point' parameter (one that is used when the required 'point' parameter is ommited?); A default of the parameter is [0, 0];
-			context.fillText(text, ...(point || [0, 0]).slice(0, 2))
-			context.fillStyle = lastColour
-		})
+		const [text, font, point] = argline
+		const lastColour = context.strokeStyle
+		context.fillStyle = (point && point[2]) || canvasParams.get("base-color")
+		// todo: add the defaults [as a parameter];
+		context.font = font
+		// ? create a 'default-point' parameter (one that is used when the required 'point' parameter is ommited?); A default of the parameter is [0, 0];
+		context.fillText(text, ...(point || [0, 0]).slice(0, 2))
+		context.fillStyle = lastColour
 	},
 	"font-load": async function (argline) {
 		const [fontName, fontUrl] = argline
@@ -132,10 +127,10 @@ export function drawPoint(x, y) {
 	}
 }
 
-export default function draw(primitive) {
+export default async function draw(primitive) {
 	if (primitive) {
 		const { command, argline } = primitive
-		drawMap[command](argline)
+		await drawMap[command](argline)
 	}
 }
 export function clear() {

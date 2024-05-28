@@ -75,8 +75,8 @@ export function validateNumber(string) {
 	return regexps.decimal.test(string)
 }
 
-export function validate(text, callback, validityCheck = isValid) {
-	if (validityCheck(text)) return callback(text)
+export async function validate(text, callback, validityCheck = isValid) {
+	if (validityCheck(text)) return await callback(text)
 }
 
 // ! later, refactor using 'math-expressions.js';

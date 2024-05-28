@@ -250,3 +250,5 @@
 26. DARK THEME: 
 
 	The colours are IMPOSSIBLE to work with during nighttime/with-tired-eyes...; 
+
+27. Ensure cross-browser compatibility!

@@ -110,7 +110,7 @@ const ASTmap = {
 							transform: elPres
 								? [
 										{
-											transform: "rotation",
+											transform: "rotate",
 											args: [ad.rotationAngle, ...ad.center]
 										}
 								  ]

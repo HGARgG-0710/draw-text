@@ -32,3 +32,5 @@ export const colour = (params) => (points, elliptics, arrows) =>
 		.map((x, i) => (x[2] ? x[2] : arrows[i][1] ? arrows[i][1] : elliptics[i][2]))
 		.reduce((acc, curr) => (acc ? acc : curr ? curr : null), null) ||
 	params.get("base-color")
+
+export const capitalize = (x) => `${x[0].toUpperCase()}${x.slice(1).toLowerCase()}`

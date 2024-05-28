@@ -3,7 +3,7 @@ import { parseSingle } from "../types.mjs"
 import { canvasParams } from "../state/params.mjs"
 import { vars, substitute } from "../state/vars.mjs"
 
-export default function canvasProcess(expression, context) {
+export default async function canvasProcess(expression, context) {
 	const { command, argline } = expression
 	switch (command) {
 		case "set-param":
@@ -23,6 +23,6 @@ export default function canvasProcess(expression, context) {
 					},
 					context
 				)
-			return draw(substitute(expression))
+			return await draw(substitute(expression))
 	}
 }

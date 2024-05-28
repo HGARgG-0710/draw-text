@@ -4,18 +4,23 @@ KNOWN BUGS LIST [fixes to be implemented sometime later]:
 
 	The fix would be: 
 
-		1.1. Change the 'font-load' interface (add the optional 'weight' parameter); 
+		1.1. Change the 'font-load' command interface (add the optional 'weight' parameter); 
 		1.2. Change the check in loadFont for font-uniqueness: 
 
 			Currently, it only checks for the family; 
 			It also must for the value of 'weight';
 
-2. Loaded files disappear after reloading (find a way to keep them between re-loads);
-
-	Solution: use 'document.localStorage' - save the files' data in base64 format, 
-		concatenated with some Unicode symbol outside the range of symbols used for base64 strings;
-
-3. [Minor inconsistency] The parser's slightly too inacuratte in regard of when there is a NECESSITY in a "/ |\t/"; 
+2. [Minor inconsistency] The parser's slightly too inacuratte in regard of when there is a NECESSITY in a "/ |\t/"; 
 
 	Fix that (add a "/( |\t)+/")...
 	Tailor all the parser's checks accordingly...;
+
+3. svg-values.mjs: arcNextPoint - wrong values [SVG Ellipses again];
+
+	The subtraction-term of 'arcNextPoint' must be one of: 
+
+		1. 1
+		2. 10^(-4)
+
+	Depending on the index (i in {0, 1}) and (possibly) other things, like, for instance, rotation angle, radius and so forth...
+	Find out exactly, until then - Ellipses are at least (mildly) dysfunctional...; 
