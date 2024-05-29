@@ -1,0 +1,6 @@
+font-load "Marically" "Marically Trial.otf"
+variable letterColour #6a6ee6
+line-width 4
+stroke-text "E" "215px Marically" (80, 250, letterColour)
+line-width 15
+contour (150, 20)-(45, letterColour)(20, 150)
