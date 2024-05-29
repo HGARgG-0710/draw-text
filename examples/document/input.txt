@@ -1,0 +1,9 @@
+base-color #ffdd04
+line-width 5
+line-cap r
+contour (50, 20)->(250, 20)->(250, 280)->(50, 280)->
+contour (75, 80)->(225, 80)
+contour (75, 114)->(225, 114)
+contour (75, 148)->(225, 148)
+contour (75, 182)->(225, 182)
+contour (75, 216)->(225, 216)
