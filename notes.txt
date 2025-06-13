@@ -1,3 +1,15 @@
+0. TODO: re-do the project... [the JavaScript only, all else is more-or-less fine]
+	1. Use TypeScript this time
+		Employ Java-like code, classes more actively. 
+		Better for maintainability. 
+	2. Use `parsers.js` for the draw-text's grammar [parser + validator]
+	3. Refactor this thing (mightily)
+	4. Add a proper architecture (or a something close to it, anyway...)
+	5. Fix the bloody SVG alrady [lib - svg.js] + the ellipses
+	6. Ensure cross-browser compatibility
+	7. Complete all the (remaining) TODOs in here
+	8. 
+
 1. IDEA: create means to program curves ... (?using functions/Infinite series? some recursive name-giving mini-language?); 
 	Consider how to factor them into the syntax...;
 
@@ -32,38 +44,7 @@
 				'T(a,b,c,d,e,f)(x, y)'
 			Value - new point. 
 
-		Whole separate, under question: 
-		14. Animations? [more complex, doing will require finding a finite set of elementary operations equivalent in power to multi-layer structures such as 'for-loops' in the sense of determining the algorithms...];
-
-			IDEA: add eleven instructions: 
-
-				1. computation {...} - a computation cycle - it [effectively] causes a re-computation of variables on each render (there is a special 'time' variable which tracks the current render frame); NOTE: the screen is updated, then flushed every frame;
-				2. start - for starting the computation
-				3. stop - for stopping the computation
-				4. do-when condition {...} - executes the block, when given condition is true (NOTE: this is asynchronous - that is, it tracks the state of the program and does something when a thing reaches it...);
-				5. jump-if condition label - if given condition is true, then jumps to the label (or line, if it's a number and no such label already) in question;
-				6. label labelname - creates a new label on a given line; 
-				7. do-if condition {...} - synchronous version of 'do-when'; condition checked only once
-				8. jump-when condition label - asynchronous version of 'jump-if', same as 'do-when' is for 'do-if';
-				9. loop {...} - defines an infinite loop; 
-				10. break - breaks out of current loop
-				11. do-every condition {...} - every step of a loop [any loop] checks for the given condition, and if true - does what is inside of a block...; 
-			
-			Idea: add capabilities of a small web-game engine? 
-				Can create a game with canvas, then - download as an iframe element that can be included onto a webpage (+styles for it...);
-				NOTE: this will require: 
-
-					1. draw-text code to JavaScript compilation; 
-					2. new [more sophisticated] editor - particularly, FOR SCREEN/WINDOW SIZES (dynamic ones, too)!
-					3. [not essential, but good to have] Ability to compile the game with desired paths for images and so forth. 
-					4. [KEY!] The user input capabilities; 
-			
-			Idea: for data-storage, one can use the client + JSON: 
-
-				1. json{...} - an expression, result of which is a JSON-string of whatever is passed to 'json'
-				2. from-json filepath - reads a filepath 
-			
-		15. clear - good for animation, resets the Canvas...; 
+		14. clear - good for animation, resets the Canvas...; 
 
 2. IDEA: add an .svg of some draw-text example to the README...;
 3. IDEA: add more details to the page's HTML and CSS; 
@@ -72,97 +53,43 @@
 	For them - choose different proportions. 
 	The values of phones are FARRR too different. 
 	They are not height-oriented, but rather width-oriented...; 
-5. IDEA: add 'comment's into the project's language's vocabulary...; 
+
+5. add 'comment's into the project's language's vocabulary...; 
 	Useful for designation of particular elements of images, in the cases of certain complexity. 
-6. IDEA [visual design]: add a generation of random pattern to the sides of the page (current space-rect); 
-	Think whether the pattern would be recurring, or it would create new colours each time user would 
-		change the canvas size (thus increasing the page size...); 
-	Also - consider how they'd be generated (that is, how would the colour pattern be chosen...
-		What vector-function of n>=2 colour components - RGB/other - to pick/construct?)
-	
-	NOTE UPDATE: now, it comes down to changing the background - the task became more chanllenging, but also far more fun! 
-	Think about it...; 
 
-7. A website Favicon - add it; 
-
+6. The website's Favicon - add it; 
 	Think of something pretty. Draw it with 'draw-text'; 
 	Then, use as a favicon (an .svg...); 
 
-8. Arithmetic! 
+	Idea: a [slightly "edgy"] brush with paint on its end on top of a palette [drawn with `-` - as a curve]; 
 
+7. Arithmetic! 
 	Add arithmetic for those expressions (simple addition, multiplication, division, subtraction and modulo ought to do it by now...); 
-	Add simple case static/strong typezation typezation 
-		(or, more precisely, add another layer of correctness-checking - now the program would also have to be sound from type-standpoint of view, 
-			besides only just adequate parsibility); 
-	Also - when implementing, add the rationals (at least the finite ones) and additive inverses support (in particular - for angles). 
+	Includes: 
+		0. (proper) braces, order-of-operations/BOMDAS
+		1. floats
+		2. "strong" operations - numbers can't be added to colours, etc
+		3. booleans (boolean arithmetic/operators) and trigonometric functions (sin, cos, tan): 
+			Specifically - it (should) be possible to read a given 'param' as a boolean value, then 
+				employ it as a part of a `boolean arithmetic` expression. Then - that can be converted 
+					(implicitly) to 1/0 during the cours of a FURTHER arithmetic parent-expression. 
 
-	Also - the booleans and trigonometric functions (sin, cos, tan); 
-
-9. Add arguments; 
-
+8. Add script arguments
 	Syntax: [! or % or $ or @]n, where 'n' is the number of the argument...; 'n' can be an expression (so is, for instance, calculated); 
-
 	[useful with images, paths and filereading];
-
-10. Add filereading: 
-
-	For text files only (getting stroke-Text strings, colours, numbers and points); 
-
-11. Add a simple 'compiler' program for draw-this code: 
-
-	Would, in truth, simply substitute the argument-variables for static values, provided by the user; 
-	Eliminates the need for further user input;
-
-	Also - eliminates inner calls from other files 
-		(if they are available - puts the code inside with appropriate name collisions in vars fixed (when required), otherwise - a compiler error); 
 	
-12. Add file-running commands: 
+9. Add file-running commands: 
 
-	Two directives: 
+	Three directives: 
 
-		1. run filepath [...arguments] - runs a given file within the context of the present canvas (without merging variable spaces); 
-		2. paste filepath [...arguments] - pastes the code of the given file into the present one (note: IT DOES NOT HAVE TO BE CORRECT AS OF SELF, variables can be undefined, for instance);
+		0. load-file "FileLabel" "filepath" - loads a file to be known under the "FileLabel" label 
+		1. run "FileLabel" [...arguments] - runs a given file within the context of the present canvas (without merging variable spaces); 
+		2. paste "FileLabel" [...arguments] - pastes the code of the given file into the present one (note: IT DOES NOT HAVE TO BE CORRECT AS OF SELF, variables can be undefined, for instance);
 
-13. Add a way to access the command-properties (such as 'radius'): 
-
+10. Add a way to access the command-properties (such as 'radius'): 
 	For instance, add a special symbol (like % or $, or @, or !) to get their values [those will be ignored by the 'validate' function]; 
-
-14. Add more complex data structures: 
-
-	For instance - arrays: 
-
-		1. array x [...] - expression for defining an array
-		2. x[...] - indexation
-		3. array x ind1 val1, ind2 val2, ... - set a value for an array's index (can be repeated)
-		4. array x ind - delete index 'ind' from array (performs backwards shift of all the latter values);
-		5. enumeration x start next-ind {...} - enumerates all the items in the array, where 'start' is the initial index and 'next-ind' is the gap value for each next index to enumerate (an expression, evaluated at every turn);
-			This is particularly powerul and useful, because in a single stroke it elegantly generalizes: 
-
-				1. classical for-loops (just use '1');
-				2. every 'nth' item of the array (use 'n');
-				3. other, more complex cases;
 	
-		6?. Some functions for arrays (like, 'slice' or 'map'? Would make development far easier, however, would increase the number of operators...):
-		7?. Make the triple 'point' (x, y, c) just a case of 'array' (add alternative syntax - '(x1, ..., xn)'); 
-	
-15. Idea [possibly, not good]: functions!
-
-	They would be evaluated as a set of compilation-structures, 
-		namely - for them there'd exist a separate process for putting those out as a script in an alternative file (so as to replace 'function's with 'run's);
-	This'd be a special 'de-function' code operation (for it, too, a script would be written...); 
-	There'd also exist an alternative implementation that uses JS functions: 
-
-		function name {
-			...
-		}
-	
-	The i'th argument of n-level function is accessed via "$[repeat n]$i", whereas "$i" is used for script argument [0-level function];
-
-16. Add code highlighting for the on-the-website editor? 
-
-	Keywords-colouring, at least, and underline matching brackets when near them...;
-
-17. Extend the module for svg support!
+11. Extend the module for svg support!
 
 	The 'js/svg.mjs' is a module needed to ensure the svg support on the website; 
 
@@ -171,22 +98,7 @@
 		one is going to write a library of one's own 
 			(first as a submodule of Draw-Text, then - as a separate thing...)
 		
-18. IDEA: separate the website code and the code of the PL: 	
-
-	Create a separate repo of DTPL (draw-text programming language), 
-	specifically for everything related to the language; 
-
-	Then, keep the website ONLY as the usage of all that functionality + components...; 
-
-	Note: code structure is starting to get too messy and unwieldy. 
-
-19. IDEA [possibly, a bad one]: Add 3d! 
-
-	After having completed the game engine, animation and all the other functionalities, 
-		add the third dimension.
-	[?webgl for this cause, mayhaps?]
-
-20. IDEA [SVG-extension]: 
+12. IDEA [SVG-extension]: 
 
 	Previously (in 1.), features from Canvas were decided to be added to the website as wrappers (namely, the extension of the power of draw-text); 
 	Now, as one started implementing the SVG compatibility of the format, it is time to consider doing the same with it; 
@@ -196,59 +108,18 @@
 
 		1. <textPath>
 	
-21. THE MINIMUM SIZE OF POINTS IS SLIGHTLY LIMITED... 
-
+13. THE MINIMUM GRANULARITY OF POINTS IS SLIGHTLY LIMITED... 
 	Just another reminder - due to the fact that there are no floats in the typesystem (yet), 
 	there's a VERY large number of beautiful ellipse-sizes not available (in the angle argument); 
 	
 	That is particularly visible when ellipses are large enough - those sub-degrees could make a very real (and, ofttimes, essential) difference. 
 	The floats have just grown in importance...; 
 
-22. IDEA: add functionalities (for 2d): 
-
-	1. WebGL; 
-	2. WebGPU; 
-
-	Similarly, for 3D;
-
-	This will permit the more "serious" implementation of a mini-web-game-engine idea
-		(for it to become 'not so mini' anymore...); 
-	
-	IDEA: also - create not only the API layers for them, but ways for representation AS WELL! 
-
-		So, say, there'd be a separate screens for: 
-
-			1. SVG (animation, scripts AND images); 
-			2. WebGL; 
-			3. WebGPU; 
-			4. Canvas (already present); 
-
-		Would look (CSS) the same, but behave in accordance with given APIs; 
-		All can be exported as desired; 
-		[SVG is perfect, because it's ALREADY a format that is scriptable...]; 
-	
-23. IDEA: Create a JS module for custom carets (surprisingly, browser's CSS implementations doesn't seem to support it yet); Use it in Draw-Text?
-	Can be done via a combination of: 
-
-		1. styling (changing a particular element); 
-		2. dom/text manipulation; 
-		3. handling of keyboard input; 
-	
-	Only (possible) problem is the performance. Consider that before using. 
-
-24. IDEA: create a browser-Vim module and use in Draw-text; 
-
-	Same as with 23 - dom-manipulation performance is the only potential difficulty.
-
-25. FEATURE TO ADD: 
+14. FEATURE TO ADD: 
 
 	param inside-round [true/false]: 
 
 		A boolean parameter determining whether the insides of corners are to be round (by default in both Canvas and SVG, they're not);
 		This (effectively), draw an 'inside-shadow' of the given thing with round corners; 
 	
-26. DARK THEME: 
-
-	The colours are IMPOSSIBLE to work with during nighttime/with-tired-eyes...; 
-
-27. Ensure cross-browser compatibility!
+15. Ensure cross-browser compatibility!
