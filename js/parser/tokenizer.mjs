@@ -79,7 +79,6 @@ export const parserTable = {
 	}
 }
 
-// ! refactor into 'math-expressions.j'
 function DeObject(object) {
 	return Object.keys(object).map((k) => [k, object[k]])
 }
@@ -123,11 +122,6 @@ export function Tokenizer(patterns) {
 	}
 }
 
-// ^ IDEA: create a general 'Well-formed-ness' function (like with the Parser) - Effectively, it checks for whether a given string:
-// * 	1. Contains only the allowed tokens;
-// * 	2. Has them going in the correct order (for that - create functions 'forbidAfter', 'forbidBefore');
-// returns a boolean;
-// ^ Another good general addition to the parsing library;
 export function Parser(table) {
 	const thisF = function (tokens, iStart = 0, iEnd = tokens.length) {
 		let final = []

@@ -1,6 +1,6 @@
 import { Primitive } from "../lib/lib.mjs"
 import { regexps, validityMap, commandList, connectionCommands } from "./syntax.mjs"
-import { Parser, parserTable, Tokenizer, tokens, DeSymbol } from "./tokenizer.mjs"
+import { Parser, parserTable, Tokenizer, tokens } from "./tokenizer.mjs"
 
 // TODO: later, generalize the 'parseTable' to not have 'parseLine', instead donig everything in 'parse' - when adding the 'function' expressions;
 function parseLine(line) {

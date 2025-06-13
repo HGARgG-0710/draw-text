@@ -19,8 +19,10 @@ export function decodeBuffer(encoded) {
 }
 
 export function addFile(dataTransfer) {
-	return (url, buffer) =>
-		(dataTransfer.dat = dataTransfer.data.items.add(new File([buffer], url)))
+	return (url, buffer) => {
+		dataTransfer.data.items.add(new File([buffer], url))
+		return dataTransfer.data
+	}
 }
 export function getFiles(dataTransfer) {
 	return async (inputFile) => (inputFile.files = dataTransfer.data.files)
